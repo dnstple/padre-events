@@ -8,6 +8,8 @@
 import { createSign } from "node:crypto";
 import { readFileSync } from "node:fs";
 
+import { PrivateKeyFormatError, normalisePrivateKey } from "../../lib/private-key.mjs";
+
 /** Loads .env.local into process.env without a dependency. Real env wins. */
 export function loadEnvLocal(path = ".env.local") {
   try {
@@ -28,7 +30,7 @@ export function config() {
   return {
     sheetId: process.env.GOOGLE_SHEET_ID,
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    rawKey: process.env.GOOGLE_PRIVATE_KEY,
     tab: process.env.GOOGLE_SHEET_TAB ?? "RSVPs",
     tokenUrl: process.env.GOOGLE_TOKEN_URL ?? "https://oauth2.googleapis.com/token",
     api: process.env.GOOGLE_SHEETS_API_URL ?? "https://sheets.googleapis.com/v4/spreadsheets",
@@ -40,7 +42,7 @@ export function requireConfig(c) {
   const missing = [];
   if (!c.sheetId) missing.push("GOOGLE_SHEET_ID");
   if (!c.email) missing.push("GOOGLE_SERVICE_ACCOUNT_EMAIL");
-  if (!c.key) missing.push("GOOGLE_PRIVATE_KEY");
+  if (!c.rawKey) missing.push("GOOGLE_PRIVATE_KEY");
   if (missing.length) {
     console.error(`Missing ${missing.join(", ")}.`);
     console.error("Copy .env.example to .env.local and fill in the Google values.");
@@ -65,12 +67,23 @@ export async function getAccessToken(c) {
     }),
   );
 
+  let key;
+  try {
+    key = normalisePrivateKey(c.rawKey);
+  } catch (error) {
+    if (error instanceof PrivateKeyFormatError) {
+      console.error(`\n${error.message}`);
+      process.exit(1);
+    }
+    throw error;
+  }
+
   let sig;
   try {
-    sig = b64(createSign("RSA-SHA256").update(`${header}.${claims}`).sign(c.key));
+    sig = b64(createSign("RSA-SHA256").update(`${header}.${claims}`).sign(key));
   } catch {
-    console.error("GOOGLE_PRIVATE_KEY is not a valid private key.");
-    console.error('Paste the whole private_key value in double quotes, \\n escapes intact.');
+    console.error("\nGOOGLE_PRIVATE_KEY is a well-formed PEM but cannot sign.");
+    console.error("Generate a new key: service account -> Keys -> Add key -> JSON.");
     process.exit(1);
   }
 

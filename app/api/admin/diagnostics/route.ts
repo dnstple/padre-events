@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { eventConfig } from "@/config/event";
 import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
+import { PrivateKeyFormatError, normalisePrivateKey } from "@/lib/private-key.mjs";
 import { describeSheet, isSheetsConfigured, readRsvps } from "@/lib/sheets";
 
 export const runtime = "nodejs";
@@ -53,6 +54,24 @@ export async function GET() {
       },
       { status: 503, headers: privateHeaders },
     );
+  }
+
+  // Check the key can be read before blaming Google for anything.
+  try {
+    normalisePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
+  } catch (error) {
+    if (error instanceof PrivateKeyFormatError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          problem: "private-key",
+          message: error.message,
+          hint: "Fix GOOGLE_PRIVATE_KEY in Vercel, then redeploy. Do not include surrounding quotes.",
+        },
+        { status: 503, headers: privateHeaders },
+      );
+    }
+    throw error;
   }
 
   try {

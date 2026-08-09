@@ -630,9 +630,16 @@ not been shared with the service account. Open the spreadsheet → Share → add
 the `...iam.gserviceaccount.com` address as **Editor**. This is the single most
 common setup mistake.
 
-**Logs show `Google token request failed (400)`.** The private key is malformed.
-It must be the full value including the BEGIN/END lines, on one line, with `\n`
-as two literal characters, wrapped in double quotes.
+**`error:1E08010C:DECODER routines::unsupported`.** OpenSSL could not parse
+`GOOGLE_PRIVATE_KEY`. The app now repairs the usual manglings itself — quotes
+that came along for the ride, `\n` escapes, Windows line endings, lost
+newlines, even the whole JSON file pasted into the box — so if you still see
+this, the value is genuinely damaged rather than merely untidy.
+`/api/admin/diagnostics` says which.
+
+One rule that has not changed: **in the Vercel dashboard, do not wrap the value
+in quotes.** Quotes are a `.env` file convention; a dashboard text box stores
+them as part of the value.
 
 **`Sheets append failed (404)`.** Either `GOOGLE_SHEET_ID` is wrong, or the tab
 is not called `RSVPs` (set `GOOGLE_SHEET_TAB` to match).

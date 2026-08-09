@@ -4,6 +4,7 @@ import { createSign } from "node:crypto";
 
 import { eventConfig } from "@/config/event";
 import type { Guest, RsvpStatus } from "@/lib/name-rules";
+import { normalisePrivateKey } from "@/lib/private-key.mjs";
 import type { RsvpRow } from "@/lib/rsvp-types";
 
 /**
@@ -81,10 +82,11 @@ async function getAccessToken(): Promise<string> {
   }
 
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  // Env vars cannot hold real newlines, so the key is stored with literal \n.
-  const key = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  if (!email) throw new Error("GOOGLE_SERVICE_ACCOUNT_EMAIL is not set.");
 
-  if (!email || !key) throw new Error("Google service account is not configured.");
+  // Rebuilt from whatever survived the copy-paste. Throws a message that names
+  // the actual problem instead of OpenSSL's "DECODER routines::unsupported".
+  const key = normalisePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
 
   const now = Math.floor(Date.now() / 1000);
   const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
@@ -98,9 +100,15 @@ async function getAccessToken(): Promise<string> {
     }),
   );
 
-  const signature = base64url(
-    createSign("RSA-SHA256").update(`${header}.${claims}`).sign(key),
-  );
+  let signature: string;
+  try {
+    signature = base64url(createSign("RSA-SHA256").update(`${header}.${claims}`).sign(key));
+  } catch {
+    // The key parsed as a PEM but is not a usable signing key.
+    throw new Error(
+      "GOOGLE_PRIVATE_KEY is a well-formed PEM but could not sign. Generate a new service-account key.",
+    );
+  }
 
   const response = await fetch(TOKEN_URL, {
     method: "POST",
