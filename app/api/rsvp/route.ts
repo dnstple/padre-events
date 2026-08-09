@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { eventConfig } from "@/config/event";
-import { createAdminClient, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { appendRsvp, isSheetsConfigured } from "@/lib/sheets";
 import {
   MAX_BODY_BYTES,
   calculatePartySize,
@@ -15,9 +15,9 @@ export const dynamic = "force-dynamic";
 /**
  * Public RSVP endpoint.
  *
- * Deliberately narrow: it accepts one submission and returns only what the
- * confirmation screen needs to render. It never reads existing rows, never
- * returns counts, and never exposes another guest's data.
+ * Deliberately narrow: it accepts one submission, appends a row to the sheet,
+ * and returns only what the confirmation screen needs. It never reads the sheet
+ * back, so it cannot leak another guest's response or a running total.
  *
  * Request bodies are never logged.
  */
@@ -102,35 +102,28 @@ export async function POST(request: Request) {
 
   const partySize = calculatePartySize(submission.rsvp_status, additionalGuests);
 
-  if (!isSupabaseConfigured()) {
+  if (!isSheetsConfigured()) {
     return problem(503, "RSVPs are not available right now. Please try again shortly.");
   }
 
-  // ---- 5. Insert -----------------------------------------------------------
-  const supabase = createAdminClient();
+  // ---- 5. Append -----------------------------------------------------------
+  const rsvp = {
+    first_name: submission.first_name,
+    last_name: submission.last_name,
+    rsvp_status: submission.rsvp_status,
+    additional_guests: additionalGuests,
+    party_size: partySize,
+  };
 
-  const { data, error } = await supabase
-    .from("event_rsvps")
-    .insert({
-      event_slug: eventConfig.slug,
-      first_name: submission.first_name,
-      last_name: submission.last_name,
-      rsvp_status: submission.rsvp_status,
-      additional_guests: additionalGuests,
-      party_size: partySize,
-    })
-    // Return ONLY this submission's own fields. Nothing aggregate, no ids of
-    // other rows, no counts.
-    .select("first_name, last_name, rsvp_status, additional_guests, party_size")
-    .single();
-
-  if (error || !data) {
-    // Log the database error, never the body.
-    console.error("[rsvp] insert failed:", error?.code ?? "unknown", error?.message ?? "");
+  try {
+    await appendRsvp(rsvp);
+  } catch (error) {
+    // Log the failure, never the body.
+    console.error("[rsvp] append failed:", error instanceof Error ? error.message : "unknown");
     return problem(500, "We could not save your response. Please try again.");
   }
 
-  return NextResponse.json({ ok: true, rsvp: data }, { status: 201, headers: jsonHeaders });
+  return NextResponse.json({ ok: true, rsvp }, { status: 201, headers: jsonHeaders });
 }
 
 /** Everything other than POST is closed. */

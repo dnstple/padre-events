@@ -32,21 +32,6 @@ export default function LoginForm() {
         <legend className="visually-hidden">Administrator sign in</legend>
 
         <div className={styles.loginField}>
-          <label className={styles.loginLabel} htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            className={styles.loginInput}
-            autoComplete="username"
-            required
-            spellCheck={false}
-          />
-        </div>
-
-        <div className={styles.loginField}>
           <label className={styles.loginLabel} htmlFor="password">
             Password
           </label>
@@ -57,6 +42,7 @@ export default function LoginForm() {
             className={styles.loginInput}
             autoComplete="current-password"
             required
+            autoFocus
           />
         </div>
       </fieldset>

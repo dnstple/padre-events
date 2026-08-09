@@ -1,57 +1,48 @@
+import { cookies } from "next/headers";
+
 import { eventConfig } from "@/config/event";
-import { getAdminSession } from "@/lib/admin-auth";
+import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
 import { toCsv } from "@/lib/csv";
-import { guestNames, type RsvpRow } from "@/lib/rsvp-types";
-import { createAdminClient, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { guestNames } from "@/lib/rsvp-types";
+import { isSheetsConfigured, readRsvps } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const textHeaders = {
+  "Content-Type": "text/plain; charset=utf-8",
+  "Cache-Control": "no-store",
+} as const;
+
 /**
- * Authenticated CSV export.
- *
- * Uses exactly the same authorisation gate as the dashboard data endpoint —
- * a valid Supabase session whose email is in ADMIN_EMAILS. Output is escaped
- * against spreadsheet formula injection in lib/csv.ts.
+ * Authenticated CSV export. Same gate as the dashboard, and the output is
+ * escaped against spreadsheet formula injection in lib/csv.ts.
  */
 export async function GET() {
-  const auth = await getAdminSession();
-
-  if (!auth.ok) {
-    return new Response(
-      auth.reason === "unauthenticated" ? "Please sign in." : "Not authorised.",
-      {
-        status: auth.reason === "unauthenticated" ? 401 : 403,
-        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
-      },
-    );
+  if (!isAdminConfigured()) {
+    return new Response("Not authorised.", { status: 403, headers: textHeaders });
   }
 
-  if (!isSupabaseConfigured()) {
-    return new Response("Supabase is not configured.", {
+  const jar = await cookies();
+  if (!verifySession(jar.get(ADMIN_COOKIE)?.value)) {
+    return new Response("Please sign in.", { status: 401, headers: textHeaders });
+  }
+
+  if (!isSheetsConfigured()) {
+    return new Response("The guest list sheet is not configured.", {
       status: 503,
-      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      headers: textHeaders,
     });
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("event_rsvps")
-    .select("first_name, last_name, rsvp_status, additional_guests, party_size, created_at")
-    .eq("event_slug", eventConfig.slug)
-    .order("created_at", { ascending: false })
-    .limit(10000);
-
-  if (error) {
-    console.error("[admin/export] query failed:", error.code, error.message);
-    return new Response("Export failed.", {
-      status: 500,
-      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
-    });
+  let rows;
+  try {
+    rows = await readRsvps();
+  } catch (error) {
+    console.error("[admin/export] read failed:", error instanceof Error ? error.message : "unknown");
+    return new Response("Export failed.", { status: 500, headers: textHeaders });
   }
-
-  const rows = (data ?? []) as RsvpRow[];
 
   const csv = toCsv([
     [

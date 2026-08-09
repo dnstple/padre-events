@@ -11,9 +11,11 @@ import styles from "./admin.module.css";
  * Guest list.
  *
  * Data refresh is authenticated polling every 10 seconds, plus a refresh on
- * window focus and a visible manual control. Supabase Realtime was considered
- * and rejected: it would require a readable RLS policy on event_rsvps, which
- * would expose the guest list to anyone holding the anon key. Security first.
+ * window focus and a visible manual control. Google Sheets has no push channel,
+ * and the sheet is only ever read server-side by an authenticated route, so
+ * polling an endpoint that checks the session on every request is both the
+ * simplest option and the one that never exposes the list to the browser
+ * without a valid session.
  * -------------------------------------------------------------------------- */
 
 const POLL_INTERVAL_MS = 10_000;

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { cookies } from "next/headers";
+
 import { eventConfig } from "@/config/event";
 import Wordmark from "@/components/Wordmark";
-import { getAdminSession } from "@/lib/admin-auth";
+import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
 
 import { signOut } from "./actions";
 import styles from "./admin.module.css";
@@ -22,34 +24,24 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminPage() {
-  const auth = await getAdminSession();
-
-  if (!auth.ok) {
-    if (auth.reason === "unauthenticated") redirect("/admin/login");
-
-    // Authenticated but not permitted, or ADMIN_EMAILS is unset.
+  if (!isAdminConfigured()) {
     return (
       <main className={styles.loginShell} data-surface="dark">
         <div className={styles.loginCard}>
           <Wordmark className={styles.loginMark} label="Padre65" />
-          <h1 className={styles.loginTitle}>
-            {auth.reason === "unconfigured"
-              ? "Administrator access is not configured."
-              : "This account is not authorised."}
-          </h1>
+          <h1 className={styles.loginTitle}>Administrator access is not configured.</h1>
           <p className={styles.loginNote}>
-            {auth.reason === "unconfigured"
-              ? "Set the ADMIN_EMAILS environment variable to the addresses permitted to view the guest list, then redeploy."
-              : "Ask for this address to be added to ADMIN_EMAILS, or sign in with an administrator account."}
+            Set ADMIN_PASSWORD and ADMIN_SESSION_SECRET in your environment
+            variables, then redeploy.
           </p>
-          <form action={signOut}>
-            <button type="submit" className={styles.loginButton}>
-              Sign out
-            </button>
-          </form>
         </div>
       </main>
     );
+  }
+
+  const jar = await cookies();
+  if (!verifySession(jar.get(ADMIN_COOKIE)?.value)) {
+    redirect("/admin/login");
   }
 
   return (
@@ -58,7 +50,6 @@ export default async function AdminPage() {
         <Wordmark className={styles.mark} label="Padre65" />
         <span className={styles.barLabel}>Guest list</span>
         <span className={styles.barSpacer} />
-        <span className={styles.barEmail}>{auth.session.email}</span>
         <form action={signOut}>
           <button type="submit" className={`${styles.button} ${styles.buttonQuiet}`}>
             Sign out

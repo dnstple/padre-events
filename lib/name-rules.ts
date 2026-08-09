@@ -26,6 +26,15 @@ const FORBIDDEN = /[<>{}\\`$|]/;
 const HTML_TAG = /<[^>]*>/;
 const HTML_ENTITY = /&#?\w+;/;
 
+/**
+ * A leading =, +, @ or - turns a cell into a formula in Google Sheets, Excel
+ * and Numbers. Responses are written straight into a spreadsheet the organisers
+ * open, so these are rejected at the door rather than escaped downstream — that
+ * way nothing dangerous is ever stored, in the sheet or the CSV or the DOM.
+ * No real first or last name begins with one of these.
+ */
+const FORMULA_LEAD = /^[=+@\-]/;
+
 /** Collapses whitespace and trims. Always apply before validating or storing. */
 export function normaliseName(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -43,6 +52,9 @@ export function nameError(value: unknown): string | null {
   }
   if (FORBIDDEN.test(name) || HTML_TAG.test(name) || HTML_ENTITY.test(name)) {
     return "Please use letters only";
+  }
+  if (FORMULA_LEAD.test(name)) {
+    return "Please start with a letter";
   }
 
   return null;

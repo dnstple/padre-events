@@ -8,7 +8,7 @@ page for guests, a private guest list for you.
 - **Guest list** — `/admin`
 - **Intended production URL** — `https://events.padre65.com`
 
-Next.js 16 (App Router) · TypeScript · CSS Modules · Supabase · Vercel.
+Next.js 16 (App Router) · TypeScript · CSS Modules · Google Sheets · Vercel.
 No UI framework, no CSS framework, no analytics.
 
 ---
@@ -18,12 +18,12 @@ No UI framework, no CSS framework, no analytics.
 1. [Local installation](#1-local-installation)
 2. [Development command](#2-development-command)
 3. [Production build](#3-production-build)
-4. [Create the Supabase project](#4-create-the-supabase-project)
-5. [Run the SQL migration](#5-run-the-sql-migration)
-6. [Enable Supabase Auth](#6-enable-supabase-auth)
-7. [Disable public sign-up](#7-disable-public-sign-up)
-8. [Create the administrator account](#8-create-the-administrator-account)
-9. [Set ADMIN_EMAILS](#9-set-admin_emails)
+4. [Create the Google Sheet](#4-create-the-google-sheet)
+5. [Create a service account](#5-create-a-service-account)
+6. [Share the sheet with the service account](#6-share-the-sheet-with-the-service-account)
+7. [Keep the sheet private](#7-keep-the-sheet-private)
+8. [Set the administrator password](#8-set-the-administrator-password)
+9. [Generate the session secret](#9-generate-the-session-secret)
 10. [Configure local environment variables](#10-configure-local-environment-variables)
 11. [Replace the event details](#11-replace-the-event-details)
 12. [Replace the hero media](#12-replace-the-hero-media)
@@ -58,9 +58,9 @@ time, so installs and builds work offline and behind a proxy.
 npm run dev
 ```
 
-Then open <http://localhost:3000>. The invitation renders without Supabase
-configured; submitting an RSVP returns a polite "not available right now"
-until you complete steps 4–10.
+Then open <http://localhost:3000>. The invitation renders fine with nothing
+configured; submitting an RSVP returns a polite "not available right now" until
+you complete steps 4–10.
 
 ## 3. Production build
 
@@ -73,96 +73,99 @@ npx tsc --noEmit  # type check on its own
 
 ---
 
-## 4. Create the Supabase project
+## 4. Create the Google Sheet
 
-1. Go to <https://supabase.com/dashboard> and create a new project.
-2. Pick the region closest to your guests — **London (eu-west-2)** for this event.
-3. Save the database password somewhere safe; you will not need it for the app,
-   only for direct database access.
-4. Once the project has finished provisioning, open **Project Settings → API**
-   and note three values:
-   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon / public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`
+1. Create a new spreadsheet at <https://sheets.new>.
+2. Rename the first tab to **RSVPs** (or set `GOOGLE_SHEET_TAB` to whatever you
+   call it).
+3. Put this header in row 1, one value per cell across A to L:
 
-> The service-role key bypasses every access rule in the database. It belongs
-> only in server environment variables. Never prefix it with `NEXT_PUBLIC_`,
-> never paste it into client code, and never commit it.
+   ```
+   Submitted at (UTC) | Event | First name | Last name | Status | Party size |
+   Guest 1 first | Guest 1 last | Guest 2 first | Guest 2 last |
+   Guest 3 first | Guest 3 last
+   ```
 
-## 5. Run the SQL migration
+   Or run `npm run sheet:header` after step 5 and it writes the header for you.
 
-Open **SQL Editor → New query** in the Supabase dashboard, paste the entire
-contents of `supabase/migrations/0001_event_rsvps.sql`, and run it.
+4. Copy the spreadsheet ID out of the URL — it is the long string between
+   `/d/` and `/edit`:
 
-The script is idempotent — re-running it is safe.
+   ```
+   https://docs.google.com/spreadsheets/d/THIS_IS_THE_ID/edit
+   ```
 
-It creates the `event_rsvps` table, its constraints and indexes, the
-`updated_at` trigger, enables Row Level Security, and revokes the default
-grants from the `anon` and `authenticated` roles.
+   That is `GOOGLE_SHEET_ID`.
 
-To verify, run:
+The app only ever appends rows and reads columns A–L. It never deletes, never
+reorders, and ignores rows belonging to a different `slug`, so you can keep
+several events in one sheet if you want.
 
-```sql
-select relrowsecurity, relforcerowsecurity from pg_class where relname = 'event_rsvps';
--- expect: t | t
+## 5. Create a service account
 
-select count(*) from pg_policies where tablename = 'event_rsvps';
--- expect: 0
-```
+The site signs in to Google as a robot, not as you. That means no OAuth consent
+screen and no token that expires when you change your password.
 
-**Zero policies is correct, not an oversight.** With RLS enabled and no
-policies, the table denies everything to the anon and authenticated roles.
-Only the server-side service-role client can read or write it. Do not add a
-read policy — see [Security model](#security-model).
+1. Go to <https://console.cloud.google.com/> and create a project (any name).
+2. **APIs & Services → Library → Google Sheets API → Enable.**
+3. **APIs & Services → Credentials → Create credentials → Service account.**
+   Give it a name like `padre65-events`. No roles are needed — the sheet itself
+   grants the access.
+4. Open the service account → **Keys → Add key → Create new key → JSON.**
+   A file downloads.
+5. Out of that file you need exactly two values:
+   - `client_email` → `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+   - `private_key` → `GOOGLE_PRIVATE_KEY`
 
-If you prefer the CLI:
+> The private key is a credential as powerful as a password. Put it in your
+> environment variables and nowhere else. Delete the downloaded JSON once the
+> two values are stored, and never commit it.
+
+When you paste the key into an environment variable, keep it on one line with
+its `\n` escapes intact and wrap the whole thing in double quotes. The app
+converts those escapes back into newlines at runtime.
+
+## 6. Share the sheet with the service account
+
+Open the spreadsheet → **Share** → paste the service account's email
+(`...iam.gserviceaccount.com`) → give it **Editor** → Send.
+
+This is the step people forget. Without it every write fails with a 403.
+
+## 7. Keep the sheet private
+
+**Do not use File → Share → Publish to the web, and do not set "Anyone with the
+link" on the spreadsheet.** The sheet is your database. Anyone who can open it
+can read every guest's name.
+
+Share it only with the service account and with people who should see the guest
+list. That is the whole access model — there is no second layer behind it.
+
+## 8. Set the administrator password
+
+The guest list at `/admin` is protected by one shared password, set in
+`ADMIN_PASSWORD`. There are no user accounts to create.
+
+Use something long and random rather than memorable:
 
 ```bash
-supabase link --project-ref <your-ref>
-supabase db push
+node -e "console.log(require('crypto').randomBytes(18).toString('base64url'))"
 ```
 
-## 6. Enable Supabase Auth
+Changing the value and redeploying revokes access immediately.
 
-Email/password sign-in is enabled by default on new projects. Confirm at
-**Authentication → Sign In / Providers → Email** that **Email** is enabled.
+## 9. Generate the session secret
 
-You do not need any OAuth provider, magic links, or SMS.
+`ADMIN_SESSION_SECRET` signs the admin session cookie. Any long random string
+works:
 
-## 7. Disable public sign-up
-
-**Authentication → Sign In / Providers → Email**, then turn **Allow new users
-to sign up** *off*.
-
-This site never exposes a registration form, but turning sign-up off closes the
-Supabase Auth API endpoint too, so nobody can create an account against your
-project directly.
-
-## 8. Create the administrator account
-
-**Authentication → Users → Add user → Create new user**.
-
-- Enter the administrator's email address and a strong password.
-- Tick **Auto Confirm User** (there is no email-confirmation flow in this app).
-
-Repeat for each person who needs the guest list. Use a password manager.
-
-## 9. Set ADMIN_EMAILS
-
-Being able to sign in is not enough. The email address must also appear in the
-`ADMIN_EMAILS` environment variable, which is checked on the server on every
-admin page load and every admin API request.
-
-```
-ADMIN_EMAILS=you@padre65.com,studio@padre65.com
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Comma-separated, case-insensitive, whitespace tolerated. **If `ADMIN_EMAILS` is
-empty or unset, all admin access is denied** — it fails closed.
-
-To revoke someone's access immediately, remove them from `ADMIN_EMAILS` and
-redeploy. (Deleting their Supabase user works too, and is the more thorough
-option.)
+Changing it signs everyone out. **Both** `ADMIN_PASSWORD` and
+`ADMIN_SESSION_SECRET` must be set — if either is missing, `/admin` refuses
+everyone rather than falling open.
 
 ## 10. Configure local environment variables
 
@@ -175,11 +178,16 @@ Fill in the values from step 4 and step 9. `.env.local` is git-ignored;
 
 | Variable | Where it runs | Purpose |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | client + server | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | Publishable key, auth only |
-| `SUPABASE_SERVICE_ROLE_KEY` | **server only** | Reads/writes `event_rsvps` |
-| `ADMIN_EMAILS` | **server only** | Guest-list allow-list |
+| `GOOGLE_SHEET_ID` | **server only** | Which spreadsheet to write to |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | **server only** | Who the app signs in as |
+| `GOOGLE_PRIVATE_KEY` | **server only** | Signs the Google auth request |
+| `GOOGLE_SHEET_TAB` | **server only** | Optional; defaults to `RSVPs` |
+| `ADMIN_PASSWORD` | **server only** | Opens `/admin` |
+| `ADMIN_SESSION_SECRET` | **server only** | Signs the admin cookie |
 | `NEXT_PUBLIC_SITE_URL` | client + server | Canonical URL and Open Graph |
+
+Only `NEXT_PUBLIC_SITE_URL` is exposed to the browser. Everything else is
+server-only and is verified absent from the client bundle by the test suite.
 
 Restart `npm run dev` after changing them.
 
@@ -226,12 +234,10 @@ Three things worth knowing:
 - **`slug`** — the admin dashboard and CSV export only ever show rows matching
   this slug. Changing it starts a clean guest list without deleting the old one.
 
-**`maxAdditionalGuests`** is enforced in three independent places: the browser,
-the server route, and a database `CHECK` constraint. If you raise it above 3,
-you must also widen the two constraints in
-`supabase/migrations/0001_event_rsvps.sql`
-(`event_rsvps_guests_max_three` and `event_rsvps_party_size_range`) with a new
-migration. The database will reject anything larger until you do.
+**`maxAdditionalGuests`** is enforced in the browser and again on the server,
+which is the authority. Raising it above 3 also means adding columns to the
+sheet and widening the row builder in `lib/sheets.ts` — the sheet has fixed
+columns for three guests.
 
 ## 12. Replace the hero media
 
@@ -311,16 +317,20 @@ vercel --prod   # production
 
 ## 14. Add the environment variables in Vercel
 
-**Project → Settings → Environment Variables.** Add all five for **Production**,
+**Project → Settings → Environment Variables.** Add these for **Production**,
 **Preview** and **Development**:
 
 | Name | Value |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://<ref>.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | the service-role key — mark it **Sensitive** |
-| `ADMIN_EMAILS` | `you@padre65.com,studio@padre65.com` |
+| `GOOGLE_SHEET_ID` | the ID from the spreadsheet's URL |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | `...iam.gserviceaccount.com` |
+| `GOOGLE_PRIVATE_KEY` | the key, quoted, `\n` intact — mark **Sensitive** |
+| `ADMIN_PASSWORD` | your chosen password — mark **Sensitive** |
+| `ADMIN_SESSION_SECRET` | the hex string — mark **Sensitive** |
 | `NEXT_PUBLIC_SITE_URL` | `https://events.padre65.com` |
+
+Pasting `GOOGLE_PRIVATE_KEY` into Vercel: keep it on a single line, keep the
+`\n` sequences as the literal two characters, and wrap it in double quotes.
 
 Environment variables are read at build time as well as at runtime, so
 **redeploy after changing any of them**.
@@ -376,8 +386,8 @@ await fetch("/api/admin/rsvps").then(r => r.status)   // 401
 ## 17. Test administrator sign-in
 
 - Visit `/admin` while signed out → you are redirected to `/admin/login`.
-- Sign in with an address **not** in `ADMIN_EMAILS` → refused.
-- Sign in with an allow-listed administrator → the guest list loads.
+- Enter a wrong password → refused, with no hint about what was wrong.
+- Enter the real password → the guest list loads.
 - Leave the tab open and submit an RSVP from your phone → the row appears within
   ten seconds without a reload.
 - Search for an additional attendee's name → the host's row is returned.
@@ -404,19 +414,16 @@ requesting `/api/admin/export` while signed out returns 401.
 
 The dashboard is deliberately read-only. When the event is over, pick one:
 
-- **Keep it, hide it** — set `seo.noindex: true` (already the default) and stop
-  sharing the link. The data stays in Supabase.
+- **Keep it, hide it** — `seo.noindex: true` is already the default; stop
+  sharing the link. The sheet stays where it is.
 - **Archive and clear** — export the CSV, store it wherever guest data belongs,
-  then delete the rows:
-
-  ```sql
-  delete from public.event_rsvps where event_slug = 'after-hours-2026';
-  ```
-
-- **Run the next event** — change `slug` in `config/event.ts` and redeploy. The
-  old rows remain but are no longer shown anywhere; the new list starts empty.
-- **Take the site down** — remove the domain in Vercel, or pause the project.
-  Deleting the Supabase project destroys the data irreversibly.
+  then delete the rows from the sheet by hand. Deleting rows in Google Sheets is
+  instant and the app does not care about gaps.
+- **Run the next event** — change `slug` in `config/event.ts` and redeploy. Old
+  rows stay in the sheet but are filtered out everywhere; the new list starts
+  empty. You can keep several events in one spreadsheet this way.
+- **Take the site down** — remove the domain in Vercel, or delete the project.
+  The sheet survives independently; deleting it is the irreversible step.
 
 Only collect what you need, and keep names no longer than you have a reason to.
 
@@ -454,14 +461,11 @@ config/event.ts                 ← the only file you edit for content
 lib/
   name-rules.ts                 field rules shared by browser and server
   validation.ts                 server-side Zod schemas
-  admin-auth.ts                 session + ADMIN_EMAILS check
+  sheets.ts                     Google Sheets read/append (server-only)
+  admin-session.ts              password check + signed session cookie
   csv.ts                        CSV with formula-injection escaping
   rsvp-types.ts                 row types and totals
-  supabase/admin.ts             service-role client (server-only)
-  supabase/server.ts            cookie session client (auth only)
-  supabase/browser.ts           anon browser client
-proxy.ts                        session refresh + first-pass /admin redirect
-supabase/migrations/            the SQL migration
+proxy.ts                        first-pass /admin redirect
 ```
 
 ### Request flow
@@ -469,35 +473,37 @@ supabase/migrations/            the SQL migration
 **Guest submits an RSVP.** The browser POSTs to `/api/rsvp`. The route rejects
 non-JSON and anything over 4 KB, parses the body with Zod, ignores every field
 it did not ask for (including any `party_size` the browser sent), calculates the
-party size itself, inserts via the service-role client, and returns only that
-submission's own fields.
+party size itself, appends one row to the sheet, and returns only that
+submission's own fields. It never reads the sheet back, so it cannot leak
+another guest's response or a running total.
 
-**Administrator opens the dashboard.** `proxy.ts` refreshes the Supabase cookie
-and bounces signed-out visitors to `/admin/login`. The page then independently
-verifies the session with `getUser()` — which revalidates the token against
-Supabase rather than trusting the cookie — and checks the email against
-`ADMIN_EMAILS`. Guest data is fetched client-side from `/api/admin/rsvps`, which
-repeats both checks, so **no guest name is ever present in server-rendered HTML**.
+**Administrator opens the dashboard.** `proxy.ts` bounces visitors with no
+session cookie to `/admin/login`. The page then independently verifies the
+cookie's HMAC and expiry server-side. Guest data is fetched client-side from
+`/api/admin/rsvps`, which verifies the session again, so **no guest name is ever
+present in server-rendered HTML**.
 
 ---
 
 ## Security model
 
-- **The service-role key never reaches the browser.** `lib/supabase/admin.ts`
-  imports `server-only`, so the build fails if it is ever pulled into a client
-  component. Verified: no client chunk contains it.
-- **RLS is on with zero policies.** The anon and authenticated roles are denied
-  select, insert, update and delete. Only the server can touch the table.
-- **Realtime was rejected on purpose.** Supabase Realtime would require a
-  readable policy on `event_rsvps`, which would hand the guest list to anyone
-  with the anon key — that key is public by design. The dashboard uses
-  authenticated polling (10 s) plus refresh-on-focus and a manual button
-  instead. Do not loosen the policies to enable Realtime.
+- **The Google private key never reaches the browser.** `lib/sheets.ts` imports
+  `server-only`, so the build fails if it is ever pulled into a client
+  component. The test suite scans every built client chunk for the key, the
+  admin password, the session secret and the sheet ID, and fails if any appear.
+- **The sheet is the access boundary.** Google only lets the service account in
+  because you shared the sheet with it. Keep the spreadsheet private — do not
+  publish it to the web or enable "anyone with the link". There is no second
+  layer behind that.
 - **Authorisation is re-checked on every admin request**, not once at sign-in.
-  Middleware is a convenience, not the boundary.
-- **Fails closed.** An empty `ADMIN_EMAILS` denies everyone.
-- **No account enumeration.** A wrong password and a non-allow-listed address
-  produce the same message.
+  The middleware only looks for a plausible cookie; the signature and expiry are
+  verified in the route handlers, where `node:crypto` is available.
+- **The session cookie cannot be extended.** Its expiry is inside the signed
+  payload, so editing the cookie invalidates it.
+- **Fails closed.** If `ADMIN_PASSWORD` or `ADMIN_SESSION_SECRET` is missing,
+  `/admin` refuses everyone.
+- **Brute force.** Every sign-in attempt pauses for a fixed 600 ms whether the
+  password is right or wrong, and the comparison is constant-time.
 - **CSRF.** Sign-in and sign-out are Next.js Server Actions, which validate
   Origin against Host. Session cookies are `httpOnly`, `SameSite=Lax`, and
   `Secure` in production.
@@ -573,21 +579,28 @@ Notes:
 
 ## Troubleshooting
 
-**"RSVPs are not available right now."** `NEXT_PUBLIC_SUPABASE_URL` or
-`SUPABASE_SERVICE_ROLE_KEY` is missing. On Vercel, redeploy after adding them.
+**"RSVPs are not available right now."** One of `GOOGLE_SHEET_ID`,
+`GOOGLE_SERVICE_ACCOUNT_EMAIL` or `GOOGLE_PRIVATE_KEY` is missing. On Vercel,
+redeploy after adding them — env vars are read at build time too.
 
-**"Administrator access is not configured."** `ADMIN_EMAILS` is empty or unset.
+**"Administrator access is not configured."** `ADMIN_PASSWORD` or
+`ADMIN_SESSION_SECRET` is missing. Both are required; it fails closed.
 
-**"Those details were not recognised."** Either the password is wrong or the
-address is not in `ADMIN_EMAILS`. The message is intentionally identical for
-both. Check the exact spelling of the address in both Supabase and the variable.
+**An RSVP returns 500, logs show `Sheets append failed (403)`.** The sheet has
+not been shared with the service account. Open the spreadsheet → Share → add
+the `...iam.gserviceaccount.com` address as **Editor**. This is the single most
+common setup mistake.
 
-**Signed in, but the guest list is empty.** Check `event_slug` in the database
-matches `slug` in `config/event.ts`.
+**Logs show `Google token request failed (400)`.** The private key is malformed.
+It must be the full value including the BEGIN/END lines, on one line, with `\n`
+as two literal characters, wrapped in double quotes.
 
-**An RSVP returns 500.** Check the Vercel function logs for a Postgres error
-code. `23514` is a check-constraint violation — most often `maxAdditionalGuests`
-raised in the config without a matching migration (see step 11).
+**`Sheets append failed (404)`.** Either `GOOGLE_SHEET_ID` is wrong, or the tab
+is not called `RSVPs` (set `GOOGLE_SHEET_TAB` to match).
+
+**Signed in, but the guest list is empty.** Check the `Event` column in the
+sheet matches `slug` in `config/event.ts`. Rows for other slugs are filtered
+out on purpose.
 
 **Admin redirect loop.** Usually a cookie/domain mismatch. Confirm
 `NEXT_PUBLIC_SITE_URL` matches the domain you are actually visiting.

@@ -1,69 +1,75 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { allowedAdminEmails } from "@/lib/admin-auth";
-import { createSessionClient } from "@/lib/supabase/server";
+import {
+  ADMIN_COOKIE,
+  isAdminConfigured,
+  issueSession,
+  passwordMatches,
+} from "@/lib/admin-session";
 
 /**
  * Administrator sign-in and sign-out.
  *
- * These are Server Actions, which Next.js protects against CSRF by comparing
- * the request's Origin with the Host — so no bespoke token plumbing is needed.
- * The password never touches a client-side Supabase call, and the resulting
- * session cookies are httpOnly, SameSite=Lax and Secure in production.
+ * Server Actions, which Next.js protects against CSRF by comparing the
+ * request's Origin with the Host — no bespoke token plumbing needed. The
+ * password is never echoed back and the session cookie is httpOnly.
  */
 
 export type LoginState = { error: string | null };
+
+/** Slows brute force without needing any shared state. */
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function signIn(
   _previous: LoginState,
   formData: FormData,
 ): Promise<LoginState> {
-  const email = String(formData.get("email") ?? "")
-    .trim()
-    .toLowerCase();
   const password = String(formData.get("password") ?? "");
 
-  if (!email || !password) {
-    return { error: "Enter your email address and password." };
+  if (!isAdminConfigured()) {
+    return { error: "Administrator access is not configured." };
   }
 
-  const allowed = allowedAdminEmails();
-
-  if (allowed.size === 0) {
-    return { error: "Administrator access is not configured. Set ADMIN_EMAILS." };
+  if (!password) {
+    return { error: "Enter the password." };
   }
 
-  // Refuse before touching Supabase if the address is not on the allow-list.
-  // The message is deliberately identical to a wrong-password failure so this
-  // cannot be used to enumerate which addresses are administrators.
-  if (!allowed.has(email)) {
-    return { error: "Those details were not recognised." };
+  // A fixed pause on every attempt, so a wrong guess costs the same as a right
+  // one and the endpoint is not worth hammering.
+  await delay(600);
+
+  if (!passwordMatches(password)) {
+    return { error: "That password was not recognised." };
   }
 
-  let supabase;
-  try {
-    supabase = await createSessionClient();
-  } catch {
-    return { error: "Supabase is not configured." };
-  }
+  const session = issueSession();
+  if (!session) return { error: "Administrator access is not configured." };
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    return { error: "Those details were not recognised." };
-  }
+  const jar = await cookies();
+  jar.set(ADMIN_COOKIE, session.value, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: session.maxAge,
+  });
 
   redirect("/admin");
 }
 
 export async function signOut(): Promise<void> {
-  try {
-    const supabase = await createSessionClient();
-    await supabase.auth.signOut();
-  } catch {
-    // Already signed out, or Supabase unreachable — redirect regardless.
-  }
+  const jar = await cookies();
+  jar.set(ADMIN_COOKIE, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 0,
+  });
   redirect("/admin/login");
 }

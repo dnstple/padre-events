@@ -6,19 +6,9 @@ import type { NextConfig } from "next";
  * The CSP is intentionally tight. `'unsafe-inline'` is present for styles only,
  * because Next.js injects inline <style> for CSS Modules; scripts are limited to
  * self plus the strict-dynamic-free inline bootstrap Next requires.
- * `connect-src` allows the Supabase project origin so the login form can reach
- * the auth endpoint.
+ * Google Sheets is only ever contacted from the server, so `connect-src` stays
+ * same-origin.
  */
-
-const supabaseOrigin = (() => {
-  try {
-    return process.env.NEXT_PUBLIC_SUPABASE_URL
-      ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
-      : "";
-  } catch {
-    return "";
-  }
-})();
 
 const csp = [
   "default-src 'self'",
@@ -31,7 +21,9 @@ const csp = [
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
-  `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin} ${supabaseOrigin.replace("https://", "wss://")}` : ""}`,
+  // Google is only ever contacted server-side, so the browser needs nothing
+  // beyond same-origin.
+  "connect-src 'self'",
   "upgrade-insecure-requests",
 ].join("; ");
 

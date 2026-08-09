@@ -1,20 +1,19 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { eventConfig } from "@/config/event";
-import { getAdminSession } from "@/lib/admin-auth";
-import { createAdminClient, isSupabaseConfigured } from "@/lib/supabase/admin";
-import type { RsvpRow, RsvpTotals } from "@/lib/rsvp-types";
-import { summarise } from "@/lib/rsvp-types";
+import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
+import { summarise, type RsvpTotals } from "@/lib/rsvp-types";
+import { isSheetsConfigured, readRsvps } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 /**
- * Authenticated guest-list endpoint. Polled by the dashboard every 10s.
+ * Authenticated guest list, polled by the dashboard.
  *
- * Authorisation is re-checked here on every single request — the dashboard
- * being rendered once does not grant ongoing access.
+ * The session is re-verified on every single request. The dashboard having been
+ * rendered once grants nothing.
  */
 
 const privateHeaders = {
@@ -25,48 +24,40 @@ const privateHeaders = {
 } as const;
 
 export async function GET() {
-  const auth = await getAdminSession();
-
-  if (!auth.ok) {
-    const status = auth.reason === "unauthenticated" ? 401 : 403;
-    const message =
-      auth.reason === "unconfigured"
-        ? "Administrator access is not configured."
-        : auth.reason === "unauthenticated"
-          ? "Please sign in."
-          : "This account is not authorised.";
-    return NextResponse.json({ ok: false, message }, { status, headers: privateHeaders });
+  if (!isAdminConfigured()) {
+    return NextResponse.json(
+      { ok: false, message: "Administrator access is not configured." },
+      { status: 403, headers: privateHeaders },
+    );
   }
 
-  if (!isSupabaseConfigured()) {
+  const jar = await cookies();
+  if (!verifySession(jar.get(ADMIN_COOKIE)?.value)) {
     return NextResponse.json(
-      { ok: false, message: "Supabase is not configured." },
+      { ok: false, message: "Please sign in." },
+      { status: 401, headers: privateHeaders },
+    );
+  }
+
+  if (!isSheetsConfigured()) {
+    return NextResponse.json(
+      { ok: false, message: "The guest list sheet is not configured." },
       { status: 503, headers: privateHeaders },
     );
   }
 
-  const supabase = createAdminClient();
-
-  const { data, error } = await supabase
-    .from("event_rsvps")
-    .select("id, first_name, last_name, rsvp_status, additional_guests, party_size, created_at")
-    .eq("event_slug", eventConfig.slug)
-    .order("created_at", { ascending: false })
-    .limit(5000);
-
-  if (error) {
-    console.error("[admin/rsvps] query failed:", error.code, error.message);
+  try {
+    const rows = await readRsvps();
+    const totals: RsvpTotals = summarise(rows);
+    return NextResponse.json(
+      { ok: true, rows, totals, fetchedAt: new Date().toISOString() },
+      { status: 200, headers: privateHeaders },
+    );
+  } catch (error) {
+    console.error("[admin/rsvps] read failed:", error instanceof Error ? error.message : "unknown");
     return NextResponse.json(
       { ok: false, message: "We could not load the guest list." },
       { status: 500, headers: privateHeaders },
     );
   }
-
-  const rows = (data ?? []) as RsvpRow[];
-  const totals: RsvpTotals = summarise(rows);
-
-  return NextResponse.json(
-    { ok: true, rows, totals, fetchedAt: new Date().toISOString() },
-    { status: 200, headers: privateHeaders },
-  );
 }

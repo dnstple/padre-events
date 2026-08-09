@@ -15,8 +15,9 @@ export const dynamic = "force-dynamic";
 /**
  * Administrator sign-in.
  *
- * There is no registration link and no password-reset self-service: accounts
- * are created by hand in Supabase and allow-listed via ADMIN_EMAILS.
+ * One shared password, set via the ADMIN_PASSWORD environment variable. There
+ * are no user accounts, so there is nothing to register for and nothing to
+ * reset — changing the variable and redeploying revokes every session.
  */
 export default function AdminLoginPage() {
   return (
@@ -26,7 +27,7 @@ export default function AdminLoginPage() {
         <h1 className={styles.loginTitle}>Guest list</h1>
         <LoginForm />
         <p className={styles.loginNote}>
-          Administrator accounts are created in Supabase. There is no public sign-up.
+          Private. Enter the organiser password to view the guest list.
         </p>
       </div>
     </main>
