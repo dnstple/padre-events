@@ -18,7 +18,8 @@
   font-size: var(--step-2);
   line-height: 1.15;
   letter-spacing: -0.01em;
-  max-width: 20ch;
+  max-width: 34ch;
+  text-wrap: balance;
   margin-bottom: clamp(1.75rem, 1.2rem + 2vw, 3rem);
 }
 

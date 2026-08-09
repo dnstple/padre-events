@@ -141,10 +141,13 @@ export const eventConfig: EventConfig = {
   },
 
   brandmark: {
-    // Drop the logo into /public/media and point this at it.
-    src: "",
-    width: 2600,
-    height: 521,
+    // Traced from PADRE LOGO HIGH RES WHITE.png (21312 × 4271, 660 KB) to a
+    // 6.5 KB vector, so it stays crisp at any size on any screen. Used as a CSS
+    // mask and painted with the surrounding text colour — one file serves both
+    // the dark invitation and the light admin bar.
+    src: "/media/padre-wordmark.svg",
+    width: 4000,
+    height: 802,
   },
 
   labels: { heroCta: "Details", rsvpCta: "RSVP" },
