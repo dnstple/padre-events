@@ -103,7 +103,7 @@ export const eventConfig: EventConfig = {
   eyebrow: "PRIVATE EVENT · LONDON",
   title: { lead: "PADRE65", accent: "HOUSE PARTY" },
   description:
-    "Join us for an evening of music, drinks and good vibes. A private gathering shaped around the people and stories behind Padre65.",
+    "Join us for an evening of live music from our DJ, free drinks and good vibes. A private gathering celebrating the people and stories behind Padre65.",
 
   dateISO: "2026-08-15T22:00:00+01:00",
   dateDisplay: "Saturday, 15 August",
