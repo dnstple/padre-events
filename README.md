@@ -290,8 +290,25 @@ supplied image is generated from the event copy and is safe to overwrite.
 
 ### Favicon
 
-Replace `public/icon.svg`. The browser theme colour is set in `app/layout.tsx`
-(`viewport.themeColor`).
+Three files, all generated from `Logos/Main/Logo_Olives_Red.png`:
+
+| File | Size | Used by |
+|---|---|---|
+| `public/favicon.ico` | 16, 32, 48, 64 | browser tabs, bookmarks |
+| `public/icon.png` | 512 | Android, high-density tabs |
+| `public/apple-icon.png` | 180 | iOS home screen |
+
+Each favicon size is rendered from the source separately rather than downscaled
+from one large image — at 16px that is the difference between a mark and a
+smudge — and the small sizes carry almost no margin, because at 16px a single
+pixel of padding costs 6% of the icon.
+
+The mark sits on the brand's bone `#f4f1ea` rather than staying transparent.
+The red measures **1.6:1** against a dark browser tab strip, which is
+effectively invisible, and **6.6:1** on bone whatever theme the browser is in.
+If you would rather it were transparent, that is the trade you are making.
+
+The browser theme colour is separate, in `app/layout.tsx` (`viewport.themeColor`).
 
 ---
 

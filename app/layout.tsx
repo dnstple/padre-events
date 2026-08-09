@@ -32,8 +32,14 @@ export const metadata: Metadata = {
     images: [eventConfig.seo.image],
   },
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icon.svg" }],
+    // The mark is painted on the brand's bone background rather than left
+    // transparent: the red measures 1.6:1 against a dark browser tab strip,
+    // which is invisible, and 6.6:1 on bone regardless of the tab theme.
+    icon: [
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48 64x64" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
   // No Event structured data while the invitation is unlisted.
   other: { "format-detection": "telephone=no" },
