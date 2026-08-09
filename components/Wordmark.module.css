@@ -1,0 +1,47 @@
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.14em;
+  font-family: var(--font-mark);
+  font-weight: 700;
+  font-size: var(--wordmark-size, 1.1875rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: currentColor;
+  white-space: nowrap;
+}
+
+/* ---- Supplied logo ------------------------------------------------------
+ * Masked rather than drawn as an <img>, so the mark inherits the surrounding
+ * text colour on every surface from a single white source file.
+ * ------------------------------------------------------------------------ */
+.logo {
+  display: block;
+  /* Cap height of the logo is matched to the typographic fallback's size. */
+  height: calc(var(--wordmark-size, 1.1875rem) * 0.86);
+  aspect-ratio: var(--logo-ratio, 5 / 1);
+  background-color: currentColor;
+  -webkit-mask-image: var(--logo-src);
+  mask-image: var(--logo-src);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: left center;
+  mask-position: left center;
+}
+
+/* ---- Typographic fallback ----------------------------------------------- */
+.padre {
+  /* The brand lockup reads tighter than Petrona's default fit. */
+  letter-spacing: -0.005em;
+}
+
+.sixtyfive {
+  /* The lockup raises and shrinks the numerals, but never below ~11px —
+     small type still has to be legible. */
+  font-size: 0.62em;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: lining-nums;
+}

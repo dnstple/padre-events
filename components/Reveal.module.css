@@ -1,0 +1,179 @@
+.reveal {
+  --reveal-delay: 0ms;
+}
+
+/* The observed element is never itself clipped — see Reveal.tsx. */
+.o_mask,
+.o_clip {
+  /* Keeps the animating child inside the intended box. */
+  overflow: hidden;
+}
+
+.o_rule {
+  overflow: hidden;
+}
+
+/* ---- Text mask reveal --------------------------------------------------- */
+.mask {
+  display: block;
+  clip-path: inset(0 0 100% 0);
+  transform: translate3d(0, 0.42em, 0);
+  opacity: 0;
+  transition:
+    clip-path var(--dur-editorial) var(--ease-editorial) var(--reveal-delay),
+    transform var(--dur-editorial) var(--ease-editorial) var(--reveal-delay),
+    opacity 600ms linear var(--reveal-delay);
+  will-change: clip-path, transform;
+}
+
+.reveal.shown .mask {
+  clip-path: inset(0 0 -18% 0);
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+
+/* ---- Fine-line drawing --------------------------------------------------
+ * The outer element carries the hairline's colour; the child paints it. */
+.rule {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-slow) var(--ease-editorial) var(--reveal-delay);
+  will-change: transform;
+}
+
+.reveal.shown .rule {
+  transform: scaleX(1);
+}
+
+/* ---- Media clip reveal --------------------------------------------------
+ * Fills the reserved aspect-ratio box so images can still position against it. */
+.clip {
+  position: absolute;
+  inset: 0;
+  display: block;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1600ms var(--ease-editorial) var(--reveal-delay);
+  will-change: clip-path;
+}
+
+.reveal.shown .clip {
+  clip-path: inset(0 0 0 0);
+}
+
+/* ---- Opacity only (applied directly to the observed element) ------------ */
+.o_fade {
+  opacity: 0;
+  transform: translate3d(0, 0.6rem, 0);
+  transition:
+    opacity var(--dur-slow) var(--ease) var(--reveal-delay),
+    transform var(--dur-slow) var(--ease-editorial) var(--reveal-delay);
+}
+
+.o_fade.shown {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Reduced motion: no movement, no clipping, no delay — just present.
+   The .shown class is added immediately in this mode, but these rules make the
+   result robust even before the effect runs. */
+@media (prefers-reduced-motion: reduce) {
+  .mask,
+  .rule,
+  .clip,
+  .o_fade {
+    clip-path: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+}
+
+/* =============================================================================
+   IMMEDIATE — above-the-fold entry, CSS only.
+   Keyframes rather than transitions, so the content animates from first paint
+   without waiting for hydration and still renders with JavaScript disabled.
+   ========================================================================== */
+
+.immediate .mask {
+  clip-path: inset(0 0 -18% 0);
+  transform: none;
+  opacity: 1;
+  transition: none;
+  animation: maskIn var(--dur-editorial) var(--ease-editorial) var(--reveal-delay) both;
+}
+
+@keyframes maskIn {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translate3d(0, 0.42em, 0);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0 0 -18% 0);
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+.immediate .rule {
+  transform: scaleX(1);
+  transition: none;
+  animation: ruleIn var(--dur-slow) var(--ease-editorial) var(--reveal-delay) both;
+}
+
+@keyframes ruleIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.immediate .clip {
+  clip-path: inset(0 0 0 0);
+  transition: none;
+  animation: clipIn 1600ms var(--ease-editorial) var(--reveal-delay) both;
+}
+
+@keyframes clipIn {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.o_fade.immediate {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  animation: fadeIn var(--dur-slow) var(--ease-editorial) var(--reveal-delay) both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.6rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .immediate .mask,
+  .immediate .rule,
+  .immediate .clip,
+  .o_fade.immediate {
+    animation: none !important;
+  }
+}

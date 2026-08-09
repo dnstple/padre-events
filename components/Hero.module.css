@@ -1,0 +1,411 @@
+.hero {
+  position: relative;
+  /* Small-viewport units keep the composition clear of mobile browser chrome. */
+  min-height: 100svh;
+  display: flex;
+  background: var(--ink-bg);
+  color: var(--on-dark);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ---- Media -------------------------------------------------------------- */
+.media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.mobileOnly {
+  display: block;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+/*
+ * Legibility veil.
+ *
+ * A flat wash alone either muddies the photograph or leaves the title
+ * unreadable against a bright sky, so this is a base wash plus a little extra
+ * weight top and bottom where the type actually sits. It is doing a job, not
+ * decorating — the centre of the frame is left almost untouched.
+ */
+/*
+ * Legibility veils.
+ *
+ * A viewport-percentage gradient does not work here: on a shorter screen the
+ * title rides up into the bright horizon and loses contrast. So the base wash
+ * stays very light — it only unifies the frame — and the two veils that do the
+ * real work are attached to the text blocks themselves, via ::before below.
+ * They therefore track the type wherever it lands, at any viewport height.
+ *
+ * Measured against the actual photograph rather than assumed. See the note in
+ * the README about re-checking if the image is replaced.
+ */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 19, 14, 0.06);
+}
+
+/* ---- Typographic composition (fallback when no media is configured) ----- */
+.composition {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.driftMark {
+  position: absolute;
+  right: -0.14em;
+  bottom: -0.3em;
+  font-family: var(--font-mark);
+  font-weight: 700;
+  font-size: clamp(20rem, 62vw, 58rem);
+  line-height: 0.72;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(160, 44, 44, 0.34);
+  animation: drift 64s var(--ease) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-3.5%, -2.5%, 0);
+  }
+}
+
+.hairlineV {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--gutter);
+  width: 1px;
+  background: rgba(244, 241, 234, 0.09);
+}
+
+.hairlineR {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: var(--gutter);
+  width: 1px;
+  background: rgba(244, 241, 234, 0.06);
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image: radial-gradient(rgba(244, 241, 234, 0.055) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+}
+
+/* ---- Frame -------------------------------------------------------------- */
+.frame {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: clamp(1.25rem, 0.9rem + 1.6vw, 2.5rem) var(--gutter)
+    calc(clamp(1.5rem, 1rem + 2vw, 2.75rem) + env(safe-area-inset-bottom, 0px));
+}
+
+.top {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Veil behind the header chrome, which sits over the brightest part of the
+   sky. Bleeds past the frame's gutter and is clipped by .hero's overflow. */
+.top::before {
+  content: "";
+  position: absolute;
+  left: -100vw;
+  right: -100vw;
+  top: -10rem;
+  bottom: -5.5rem;
+  z-index: -1;
+  pointer-events: none;
+  /* A long, gentle fall-off — a short one leaves a visible band edge across
+     the sky. Warm-tinted rather than neutral black, so darkening the sky does
+     not also drain the colour out of the sunset. */
+  background: linear-gradient(
+    to bottom,
+    rgba(34, 20, 15, 0.86) 0%,
+    rgba(34, 20, 15, 0.82) 60%,
+    rgba(34, 20, 15, 0.36) 82%,
+    rgba(34, 20, 15, 0) 100%
+  );
+}
+
+.mark {
+  --wordmark-size: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
+  color: var(--on-dark);
+}
+
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--on-dark);
+}
+
+/* ---- Title -------------------------------------------------------------- */
+.breathe {
+  min-height: 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums;
+  font-weight: 300;
+  font-size: clamp(2.5rem, 1.3rem + 5.8vw, 6.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.titleLine {
+  display: block;
+}
+
+.dash {
+  color: var(--red-on-dark);
+  margin-right: 0.18em;
+}
+
+.accent {
+  font-style: italic;
+  font-weight: 300;
+}
+
+.standfirst {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 300;
+  line-height: 1.5;
+  max-width: 40ch;
+  color: var(--on-dark);
+  text-wrap: pretty;
+  margin-bottom: clamp(0.25rem, 1vw, 0.75rem);
+}
+
+/* ---- Bottom ------------------------------------------------------------- */
+.bottom {
+  position: relative;
+  display: grid;
+  gap: clamp(0.9rem, 0.6rem + 1vw, 1.4rem);
+}
+
+/* Veil behind the title block. Anchored to the block, so it follows the type
+   up and down as the viewport height changes. */
+.bottom::before {
+  content: "";
+  position: absolute;
+  left: -100vw;
+  right: -100vw;
+  top: -9rem;
+  bottom: -8rem;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(24, 15, 11, 0) 0%,
+    rgba(24, 15, 11, 0.6) 22%,
+    rgba(22, 15, 12, 0.82) 48%,
+    rgba(18, 16, 14, 0.9) 100%
+  );
+}
+
+.rule {
+  display: block;
+  height: 1px;
+  width: 100%;
+  /* Reveal paints the hairline with currentColor. */
+  color: rgba(244, 241, 234, 0.24);
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem clamp(1.5rem, 1rem + 3vw, 4rem);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem clamp(1.25rem, 1rem + 2vw, 3rem);
+}
+
+.metaItem {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 400;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  color: var(--on-dark);
+  margin: 0;
+}
+
+/* ---- Primary CTA --------------------------------------------------------
+ * padre65.com's filled call to action is solid oxblood rgb(99,28,28) with
+ * near-white text at a 48px hit area. That is reproduced here, squared off to
+ * match the theme's own --media-radius: 0.
+ * ------------------------------------------------------------------------- */
+.actions {
+  display: flex;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 2.75rem;
+  background: var(--deep);
+  color: var(--bg);
+  border: 1px solid var(--deep);
+  border-radius: 0;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.cta:hover,
+.cta:focus-visible {
+  background: var(--bg);
+  border-color: var(--bg);
+  color: var(--ink);
+}
+
+/* ---- Scroll cue --------------------------------------------------------- */
+.scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: fit-content;
+  min-height: 44px;
+  color: var(--on-dark);
+  opacity: 0.72;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.scrollLabel {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+}
+
+.scrollLine {
+  display: block;
+  width: 3rem;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left center;
+  animation: scrollHint 3.2s var(--ease) infinite;
+}
+
+@keyframes scrollHint {
+  0%,
+  100% {
+    transform: scaleX(0.35);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.scroll:hover,
+.scroll:focus-visible {
+  opacity: 1;
+}
+
+/* ---- Breakpoints -------------------------------------------------------- */
+@media (max-width: 40rem) {
+  .metaRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Full-width on a phone: this is the only action that matters. */
+  .cta {
+    width: 100%;
+  }
+}
+
+@media (min-width: 48rem) {
+  .mobileOnly {
+    display: none;
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+
+  .frame {
+    gap: 2.5rem;
+  }
+
+  .driftMark {
+    font-size: clamp(28rem, 44vw, 62rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .driftMark {
+    animation: none;
+  }
+
+  .scrollLine {
+    animation: none;
+    transform: scaleX(1);
+    opacity: 0.8;
+  }
+}

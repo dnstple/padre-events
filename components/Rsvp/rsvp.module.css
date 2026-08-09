@@ -1,0 +1,586 @@
+/* =============================================================================
+   RSVP — a continuation of the editorial page, not a form on a card.
+   The section itself changes surface colour when the flow opens.
+   ========================================================================== */
+
+.section {
+  position: relative;
+  background: var(--bg);
+  color: var(--ink);
+  padding-block: var(--section-y);
+  /* The deliberate surface transition between invitation and response. */
+  transition:
+    background-color 900ms var(--ease-editorial),
+    color 900ms var(--ease-editorial);
+  overflow: hidden;
+  scroll-margin-top: 0;
+}
+
+.section[data-open="true"] {
+  background: var(--ink-bg);
+  color: var(--on-dark);
+}
+
+.inner {
+  position: relative;
+  /* Same container as the hero, so the left edges line up down the page. */
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  /* Reserve height so opening the flow does not jolt the page. */
+  min-height: min(20rem, 38svh);
+}
+
+/* ---- Prompt (closed state) ---------------------------------------------- */
+.prompt {
+  display: grid;
+  gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  /* The reading measure is limited, but the block still starts at the page's
+     left margin rather than floating in the middle of the viewport. */
+  max-width: 68rem;
+}
+
+/* The reply sits directly under the details, on the same surface — answering
+   is the continuation of reading, not a separate destination. */
+.reply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
+  padding-top: clamp(0.5rem, 1vw, 1.25rem);
+}
+
+.index {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.indexRule {
+  order: 2;
+  flex: 1;
+  max-width: 6rem;
+  height: 1px;
+  background: var(--line);
+}
+
+.promptHeading {
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--step-3);
+  line-height: 1;
+  letter-spacing: -0.018em;
+}
+
+.promptHeading em {
+  font-style: italic;
+  color: var(--deep);
+}
+
+/* ---- Primary action ----------------------------------------------------- */
+/* padre65.com's filled call to action: solid oxblood rgb(99,28,28), near-white
+   text, 48px hit area — squared off to match the theme's --media-radius: 0. */
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 2.75rem;
+  background: var(--deep);
+  color: var(--bg);
+  border: 1px solid var(--deep);
+  border-radius: 0;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  width: fit-content;
+  transition:
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.action:hover:not(:disabled),
+.action:focus-visible:not(:disabled) {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+
+/* On the near-black flow surface, oxblood-on-black would barely register as a
+   shape. The fill inverts to bone so the primary action stays unmistakable. */
+.section[data-open="true"] .action {
+  background: var(--bg);
+  border-color: var(--bg);
+  color: var(--ink);
+}
+
+.section[data-open="true"] .action:hover:not(:disabled),
+.section[data-open="true"] .action:focus-visible:not(:disabled) {
+  background: var(--red-on-dark);
+  border-color: var(--red-on-dark);
+  color: var(--ink-bg);
+}
+
+.action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 40rem) {
+  /* Same as the hero: on a phone the primary action spans the column. */
+  .reply {
+    align-items: stretch;
+  }
+
+  .reply .action {
+    width: 100%;
+  }
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  order: 1;
+  padding-block: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  background: none;
+}
+
+.secondary:hover:not(:disabled),
+.secondary:focus-visible:not(:disabled) {
+  color: var(--on-dark);
+  border-bottom-color: currentColor;
+}
+
+.secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---- Flow --------------------------------------------------------------- */
+.flow {
+  display: grid;
+  gap: clamp(2rem, 1.2rem + 3vw, 3.25rem);
+  max-width: 46rem;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+
+.progressTrack {
+  position: relative;
+  flex: 1;
+  max-width: 10rem;
+  height: 1px;
+  background: var(--line-dark);
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--red);
+  transition: width 500ms var(--ease-editorial);
+}
+
+/* Directional step transition. */
+.step {
+  display: grid;
+  gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  animation: stepIn 420ms var(--ease-editorial) both;
+}
+
+.step[data-direction="back"] {
+  animation-name: stepInBack;
+}
+
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.9rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes stepInBack {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -0.9rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.question {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--step-3);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  max-width: 20ch;
+}
+
+.question:focus {
+  outline: none;
+}
+
+.question em {
+  font-style: italic;
+}
+
+.hint {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  letter-spacing: 0.02em;
+  color: var(--on-dark-muted);
+  max-width: 44ch;
+}
+
+/* ---- Typographic radio choices ------------------------------------------ */
+.choices {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line-dark);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.choicesLegend {
+  padding: 0;
+}
+
+.choice {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: clamp(1rem, 0.7rem + 1.2vw, 1.6rem);
+  border-bottom: 1px solid var(--line-dark);
+  cursor: pointer;
+  transition: color var(--dur) var(--ease);
+}
+
+.choice:first-of-type {
+  border-top: 1px solid var(--line-dark);
+}
+
+.choiceInput {
+  /* Native radio semantics retained; visually replaced by the marker. */
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.choiceMarker {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 1px solid currentColor;
+  transform: translateY(-0.15em);
+  transition: background-color var(--dur) var(--ease);
+}
+
+.choiceLabel {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--step-2);
+  line-height: 1.15;
+  color: var(--on-dark-muted);
+  transition: color var(--dur) var(--ease);
+}
+
+.choice:hover .choiceLabel {
+  color: var(--on-dark);
+}
+
+.choiceInput:checked ~ .choiceLabel {
+  color: var(--on-dark);
+}
+
+.choiceInput:checked ~ .choiceMarker {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.choiceInput:focus-visible ~ .choiceLabel {
+  outline: 2px solid var(--bg);
+  outline-offset: 4px;
+}
+
+/* Compact variant for the party-size choices. */
+.choicesCompact .choiceLabel {
+  font-size: var(--step-1);
+}
+
+/* ---- Fields ------------------------------------------------------------- */
+.fields {
+  display: grid;
+  gap: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+@media (min-width: 40rem) {
+  .fieldRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.25rem, 1rem + 1vw, 2rem);
+  }
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+
+.input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.6rem 0 0.55rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--field-line-dark);
+  border-radius: 0;
+  color: var(--on-dark);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 300;
+  line-height: 1.3;
+  transition: border-color var(--dur) var(--ease);
+  /* 16px+ computed prevents iOS zoom-on-focus. */
+}
+
+.input::placeholder {
+  color: transparent;
+}
+
+.input:hover {
+  border-bottom-color: var(--on-dark-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-bottom-color: var(--on-dark);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--bg);
+  outline-offset: 4px;
+}
+
+.input[aria-invalid="true"] {
+  border-bottom-color: var(--red);
+}
+
+/* Error text reserves its own line, so showing it never reflows the layout. */
+.errorSlot {
+  min-height: 1.15rem;
+}
+
+.error {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  letter-spacing: 0.04em;
+  color: var(--red-on-dark);
+}
+
+.formError {
+  padding: 0.85rem 1rem;
+  border-left: 2px solid var(--red);
+  background: rgba(160, 44, 44, 0.12);
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  color: var(--on-dark);
+}
+
+/* ---- Additional guest rows ---------------------------------------------- */
+.guestRows {
+  display: grid;
+  gap: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+  border-top: 1px solid var(--line-dark);
+  padding-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+}
+
+.guestRow {
+  display: grid;
+  gap: 0.75rem;
+  animation: stepIn 320ms var(--ease-editorial) both;
+}
+
+.guestRowLabel {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--red-on-dark);
+}
+
+/* ---- Review ------------------------------------------------------------- */
+.review {
+  border-top: 1px solid var(--line-dark);
+}
+
+.reviewRow {
+  display: grid;
+  gap: 0.15rem;
+  padding-block: clamp(0.9rem, 0.7rem + 0.8vw, 1.3rem);
+  border-bottom: 1px solid var(--line-dark);
+}
+
+@media (min-width: 40rem) {
+  .reviewRow {
+    grid-template-columns: minmax(8rem, 12rem) 1fr;
+    gap: 0 2rem;
+    align-items: baseline;
+  }
+}
+
+.reviewTerm {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+
+.reviewValue {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 300;
+  color: var(--on-dark);
+  overflow-wrap: anywhere;
+}
+
+.reviewList {
+  display: grid;
+  gap: 0.2rem;
+}
+
+/* ---- Actions ------------------------------------------------------------ */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+}
+
+.privacy {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  letter-spacing: 0.03em;
+  color: var(--on-dark-muted);
+  max-width: 46ch;
+}
+
+/* Honeypot — off-screen, not display:none, and never focusable. */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ---- Confirmation ------------------------------------------------------- */
+.confirmation {
+  display: grid;
+  gap: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+  max-width: 44rem;
+  animation: stepIn 700ms var(--ease-editorial) both;
+}
+
+.confirmHeading {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--step-4);
+  line-height: 1;
+  letter-spacing: -0.018em;
+}
+
+.confirmHeading:focus {
+  outline: none;
+}
+
+.confirmHeading em {
+  font-style: italic;
+  color: var(--red-on-dark);
+}
+
+.confirmBody {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--on-dark);
+  max-width: 40ch;
+}
+
+.confirmRule {
+  height: 1px;
+  background: var(--line-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step,
+  .guestRow,
+  .confirmation {
+    animation: none;
+  }
+
+  .section {
+    transition: none;
+  }
+}

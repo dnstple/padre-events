@@ -1,0 +1,643 @@
+/* =============================================================================
+   ADMIN — a restrained editorial guest list.
+   Same palette and typography as the invitation; clarity over expression.
+   No cards, no charts, no colour-coded status pills.
+   ========================================================================== */
+
+.shell {
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem 1.5rem;
+  padding: 1.25rem var(--gutter);
+  border-bottom: 1px solid var(--line);
+}
+
+.mark {
+  --wordmark-size: 1.1875rem;
+}
+
+.barLabel {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.barSpacer {
+  margin-left: auto;
+}
+
+.barEmail {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.main {
+  flex: 1;
+  padding: clamp(1.75rem, 1.2rem + 2vw, 3rem) var(--gutter)
+    calc(3rem + env(safe-area-inset-bottom, 0px));
+  max-width: var(--max);
+  width: 100%;
+  margin-inline: auto;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums;
+  font-weight: 300;
+  font-size: var(--step-3);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.subtitle {
+  margin-top: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- Totals ------------------------------------------------------------- */
+.totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin-top: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.total {
+  padding: clamp(0.9rem, 0.7rem + 0.6vw, 1.25rem);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+
+.totalLabel {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  color: var(--muted);
+  text-wrap: balance;
+}
+
+.totalValue {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 300;
+  line-height: 1;
+  /* Lining, tabular figures: a column of counts has to align and sit on one
+     baseline. Cormorant's default old-style figures do neither. */
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.totalPrimary .totalValue {
+  color: var(--deep);
+}
+
+/* ---- Controls ----------------------------------------------------------- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
+  margin-top: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.control {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.controlLabel {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.search {
+  width: min(22rem, 100%);
+  min-height: 2.75rem;
+  padding: 0.4rem 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--field-line);
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  color: var(--ink);
+}
+
+.search:focus {
+  outline: none;
+  border-bottom-color: var(--ink);
+}
+
+.search:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--field-line);
+}
+
+.segment {
+  min-height: 2.75rem;
+  padding: 0.4rem 0.9rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  color: var(--muted);
+  border-right: 1px solid var(--line);
+  background: transparent;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.segment:last-child {
+  border-right: 0;
+}
+
+.segment[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.controlActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-left: auto;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-tight);
+  text-transform: uppercase;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.button:hover:not(:disabled),
+.button:focus-visible:not(:disabled) {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.buttonQuiet {
+  border-color: var(--field-line);
+  color: var(--muted);
+}
+
+.buttonQuiet:hover:not(:disabled),
+.buttonQuiet:focus-visible:not(:disabled) {
+  background: transparent;
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  margin-top: 0.9rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.liveDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--red);
+  margin-right: 0.5rem;
+  vertical-align: 0.1em;
+}
+
+/* ---- Table -------------------------------------------------------------- */
+.tableWrap {
+  margin-top: 1.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  /* Mobile renders records instead — see the media query below. */
+  display: none;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.7rem 1rem 0.7rem 0;
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.table td {
+  padding: 0.85rem 1rem 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  vertical-align: top;
+}
+
+.table tr:last-child td {
+  border-bottom: 1px solid var(--line);
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  min-height: 44px;
+  padding: 0;
+}
+
+.sortButton:hover,
+.sortButton:focus-visible {
+  color: var(--ink);
+}
+
+.sortCaret {
+  font-size: 0.8em;
+  color: var(--deep);
+}
+
+/* These need to out-specify `.table td` above, which sets family and size. */
+.table td.cellTime {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.table td.cellName {
+  font-size: var(--step-1);
+  font-weight: 300;
+  overflow-wrap: anywhere;
+}
+
+.table td.cellGuests {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.guestList {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.none {
+  color: var(--muted);
+}
+
+.table td.cellParty {
+  font-family: var(--font-ui);
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- Status: shape + word, never colour alone --------------------------- */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statusGlyph {
+  width: 0.6rem;
+  height: 0.6rem;
+  flex: none;
+  border: 1px solid currentColor;
+}
+
+.statusAttending {
+  color: var(--deep);
+}
+
+.statusAttending .statusGlyph {
+  background: currentColor; /* filled square */
+}
+
+.statusDeclined {
+  color: var(--muted);
+}
+
+.statusDeclined .statusGlyph {
+  background: transparent; /* hollow square */
+}
+
+/* ---- Mobile records ----------------------------------------------------- */
+.records {
+  display: grid;
+  border-top: 1px solid var(--ink);
+}
+
+.record {
+  display: grid;
+  gap: 0.45rem;
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.recordTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.recordName {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 300;
+  overflow-wrap: anywhere;
+}
+
+.recordMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.25rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.recordGuests {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  overflow-wrap: anywhere;
+}
+
+.recordGuestsLabel {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 0.5rem;
+}
+
+/* ---- States ------------------------------------------------------------- */
+.state {
+  padding: clamp(3rem, 2rem + 4vw, 5rem) 0;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.stateTitle {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 300;
+}
+
+.stateBody {
+  margin-top: 0.5rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  color: var(--muted);
+  max-width: 48ch;
+}
+
+.stateError {
+  border-left: 2px solid var(--red);
+  padding-left: 1.25rem;
+}
+
+.loadingRules {
+  display: grid;
+  gap: 1.4rem;
+  margin-top: 1.5rem;
+  max-width: 40rem;
+}
+
+.loadingRule {
+  height: 1px;
+  background: var(--line);
+  animation: pulse 1.6s var(--ease) infinite;
+}
+
+.loadingRule:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.loadingRule:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ---- Login -------------------------------------------------------------- */
+.loginShell {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  background: var(--ink-bg);
+  color: var(--on-dark);
+  padding: var(--gutter);
+}
+
+.loginCard {
+  width: min(26rem, 100%);
+  display: grid;
+  gap: 1.75rem;
+}
+
+.loginMark {
+  --wordmark-size: 1.25rem;
+  color: var(--on-dark);
+}
+
+.loginTitle {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--step-2);
+  line-height: 1.1;
+}
+
+.loginNote {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  letter-spacing: 0.03em;
+  color: var(--on-dark-muted);
+}
+
+.loginFields {
+  display: grid;
+  gap: 1.25rem;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.loginField {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.loginLabel {
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+
+.loginInput {
+  min-height: 3rem;
+  padding: 0.55rem 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--field-line-dark);
+  border-radius: 0;
+  color: var(--on-dark);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 300;
+}
+
+.loginInput:focus {
+  outline: none;
+  border-bottom-color: var(--on-dark);
+}
+
+.loginInput:focus-visible {
+  outline: 2px solid var(--bg);
+  outline-offset: 4px;
+}
+
+.loginButton {
+  min-height: 3rem;
+  padding: 0.7rem 1.5rem;
+  border: 1px solid var(--on-dark);
+  border-radius: 0;
+  background: transparent;
+  color: var(--on-dark);
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.loginButton:hover:not(:disabled),
+.loginButton:focus-visible:not(:disabled) {
+  background: var(--on-dark);
+  color: var(--ink-bg);
+}
+
+.loginButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.loginError {
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--red);
+  background: rgba(160, 44, 44, 0.14);
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  color: var(--on-dark);
+}
+
+/* ---- Breakpoints -------------------------------------------------------- */
+@media (min-width: 30rem) {
+  .totals {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .totals {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .table {
+    display: table;
+  }
+
+  .records {
+    display: none;
+  }
+}
