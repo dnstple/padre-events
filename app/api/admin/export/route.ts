@@ -52,6 +52,10 @@ export async function GET() {
       "RSVP status",
       "Additional guests",
       "Party size",
+      // Present only for guests who opted into the newsletter afterwards.
+      // These two columns are what you paste into Klaviyo.
+      "Email",
+      "Newsletter consent (UTC)",
     ],
     ...rows.map((row) => [
       new Date(row.created_at).toISOString().replace("T", " ").slice(0, 19),
@@ -60,6 +64,8 @@ export async function GET() {
       row.rsvp_status === "attending" ? "Attending" : "Declined",
       guestNames(row.additional_guests).join("; "),
       row.party_size,
+      row.email ?? "",
+      row.newsletter_consent_at ?? "",
     ]),
   ]);
 

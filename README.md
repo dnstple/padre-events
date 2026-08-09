@@ -78,12 +78,12 @@ npx tsc --noEmit  # type check on its own
 1. Create a new spreadsheet at <https://sheets.new>.
 2. Rename the first tab to **RSVPs** (or set `GOOGLE_SHEET_TAB` to whatever you
    call it).
-3. Put this header in row 1, one value per cell across A to L:
+3. Put this header in row 1, one value per cell across A to N:
 
    ```
    Submitted at (UTC) | Event | First name | Last name | Status | Party size |
    Guest 1 first | Guest 1 last | Guest 2 first | Guest 2 last |
-   Guest 3 first | Guest 3 last
+   Guest 3 first | Guest 3 last | Email | Newsletter consent (UTC)
    ```
 
    Or run `npm run sheet:header` after step 5 and it writes the header for you.
@@ -97,7 +97,7 @@ npx tsc --noEmit  # type check on its own
 
    That is `GOOGLE_SHEET_ID`.
 
-The app only ever appends rows and reads columns A–L. It never deletes, never
+The app only ever appends rows and reads columns A–N. It never deletes, never
 reorders, and ignores rows belonging to a different `slug`, so you can keep
 several events in one sheet if you want.
 
@@ -238,6 +238,41 @@ Three things worth knowing:
 which is the authority. Raising it above 3 also means adding columns to the
 sheet and widening the row builder in `lib/sheets.ts` — the sheet has fixed
 columns for three guests.
+
+### The newsletter opt-in
+
+After a response is recorded, the confirmation screen offers an optional email
+sign-up. It is genuinely optional: nobody has to give an address to reply to the
+invitation, and skipping it needs no action.
+
+Everything about it lives in `config/event.ts`:
+
+```ts
+newsletter: {
+  enabled: true,                     // false removes it entirely
+  heading: "Hear about the next one",
+  body: "Occasional email about future Padre65 events and new work. …",
+  placeholder: "Email address",
+  cta: "Sign me up",
+  success: "You’re on the list for the next one.",
+},
+```
+
+**`body` is the consent record.** Pressing the button is the affirmative act, so
+that sentence is what the guest agreed to. The server stamps column N with the
+time they pressed it. If you change what you actually send them, change this
+line too — that is the thing being consented to, not decoration.
+
+**Getting the addresses into Klaviyo.** Export the CSV from `/admin`, sort or
+filter on the Email column, and import the rows that have one. Keep the consent
+timestamp with them: Klaviyo's own terms require you to be able to show when and
+how someone opted in, and a date in a column is the whole of that evidence.
+
+**How it reaches the sheet.** The opt-in fills columns M and N of the row the
+guest's own RSVP created, so an address always sits beside the person who gave
+it. The confirmation screen holds a signed, thirty-minute token naming that row;
+the endpoint refuses anything else. A guest cannot write to somebody else's row,
+and the endpoint cannot be used at all without having submitted a response.
 
 ## 12. Replace the hero media
 
@@ -416,8 +451,12 @@ await fetch("/api/admin/rsvps").then(r => r.status)   // 401
 Press **Export CSV** on the dashboard. Columns:
 
 ```
-Submitted at (UTC), First name, Last name, RSVP status, Additional guests, Party size
+Submitted at (UTC), First name, Last name, RSVP status, Additional guests,
+Party size, Email, Newsletter consent (UTC)
 ```
+
+The last two are populated only for guests who opted into the newsletter, and
+they are what you paste into Klaviyo — see below.
 
 Additional guests are semicolon-separated in one cell. Every cell is quoted, and
 any value starting with `=`, `+`, `-` or `@` is prefixed with an apostrophe so
@@ -630,7 +669,7 @@ the one that matters when local and production disagree.
 Third possibility, if both agree and the row genuinely is in your sheet: press
 `Ctrl` + `End` (on a laptop without an End key, `Fn` + `Ctrl` + `→`) to jump to
 the last used cell. `append` writes below the last row containing anything in
-columns A–L, so a single stray character typed at row 400 puts new responses at
+columns A–N, so a single stray character typed at row 400 puts new responses at
 row 401 with a field of blank rows above them.
 
 ### Everything else

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { eventConfig } from "@/config/event";
+import { issueRowToken } from "@/lib/row-token";
 import { appendRsvp, isSheetsConfigured } from "@/lib/sheets";
 import {
   MAX_BODY_BYTES,
@@ -85,6 +86,8 @@ export async function POST(request: Request) {
           additional_guests: [],
           party_size: submission.rsvp_status === "attending" ? 1 : 0,
         },
+        // No row was written, so there is nothing to attach an address to.
+        emailToken: null,
       },
       { status: 201, headers: jsonHeaders },
     );
@@ -115,15 +118,24 @@ export async function POST(request: Request) {
     party_size: partySize,
   };
 
+  let rowNumber: number | null = null;
   try {
-    await appendRsvp(rsvp);
+    ({ rowNumber } = await appendRsvp(rsvp));
   } catch (error) {
     // Log the failure, never the body.
     console.error("[rsvp] append failed:", error instanceof Error ? error.message : "unknown");
     return problem(500, "We could not save your response. Please try again.");
   }
 
-  return NextResponse.json({ ok: true, rsvp }, { status: 201, headers: jsonHeaders });
+  // Lets the confirmation screen add an email address to this row, and nothing
+  // else. Absent if the row could not be identified, which hides the newsletter
+  // form rather than offering something that cannot work.
+  const emailToken = rowNumber === null ? null : issueRowToken(rowNumber);
+
+  return NextResponse.json(
+    { ok: true, rsvp, emailToken },
+    { status: 201, headers: jsonHeaders },
+  );
 }
 
 /** Everything other than POST is closed. */

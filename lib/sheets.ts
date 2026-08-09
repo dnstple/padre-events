@@ -51,7 +51,14 @@ export const HEADER_ROW = [
   "Guest 2 last",
   "Guest 3 first",
   "Guest 3 last",
+  // Optional, added after the response is written if the guest opts in.
+  "Email",
+  "Newsletter consent (UTC)",
 ] as const;
+
+/** Columns A–N. Guest data ends at L; the newsletter opt-in occupies M and N. */
+const FIRST_COLUMN = "A";
+const LAST_COLUMN = "N";
 
 export function isSheetsConfigured(): boolean {
   return Boolean(
@@ -159,13 +166,14 @@ export type NewRsvp = {
 };
 
 /**
- * Appends one response.
+ * Appends one response and returns the row number it landed on, so the
+ * newsletter opt-in can fill in columns M and N of that same row afterwards.
  *
  * `valueInputOption: RAW` stores every cell as literal text rather than parsing
  * it the way the Sheets UI would. Names that could act as formulas are already
  * rejected by lib/name-rules.ts; this is the second layer.
  */
-export async function appendRsvp(rsvp: NewRsvp): Promise<void> {
+export async function appendRsvp(rsvp: NewRsvp): Promise<{ rowNumber: number | null }> {
   const g = rsvp.additional_guests;
   const row = [
     new Date().toISOString().replace("T", " ").slice(0, 19),
@@ -183,13 +191,45 @@ export async function appendRsvp(rsvp: NewRsvp): Promise<void> {
   ];
 
   const response = await sheetsFetch(
-    `/values/${encodeURIComponent(SHEET_TAB)}!A:L:append` +
+    `/values/${encodeURIComponent(SHEET_TAB)}!${FIRST_COLUMN}:${LAST_COLUMN}:append` +
       `?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
     { method: "POST", body: JSON.stringify({ values: [row] }) },
   );
 
   if (!response.ok) {
     throw new Error(`Sheets append failed (${response.status})`);
+  }
+
+  // Google reports where it put the row, e.g. "RSVPs!A7:N7". If that ever
+  // changes shape the RSVP still succeeded — only the opt-in is lost, so this
+  // degrades to null rather than throwing.
+  const data = (await response.json().catch(() => null)) as
+    | { updates?: { updatedRange?: string } }
+    | null;
+
+  const match = data?.updates?.updatedRange?.match(/![A-Z]+(\d+)/);
+  return { rowNumber: match ? Number(match[1]) : null };
+}
+
+/**
+ * Writes the newsletter opt-in into columns M and N of a row that already
+ * exists. Only ever called with a row number that arrived inside a signed
+ * token, so a visitor cannot aim this at somebody else's response.
+ */
+export async function attachNewsletterOptIn(
+  rowNumber: number,
+  email: string,
+): Promise<void> {
+  const consentAt = new Date().toISOString().replace("T", " ").slice(0, 19);
+
+  const response = await sheetsFetch(
+    `/values/${encodeURIComponent(SHEET_TAB)}!M${rowNumber}:N${rowNumber}` +
+      `?valueInputOption=RAW`,
+    { method: "PUT", body: JSON.stringify({ values: [[email, consentAt]] }) },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Sheets newsletter update failed (${response.status})`);
   }
 }
 
@@ -250,7 +290,7 @@ export async function describeSheet(): Promise<SheetIdentity> {
 /** Reads every response for the configured event, newest first. */
 export async function readRsvps(): Promise<RsvpRow[]> {
   const response = await sheetsFetch(
-    `/values/${encodeURIComponent(SHEET_TAB)}!A2:L?majorDimension=ROWS`,
+    `/values/${encodeURIComponent(SHEET_TAB)}!${FIRST_COLUMN}2:${LAST_COLUMN}?majorDimension=ROWS`,
   );
 
   if (!response.ok) {
@@ -276,6 +316,8 @@ export async function readRsvps(): Promise<RsvpRow[]> {
       g2l = "",
       g3f = "",
       g3l = "",
+      email = "",
+      consentAt = "",
     ] = cells;
 
     // Skip blank rows and anything belonging to a different event.
@@ -300,6 +342,8 @@ export async function readRsvps(): Promise<RsvpRow[]> {
       additional_guests: rsvpStatus === "attending" ? guests : [],
       party_size: Number(partySize) || 0,
       created_at: submittedAt ? `${submittedAt.replace(" ", "T")}Z` : new Date(0).toISOString(),
+      email: email || null,
+      newsletter_consent_at: consentAt || null,
     });
   });
 

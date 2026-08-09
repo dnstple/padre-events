@@ -9,6 +9,9 @@ export type RsvpRow = {
   additional_guests: Guest[];
   party_size: number;
   created_at: string;
+  /** Only present when the guest opted into the newsletter afterwards. */
+  email: string | null;
+  newsletter_consent_at: string | null;
 };
 
 export type RsvpTotals = {

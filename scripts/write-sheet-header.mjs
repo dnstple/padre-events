@@ -12,6 +12,7 @@ const HEADER = [
   "Submitted at (UTC)", "Event", "First name", "Last name", "Status", "Party size",
   "Guest 1 first", "Guest 1 last", "Guest 2 first", "Guest 2 last",
   "Guest 3 first", "Guest 3 last",
+  "Email", "Newsletter consent (UTC)",
 ];
 
 loadEnvLocal();
@@ -21,7 +22,7 @@ requireConfig(c);
 const token = await getAccessToken(c);
 
 const res = await fetch(
-  `${c.api}/${c.sheetId}/values/${encodeURIComponent(c.tab)}!A1:L1?valueInputOption=RAW`,
+  `${c.api}/${c.sheetId}/values/${encodeURIComponent(c.tab)}!A1:N1?valueInputOption=RAW`,
   {
     method: "PUT",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },

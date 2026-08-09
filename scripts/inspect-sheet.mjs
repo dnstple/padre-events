@@ -50,7 +50,7 @@ if (!tabs.includes(c.tab)) {
 
 /* -- 2. What is in it? ------------------------------------------------------ */
 const valuesRes = await fetch(
-  `${c.api}/${c.sheetId}/values/${encodeURIComponent(c.tab)}!A1:L?majorDimension=ROWS`,
+  `${c.api}/${c.sheetId}/values/${encodeURIComponent(c.tab)}!A1:N?majorDimension=ROWS`,
   { headers: auth },
 );
 
@@ -68,7 +68,7 @@ if (rows.length === 0) {
   process.exit(0);
 }
 
-console.log(`\n${rows.length} row${rows.length === 1 ? "" : "s"} in "${c.tab}" (A1:L):\n`);
+console.log(`\n${rows.length} row${rows.length === 1 ? "" : "s"} in "${c.tab}" (A1:N):\n`);
 
 rows.forEach((cells, i) => {
   const rowNumber = i + 1;

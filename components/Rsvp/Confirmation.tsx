@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { eventConfig } from "@/config/event";
 import type { Guest, RsvpStatus } from "@/lib/name-rules";
 
+import NewsletterOptIn from "./NewsletterOptIn";
 import styles from "./rsvp.module.css";
 
 type Props = {
@@ -15,6 +16,8 @@ type Props = {
     additional_guests: Guest[];
     party_size: number;
   };
+  /** Signed reference to the sheet row this response created, if any. */
+  emailToken: string | null;
   onReturn: () => void;
   titleId: string;
 };
@@ -22,10 +25,13 @@ type Props = {
 /**
  * SUCCESS STATE
  *
- * No claim of a confirmation email — no email address was ever collected.
+ * Makes no claim that a confirmation email has been sent, because none is.
  * The heading receives focus so the outcome is announced immediately.
+ *
+ * The newsletter opt-in below is genuinely optional and comes after the
+ * outcome, so nobody has to give an address to reply to the invitation.
  */
-export default function Confirmation({ result, onReturn, titleId }: Props) {
+export default function Confirmation({ result, emailToken, onReturn, titleId }: Props) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const attending = result.rsvp_status === "attending";
   const guests = Array.isArray(result.additional_guests) ? result.additional_guests : [];
@@ -116,6 +122,11 @@ export default function Confirmation({ result, onReturn, titleId }: Props) {
             </div>
           </dl>
         </>
+      ) : null}
+
+      {/* Optional, and only when the server handed back a row to attach it to. */}
+      {eventConfig.newsletter.enabled && emailToken ? (
+        <NewsletterOptIn token={emailToken} />
       ) : null}
 
       <div className={styles.actions}>

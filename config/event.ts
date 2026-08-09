@@ -87,6 +87,22 @@ export type EventConfig = {
   shopUrl: string;
   /** Hard cap on additional attendees. The server enforces this too. */
   maxAdditionalGuests: number;
+  /**
+   * Optional newsletter opt-in, shown after a response is recorded. Set
+   * `enabled: false` to remove it entirely — nothing else needs changing.
+   *
+   * `body` is what the guest is agreeing to receive. Pressing the button is
+   * the consent, so this sentence is the record of what was consented to:
+   * change it only if the promise itself changes.
+   */
+  newsletter: {
+    enabled: boolean;
+    heading: string;
+    body: string;
+    placeholder: string;
+    cta: string;
+    success: string;
+  };
   seo: {
     title: string;
     description: string;
@@ -157,6 +173,15 @@ export const eventConfig: EventConfig = {
   shopUrl: "https://padre65.com/",
 
   maxAdditionalGuests: 3,
+
+  newsletter: {
+    enabled: true,
+    heading: "Hear about the next one",
+    body: "Occasional email about future Padre65 events and new work. Nothing else, and you can unsubscribe any time.",
+    placeholder: "Email address",
+    cta: "Sign me up",
+    success: "You’re on the list for the next one.",
+  },
 
   seo: {
     title: "PADRE65 — House Party",

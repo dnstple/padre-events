@@ -55,6 +55,9 @@ export default function RsvpSection() {
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SubmittedRsvp | null>(null);
+  // Signed reference to the sheet row, so the confirmation screen can offer
+  // the newsletter opt-in. Null when the server did not issue one.
+  const [emailToken, setEmailToken] = useState<string | null>(null);
 
   const submitLock = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -245,6 +248,7 @@ export default function RsvpSection() {
       }
 
       setResult(data.rsvp as SubmittedRsvp);
+      setEmailToken(typeof data.emailToken === "string" ? data.emailToken : null);
       setDirection("forward");
       setPhase("done");
       // Intentionally leave submitLock engaged — this flow submits once.
@@ -260,6 +264,7 @@ export default function RsvpSection() {
     submitLock.current = false;
     setSubmitting(false);
     setResult(null);
+    setEmailToken(null);
     setStatus(null);
     setFirstName("");
     setLastName("");
@@ -318,7 +323,12 @@ export default function RsvpSection() {
         ) : null}
 
         {phase === "done" && result ? (
-          <Confirmation result={result} onReturn={restart} titleId={`${uid}-rsvp-title`} />
+          <Confirmation
+            result={result}
+            emailToken={emailToken}
+            onReturn={restart}
+            titleId={`${uid}-rsvp-title`}
+          />
         ) : null}
 
         {isFlowStep ? (
