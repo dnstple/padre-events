@@ -579,6 +579,45 @@ Notes:
 
 ## Troubleshooting
 
+### "It said I was on the list, but the sheet is empty"
+
+Start here, because this one is misleading. The confirmation screen only
+appears after Google returns a success. A wrong ID gives 404, an unshared sheet
+gives 403, a missing tab gives 400 — all of which show the visitor an error
+instead. So if you saw the confirmation, a row was written. It is in a
+different place from the one you are looking at.
+
+Two tools find it.
+
+**`npm run sheet:check`** — reads your `.env.local` and prints the *title* of
+the spreadsheet those credentials actually open, the names of all its tabs, and
+every row in the RSVP tab with its row number:
+
+```
+Spreadsheet:  "Padre65 House Party RSVPs"
+URL:          https://docs.google.com/spreadsheets/d/1AbC.../edit
+Tabs:         "RSVPs", "Sheet2"
+
+  3 rows in "RSVPs" (A1:L):
+     1  Submitted at (UTC) | Event | First name | ...
+     2  2026-08-09 14:12:03 | house-party-2026 | Ada | Lovelace | attending | 2 | ...
+```
+
+If that title is not the document you have open, you have two spreadsheets.
+
+**`/api/admin/diagnostics`** — the same information from the *deployed* server,
+so it reflects the environment variables in Vercel rather than the ones on your
+laptop. Sign in at `/admin`, then visit the path in the same browser. This is
+the one that matters when local and production disagree.
+
+Third possibility, if both agree and the row genuinely is in your sheet: press
+`Ctrl` + `End` (on a laptop without an End key, `Fn` + `Ctrl` + `→`) to jump to
+the last used cell. `append` writes below the last row containing anything in
+columns A–L, so a single stray character typed at row 400 puts new responses at
+row 401 with a field of blank rows above them.
+
+### Everything else
+
 **"RSVPs are not available right now."** One of `GOOGLE_SHEET_ID`,
 `GOOGLE_SERVICE_ACCOUNT_EMAIL` or `GOOGLE_PRIVATE_KEY` is missing. On Vercel,
 redeploy after adding them — env vars are read at build time too.

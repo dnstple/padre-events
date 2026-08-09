@@ -186,6 +186,56 @@ export async function appendRsvp(rsvp: NewRsvp): Promise<void> {
 }
 
 /* -----------------------------------------------------------------------------
+ * Diagnostics
+ * -------------------------------------------------------------------------- */
+
+export type SheetIdentity = {
+  spreadsheetId: string;
+  title: string;
+  url: string;
+  tabs: string[];
+  configuredTab: string;
+  tabExists: boolean;
+  serviceAccountEmail: string;
+};
+
+/**
+ * Which document is this deployment actually writing to?
+ *
+ * Exists because "the form said it worked but the sheet is empty" is almost
+ * always two spreadsheets, not a failed write — and from the outside there is
+ * no way to tell which one the running server holds the ID for. Administrator
+ * access only.
+ */
+export async function describeSheet(): Promise<SheetIdentity> {
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID ?? "";
+
+  const response = await sheetsFetch("?fields=properties.title,sheets.properties.title");
+  if (!response.ok) {
+    throw new Error(`Sheets metadata failed (${response.status})`);
+  }
+
+  const data = (await response.json()) as {
+    properties?: { title?: string };
+    sheets?: { properties?: { title?: string } }[];
+  };
+
+  const tabs = (data.sheets ?? [])
+    .map((sheet) => sheet.properties?.title)
+    .filter((title): title is string => Boolean(title));
+
+  return {
+    spreadsheetId,
+    title: data.properties?.title ?? "(untitled)",
+    url: `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`,
+    tabs,
+    configuredTab: SHEET_TAB,
+    tabExists: tabs.includes(SHEET_TAB),
+    serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ?? "",
+  };
+}
+
+/* -----------------------------------------------------------------------------
  * Reads
  * -------------------------------------------------------------------------- */
 

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm run build",
-    "sheet:header": "node scripts/write-sheet-header.mjs"
+    "sheet:header": "node scripts/write-sheet-header.mjs",
+    "sheet:check": "node scripts/inspect-sheet.mjs"
   },
   "dependencies": {
     "next": "16.3.0",
