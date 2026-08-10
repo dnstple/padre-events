@@ -32,17 +32,40 @@ type Props = {
  * outcome, so nobody has to give an address to reply to the invitation.
  */
 export default function Confirmation({ result, emailToken, onReturn, titleId }: Props) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const attending = result.rsvp_status === "attending";
   const guests = Array.isArray(result.additional_guests) ? result.additional_guests : [];
 
   useEffect(() => {
-    const id = window.requestAnimationFrame(() => headingRef.current?.focus());
+    // Focus without scrolling. Letting the browser do it puts the heading at
+    // the top of the viewport, which pushes the newsletter opt-in below the
+    // fold — the one thing this screen must not do.
+    headingRef.current?.focus({ preventScroll: true });
+
+    const root = rootRef.current;
+    if (!root) return;
+
+    const id = window.requestAnimationFrame(() => {
+      // offsetHeight is layout height, so the entrance animation's transform
+      // cannot skew the decision.
+      const fits = root.offsetHeight <= window.innerHeight - 24;
+      root.scrollIntoView({
+        // Centred when the whole thing fits, so nothing is cut off at either
+        // end; top-aligned when it cannot, so at least the outcome is read
+        // first and the rest is one obvious scroll away.
+        block: fits ? "center" : "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
+    });
+
     return () => window.cancelAnimationFrame(id);
   }, []);
 
   return (
-    <div className={styles.confirmation}>
+    <div className={styles.confirmation} ref={rootRef}>
       {/* Assertive: the submission outcome should interrupt. */}
       <p role="status" aria-live="assertive" className="visually-hidden">
         {attending
@@ -97,14 +120,10 @@ export default function Confirmation({ result, emailToken, onReturn, titleId }: 
               </dd>
             </div>
             <div className={styles.reviewRow}>
-              <dt className={styles.reviewTerm}>Date</dt>
+              <dt className={styles.reviewTerm}>When</dt>
               <dd className={styles.reviewValue}>
                 <time dateTime={eventConfig.dateISO}>{eventConfig.dateDisplay}</time>
-              </dd>
-            </div>
-            <div className={styles.reviewRow}>
-              <dt className={styles.reviewTerm}>Time</dt>
-              <dd className={styles.reviewValue}>
+                {" · "}
                 {eventConfig.doorsTime} — {eventConfig.finishTime.toLowerCase()}
               </dd>
             </div>

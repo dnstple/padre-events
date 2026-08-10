@@ -699,3 +699,69 @@
     width: 100%;
   }
 }
+
+/* ---- Confirmation density ------------------------------------------------ */
+/* The confirmation now carries the newsletter opt-in as well, and the whole
+   block is supposed to be readable without scrolling. So it has to earn its
+   height: the summary drops to one line per fact, and the vertical rhythm
+   tightens. The review list on step 4 is left alone — that screen is shorter
+   and roominess helps people check their answers. */
+.confirmation {
+  gap: clamp(1.15rem, 0.85rem + 1.2vw, 1.8rem);
+}
+
+.confirmation .reviewRow {
+  /* Two columns at every width, not just above 40rem: stacking the label above
+     the value costs a line per fact, which is five lines on a phone. */
+  grid-template-columns: minmax(5.5rem, auto) 1fr;
+  gap: 0 1.25rem;
+  align-items: baseline;
+  padding-block: clamp(0.45rem, 0.35rem + 0.35vw, 0.65rem);
+}
+
+.confirmation .reviewValue {
+  font-size: var(--step-0);
+  line-height: 1.35;
+}
+
+.confirmation .reviewList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.85rem;
+}
+
+/* Short viewports — a laptop at 720, or a phone in landscape. Nothing here
+   changes the design, it just stops the block outgrowing the screen. */
+@media (max-height: 46rem) {
+  .confirmation {
+    gap: clamp(0.85rem, 0.7rem + 0.6vw, 1.2rem);
+  }
+
+  .confirmation .confirmHeading {
+    font-size: var(--step-3);
+  }
+
+  .confirmation .confirmBody {
+    font-size: var(--step-0);
+  }
+
+  .confirmation .newsletter {
+    gap: 0.65rem;
+    padding-top: 1.1rem;
+  }
+
+  .confirmation .newsletterHeading {
+    font-size: var(--step-1);
+  }
+}
+
+/* The review list carries its own top border and the newsletter its own, so
+   the standalone rule above and the last row's bottom border were each drawing
+   a second hairline a few pixels from the first. One line per boundary. */
+.confirmation .review {
+  border-top: 0;
+}
+
+.confirmation .reviewRow:last-child {
+  border-bottom: 0;
+}

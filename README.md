@@ -268,6 +268,15 @@ filter on the Email column, and import the rows that have one. Keep the consent
 timestamp with them: Klaviyo's own terms require you to be able to show when and
 how someone opted in, and a date in a column is the whole of that evidence.
 
+**It has to fit on one screen.** The whole confirmation — outcome, summary and
+opt-in — is sized to sit inside the viewport without scrolling, because an
+optional thing below the fold is an optional thing nobody sees. That is why the
+summary is one line per fact rather than label-above-value, why `Date` and
+`Time` are a single `When` row, and why there is a `max-height` block in
+`rsvp.module.css` that tightens the type on short screens. If you add a row to
+the summary or lengthen the newsletter copy, re-check it: the geometry is
+asserted at eight viewport sizes, for every party size, in the test suite.
+
 **How it reaches the sheet.** The opt-in fills columns M and N of the row the
 guest's own RSVP created, so an address always sits beside the person who gave
 it. The confirmation screen holds a signed, thirty-minute token naming that row;
