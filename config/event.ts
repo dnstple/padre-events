@@ -127,9 +127,9 @@ export const eventConfig: EventConfig = {
   doorsTime: "10:00 PM",
   finishTime: "Late",
 
-  venue: "Marylebone",
-  address: "", // ← no street address yet; the venue shows on its own until set
-  mapsUrl: "", // ← set a real Maps URL to reveal the "Open in Maps" link
+  venue: "180 Bickenhall Mansions",
+  address: "Marylebone, London W1U 6BR",
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=180+Bickenhall+Mansions+London+W1U+6BR",
 
   dressCode: "Come as you are.",
   admissionText: "Complimentary with RSVP.",

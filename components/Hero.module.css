@@ -409,3 +409,8 @@
     opacity: 0.8;
   }
 }
+
+/* Keeps a unit — a venue name, a time — from breaking mid-phrase. */
+.nowrap {
+  white-space: nowrap;
+}

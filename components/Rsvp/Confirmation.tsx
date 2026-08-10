@@ -49,7 +49,9 @@ export default function Confirmation({ result, emailToken, onReturn, titleId }: 
     const id = window.requestAnimationFrame(() => {
       // offsetHeight is layout height, so the entrance animation's transform
       // cannot skew the decision.
-      const fits = root.offsetHeight <= window.innerHeight - 24;
+      // The 48 is the scroll margin at both ends, so "fits" means fits
+      // with the same breathing room the scroll will actually leave.
+      const fits = root.offsetHeight <= window.innerHeight - 48;
       root.scrollIntoView({
         // Centred when the whole thing fits, so nothing is cut off at either
         // end; top-aligned when it cannot, so at least the outcome is read

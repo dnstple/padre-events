@@ -138,7 +138,10 @@ export default function Hero() {
                 <time dateTime={eventConfig.dateISO}>{eventConfig.dateDisplay}</time>
               </Reveal>
               <Reveal variant="fade" delay={380} as="p" className={styles.metaItem} immediate>
-                {eventConfig.venue} · {eventConfig.doorsTime}
+                {/* Each half stays whole, so a long venue name wraps between
+                    them rather than orphaning "PM" on its own line. */}
+                <span className={styles.nowrap}>{eventConfig.venue}</span>{" · "}
+                <span className={styles.nowrap}>{eventConfig.doorsTime}</span>
               </Reveal>
             </div>
 

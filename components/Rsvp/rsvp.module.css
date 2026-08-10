@@ -765,3 +765,31 @@
 .confirmation .reviewRow:last-child {
   border-bottom: 0;
 }
+
+/* The entrance animation starts the block 0.9rem low, and scrollIntoView aligns
+   whatever box is on screen at that moment — so without a scroll margin the
+   block slides 14px up under the top edge once the animation settles. */
+.confirmation {
+  scroll-margin-block: 1.5rem;
+}
+
+/* Very narrow screens. A 320px phone with three additional guests is the
+   tallest this screen ever gets, and it was landing within a few pixels of the
+   viewport — fine in a screenshot, clipped once real browser chrome is there. */
+@media (max-width: 22.5rem) {
+  .confirmation .confirmHeading {
+    font-size: var(--step-3);
+  }
+
+  .confirmation .confirmBody {
+    font-size: var(--step-0);
+  }
+
+  .confirmation .reviewRow {
+    padding-block: 0.35rem;
+  }
+
+  .confirmation .newsletterHeading {
+    font-size: var(--step-1);
+  }
+}
