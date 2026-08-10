@@ -35,9 +35,23 @@
   color: var(--muted);
 }
 
+/* Venue: text on the left, Maps link on the right, so the row is two lines
+   rather than three. `flex-wrap` means a narrow column still gets the old
+   stacked behaviour instead of a squeezed link. */
+.venueRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+}
+
+.venueText {
+  display: block;
+}
+
 .mapsLink {
   display: inline-block;
-  margin-top: 0.3rem;
   font-family: var(--font-ui);
   font-size: var(--step--2);
   font-weight: 500;
@@ -52,6 +66,20 @@
 .mapsLink:hover,
 .mapsLink:focus-visible {
   opacity: 0.62;
+}
+
+/* The underline has to sit tight against the words, which leaves the link only
+   18px tall — under the 24px WCAG 2.2 asks for. This extends the hit area
+   without moving anything, so the row keeps its height and the rule keeps its
+   position. */
+.mapsLink {
+  position: relative;
+}
+
+.mapsLink::after {
+  content: "";
+  position: absolute;
+  inset: -0.5rem -0.4rem;
 }
 
 @media (min-width: 40rem) {

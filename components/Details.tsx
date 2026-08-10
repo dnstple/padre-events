@@ -25,11 +25,16 @@ export default function Details() {
     {
       term: "Venue",
       value: (
-        <>
-          {eventConfig.venue}
-          {eventConfig.address ? (
-            <span className={styles.address}>{eventConfig.address}</span>
-          ) : null}
+        // The link sits beside the address rather than beneath it, so the
+        // venue row costs two lines instead of three. It wraps underneath on
+        // its own only when the column is too narrow to hold both.
+        <span className={styles.venueRow}>
+          <span className={styles.venueText}>
+            {eventConfig.venue}
+            {eventConfig.address ? (
+              <span className={styles.address}>{eventConfig.address}</span>
+            ) : null}
+          </span>
           {eventConfig.mapsUrl ? (
             <a
               className={styles.mapsLink}
@@ -41,7 +46,7 @@ export default function Details() {
               <span className="visually-hidden"> (opens in a new tab)</span>
             </a>
           ) : null}
-        </>
+        </span>
       ),
     },
     { term: "Dress", value: eventConfig.dressCode },
