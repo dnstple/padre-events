@@ -70,6 +70,14 @@ export type EventConfig = {
   doorsTime: string;
   finishTime: string;
   venue: string;
+  /**
+   * What the opening frame says instead of the venue — a neighbourhood rather
+   * than a building. The hero is the part that gets screenshotted and
+   * forwarded, so it names the area; the building appears further down, once
+   * someone has actually opened the invitation. Set it to the same string as
+   * `venue` if you would rather not make that distinction.
+   */
+  venueShort: string;
   /** Street address. Leave "" to show the venue alone — useful when the exact
    *  address is shared closer to the date. */
   address: string;
@@ -130,6 +138,7 @@ export const eventConfig: EventConfig = {
   // No house number anywhere public: the block and the postcode are enough to
   // find the door, and the flat number goes out privately.
   venue: "Bickenhall Mansions",
+  venueShort: "Marylebone",
   address: "Marylebone, London W1U 6BR",
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bickenhall+Mansions+London+W1U+6BR",
 

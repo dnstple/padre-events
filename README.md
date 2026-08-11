@@ -200,28 +200,41 @@ component contains an event date, a venue, a link or a piece of copy.
 
 ```ts
 export const eventConfig: EventConfig = {
-  slug: "after-hours-2026",       // groups RSVPs; change it for a new event
-  name: "PADRE65 — AFTER HOURS",
+  slug: "house-party-2026",       // groups RSVPs; change it for a new event
+  name: "PADRE65 — HOUSE PARTY",
   eyebrow: "PRIVATE EVENT · LONDON",
-  headline: "A night with Padre65.",
+  title: { lead: "PADRE65", accent: "HOUSE PARTY" },
   description: "…",
-  dateISO: "2026-09-17T19:00:00+01:00", // machine-readable, for <time>
-  dateDisplay: "Thursday, 17 September 2026",
-  dateShort: "Thursday, 17 September",   // used on the confirmation screen
-  doorsTime: "7:00 PM",
+  dateISO: "2026-08-15T22:00:00+01:00", // machine-readable, for <time>
+  dateDisplay: "Saturday, 15 August",
+  dateShort: "Saturday, 15 August",     // used on the confirmation screen
+  doorsTime: "10:00 PM",
   finishTime: "Late",
-  venue: "The Padre65 Studio",
-  address: "65 Example Street, Soho, London W1",
-  mapsUrl: "",                    // "" hides the "Open in Maps" link entirely
+  venue: "Bickenhall Mansions",   // shown in the details and the confirmation
+  venueShort: "Marylebone",       // shown in the hero — see below
+  address: "Marylebone, London W1U 6BR",
+  mapsUrl: "…",                   // "" hides the "Open in Maps" link entirely
   dressCode: "Come as you are.",
   admissionText: "Complimentary with RSVP.",
-  footerStatement: "Stories Woven in Motion.",
+  labels: { heroCta: "Details", rsvpCta: "RSVP" },
+  footerStatement: "Created by friends and family",
   instagramUrl: "https://www.instagram.com/_padre65/",
   shopUrl: "https://padre65.com/",
   maxAdditionalGuests: 3,
+  newsletter: { … },              // see "The newsletter opt-in" below
   seo: { title: "…", description: "…", image: "/media/og.png", noindex: true },
 };
 ```
+
+**Why there are two venue fields.** The hero is the part that gets
+screenshotted and forwarded, so it shows `venueShort` — a neighbourhood. The
+building and postcode appear further down, once someone has actually opened the
+invitation, and again on the confirmation. Nothing enforces the distinction; set
+both to the same string if you would rather not make it.
+
+Keep the house number out of `venue` and out of `mapsUrl` if you do not want it
+public. A postcode still lands guests at the right building, and the flat number
+can go out privately.
 
 Three things worth knowing:
 

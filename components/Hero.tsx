@@ -140,7 +140,7 @@ export default function Hero() {
               <Reveal variant="fade" delay={380} as="p" className={styles.metaItem} immediate>
                 {/* Each half stays whole, so a long venue name wraps between
                     them rather than orphaning "PM" on its own line. */}
-                <span className={styles.nowrap}>{eventConfig.venue}</span>{" · "}
+                <span className={styles.nowrap}>{eventConfig.venueShort}</span>{" · "}
                 <span className={styles.nowrap}>{eventConfig.doorsTime}</span>
               </Reveal>
             </div>
