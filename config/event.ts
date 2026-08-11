@@ -127,9 +127,11 @@ export const eventConfig: EventConfig = {
   doorsTime: "10:00 PM",
   finishTime: "Late",
 
-  venue: "180 Bickenhall Mansions",
+  // No house number anywhere public: the block and the postcode are enough to
+  // find the door, and the flat number goes out privately.
+  venue: "Bickenhall Mansions",
   address: "Marylebone, London W1U 6BR",
-  mapsUrl: "https://www.google.com/maps/search/?api=1&query=180+Bickenhall+Mansions+London+W1U+6BR",
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bickenhall+Mansions+London+W1U+6BR",
 
   dressCode: "Come as you are.",
   admissionText: "Complimentary with RSVP.",
