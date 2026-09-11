@@ -372,7 +372,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 .hero__driftMark {
   position: absolute; right: -0.06em; bottom: -0.24em;
   font-family: var(--font-heading); font-weight: 300;
-  font-size: clamp(20rem, 62vw, 58rem); line-height: 0.72; letter-spacing: -0.015em;
+  font-size: clamp(20rem, 62vw, 58rem); line-height: 1; letter-spacing: -0.015em;
   font-variant-numeric: lining-nums;
   color: transparent;
   -webkit-text-stroke: 1px rgba(160, 44, 44, 0.40);
@@ -390,8 +390,8 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
     /* Lining figures are taller than the 0.72 line box, so the mark is seated
        by measurement rather than by eye: any less top and the 6 loses its
        crown off the edge of the frame. */
-    right: 0; bottom: auto; top: 12vh;
-    font-size: clamp(13rem, 68vw, 24rem);
+    right: 0; bottom: auto; top: 6vh;
+    font-size: clamp(12rem, 45vw, 16rem);
     -webkit-text-stroke-color: rgba(160, 44, 44, 0.42);
   }
 }
@@ -1001,11 +1001,12 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
      frame it was painted over by the 0.97 wash under the type and vanished;
      up here it reads against the open sky, at the same size and weight. */
   .hero__driftMark {
-    bottom: auto; top: clamp(5rem, 16vh, 11rem); right: clamp(1.5rem, 3vw, 3.5rem);
-    /* Sized to sit whole in the open upper right rather than run off three
-       edges: at 62vw only two arcs of it were ever on screen, which read as
-       stray lines, not as the numerals. */
-    font-size: clamp(18rem, 30vw, 32rem);
+    bottom: auto; top: 6vh; right: clamp(1rem, 2vw, 2.5rem);
+    /* Sized and seated so the whole 65 sits in the corner above the name.
+       Measured, not eyeballed: with lining figures the glyphs are taller than
+       the line box, so anything higher than 6vh loses the crown of the 6 off
+       the top of the frame and the mark reads as stray lines again. */
+    font-size: clamp(14rem, 20vw, 22rem);
   }
 
   /* Details: heading and body in different columns, with real negative space */
