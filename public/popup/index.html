@@ -365,12 +365,15 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 /* Typographic composition — what the frame shows when no photograph is set,
    and what sits behind one when it is. Same device as the events site. */
 .hero__composition { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-/* Cormorant rather than the slab: the high-contrast serif numerals of the
-   brand's own 65, drawn as a hairline outline at the same size. */
+/* The headline face, not the slab. The mark is the brand's own 65 drawn as a
+   hairline outline, and a slab's blunt terminals lose the high-contrast
+   numerals that make it read as the 65 rather than as two digits. Same face
+   as the headline it sits behind. */
 .hero__driftMark {
   position: absolute; right: -0.06em; bottom: -0.24em;
-  font-family: var(--font-display); font-weight: 400;
+  font-family: var(--font-heading); font-weight: 300;
   font-size: clamp(20rem, 62vw, 58rem); line-height: 0.72; letter-spacing: -0.015em;
+  font-variant-numeric: lining-nums;
   color: transparent;
   -webkit-text-stroke: 1px rgba(160, 44, 44, 0.40);
   animation: drift 64s var(--ease) infinite alternate;
@@ -384,8 +387,11 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
    the empty upper half of the composition still carries something. */
 @media (max-width: 48rem) {
   .hero__driftMark {
-    right: -0.06em; bottom: auto; top: 8vh;
-    font-size: clamp(14rem, 74vw, 26rem);
+    /* Lining figures are taller than the 0.72 line box, so the mark is seated
+       by measurement rather than by eye: any less top and the 6 loses its
+       crown off the edge of the frame. */
+    right: 0; bottom: auto; top: 12vh;
+    font-size: clamp(13rem, 68vw, 24rem);
     -webkit-text-stroke-color: rgba(160, 44, 44, 0.42);
   }
 }
@@ -430,6 +436,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 
 .hero__title {
   font-family: var(--font-heading); font-weight: 300;
+  font-variant-numeric: lining-nums;
   font-size: var(--step-4); line-height: 0.94; letter-spacing: -0.022em;
   margin-bottom: clamp(0.85rem, 2vw, 1.4rem);
 }
@@ -994,7 +1001,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
      frame it was painted over by the 0.97 wash under the type and vanished;
      up here it reads against the open sky, at the same size and weight. */
   .hero__driftMark {
-    bottom: auto; top: 6vh; right: clamp(1.5rem, 3vw, 3.5rem);
+    bottom: auto; top: clamp(5rem, 16vh, 11rem); right: clamp(1.5rem, 3vw, 3.5rem);
     /* Sized to sit whole in the open upper right rather than run off three
        edges: at 62vw only two arcs of it were ever on screen, which read as
        stray lines, not as the numerals. */
