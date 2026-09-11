@@ -21,29 +21,29 @@
      Not Google Fonts: the site's Content-Security-Policy allows styles and
      fonts from its own origin only, and a third-party request would be
      blocked. It is also faster and leaks nothing about the visitor. -->
-<link rel="preload" href="fonts/CormorantGaramond-Variable.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="preload" href="fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/popup/fonts/CormorantGaramond-Variable.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/popup/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
 <style>
   @font-face {
     font-family: "Cormorant Garamond";
-    src: url("fonts/CormorantGaramond-Variable.woff2") format("woff2");
+    src: url("/popup/fonts/CormorantGaramond-Variable.woff2") format("woff2");
     font-weight: 300 700; font-style: normal; font-display: swap;
   }
   @font-face {
     font-family: "Cormorant Garamond";
-    src: url("fonts/CormorantGaramond-VariableItalic.woff2") format("woff2");
+    src: url("/popup/fonts/CormorantGaramond-VariableItalic.woff2") format("woff2");
     font-weight: 300 700; font-style: italic; font-display: swap;
   }
   @font-face {
     font-family: "Inter";
-    src: url("fonts/Inter-Variable.woff2") format("woff2");
+    src: url("/popup/fonts/Inter-Variable.woff2") format("woff2");
     font-weight: 100 900; font-style: normal; font-display: swap;
   }
   /* Subset to letters, digits and a little punctuation — it carries only the
      wordmark — so it is not preloaded. */
   @font-face {
     font-family: "Petrona";
-    src: url("fonts/Petrona-Wordmark.woff2") format("woff2");
+    src: url("/popup/fonts/Petrona-Wordmark.woff2") format("woff2");
     font-weight: 100 900; font-style: normal; font-display: swap;
   }
 </style>
@@ -1389,20 +1389,20 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 
       <!-- Paths come from CONFIG.images.gallery, in this DOM order. -->
       <div class="gallery__set" id="js-gallery">
-        <figure class="figure gLarge" data-reveal data-placeholder="images/event-01.jpg">
-          <img src="images/event-01.jpg" alt="Guests at the last Padre65 party" loading="lazy" decoding="async" width="1800" height="1194" />
+        <figure class="figure gLarge" data-reveal data-placeholder="/popup/images/event-01.jpg">
+          <img src="/popup/images/event-01.jpg" alt="Guests at the last Padre65 party" loading="lazy" decoding="async" width="1800" height="1194" />
         </figure>
-        <figure class="figure gTall" data-reveal style="--reveal-delay:90ms" data-placeholder="images/event-03.jpg">
-          <img src="images/event-03.jpg" alt="The DJ booth at the last Padre65 party" loading="lazy" decoding="async" width="1150" height="1734" />
+        <figure class="figure gTall" data-reveal style="--reveal-delay:90ms" data-placeholder="/popup/images/event-03.jpg">
+          <img src="/popup/images/event-03.jpg" alt="The DJ booth at the last Padre65 party" loading="lazy" decoding="async" width="1150" height="1734" />
         </figure>
-        <figure class="figure gRow" data-reveal style="--reveal-delay:60ms" data-placeholder="images/event-02.jpg">
-          <img src="images/event-02.jpg" alt="Two guests in Padre65 caps" loading="lazy" decoding="async" width="1100" height="729" />
+        <figure class="figure gRow" data-reveal style="--reveal-delay:60ms" data-placeholder="/popup/images/event-02.jpg">
+          <img src="/popup/images/event-02.jpg" alt="Two guests in Padre65 caps" loading="lazy" decoding="async" width="1100" height="729" />
         </figure>
-        <figure class="figure gRow" data-reveal style="--reveal-delay:130ms" data-placeholder="images/event-04.jpg">
-          <img src="images/event-04.jpg" alt="Guests writing on a mirror in lipstick" loading="lazy" decoding="async" width="1100" height="729" />
+        <figure class="figure gRow" data-reveal style="--reveal-delay:130ms" data-placeholder="/popup/images/event-04.jpg">
+          <img src="/popup/images/event-04.jpg" alt="Guests writing on a mirror in lipstick" loading="lazy" decoding="async" width="1100" height="729" />
         </figure>
-        <figure class="figure gRow" data-reveal style="--reveal-delay:200ms" data-placeholder="images/event-05.jpg">
-          <img src="images/event-05.jpg" alt="Padre65 pieces worn at the decks" loading="lazy" decoding="async" width="1100" height="729" />
+        <figure class="figure gRow" data-reveal style="--reveal-delay:200ms" data-placeholder="/popup/images/event-05.jpg">
+          <img src="/popup/images/event-05.jpg" alt="Padre65 pieces worn at the decks" loading="lazy" decoding="async" width="1100" height="729" />
         </figure>
       </div>
     </div>
@@ -1582,21 +1582,21 @@ const CONFIG = {
      *                           instead of it under prefers-reduced-motion
      */
     hero: {
-      webm: "media/hero.webm",
-      mp4: "media/hero.mp4",
-      mp4Mobile: "media/hero-720.mp4",
-      webmMobile: "media/hero-720.webm",
-      poster: "media/hero-poster.jpg",
-      posterMobile: "media/hero-poster-720.jpg"
+      webm: "/popup/media/hero.webm",
+      mp4: "/popup/media/hero.mp4",
+      mp4Mobile: "/popup/media/hero-720.mp4",
+      webmMobile: "/popup/media/hero-720.webm",
+      poster: "/popup/media/hero-poster.jpg",
+      posterMobile: "/popup/media/hero-poster-720.jpg"
     },
 
     /** In the order the figures appear in the markup. */
     gallery: [
-      "images/event-01.jpg",  // large frame, top left
-      "images/event-03.jpg",  // portrait frame beside it
-      "images/event-02.jpg",  // bottom row, left
-      "images/event-04.jpg",  // bottom row, middle
-      "images/event-05.jpg"   // bottom row, right
+      "/popup/images/event-01.jpg",  // large frame, top left
+      "/popup/images/event-03.jpg",  // portrait frame beside it
+      "/popup/images/event-02.jpg",  // bottom row, left
+      "/popup/images/event-04.jpg",  // bottom row, middle
+      "/popup/images/event-05.jpg"   // bottom row, right
     ]
   },
 

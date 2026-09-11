@@ -41,17 +41,17 @@ const nextConfig: NextConfig = {
   },
 
   /**
-   * The popup shop page is a standalone static file in public/popup/. It is
-   * served with a trailing slash so its relative asset paths resolve inside
-   * its own folder; /popup without one would look for /images and /media at
-   * the site root.
+   * The popup shop page is a standalone static file in public/popup/.
+   *
+   * A rewrite, not a redirect. The site runs with Next's default
+   * `trailingSlash: false`, which already redirects /popup/ to /popup — so a
+   * redirect the other way puts the two in a loop. This serves the file at
+   * /popup with the URL unchanged, and the page's own asset paths are
+   * absolute (/popup/images/..., /popup/media/...) so nothing depends on how
+   * the browser resolves a relative path against that URL.
    */
-  async redirects() {
-    return [{ source: "/popup", destination: "/popup/", permanent: false }];
-  },
-
   async rewrites() {
-    return [{ source: "/popup/", destination: "/popup/index.html" }];
+    return [{ source: "/popup", destination: "/popup/index.html" }];
   },
 
   async headers() {
