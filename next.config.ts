@@ -16,7 +16,10 @@ const csp = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  "img-src 'self' data: blob:",
+  // The popup page draws its map from OpenStreetMap raster tiles, so that one
+  // host — and only that host — is allowed as an image source. Everything else
+  // stays same-origin.
+  "img-src 'self' data: blob: https://tile.openstreetmap.org",
   "media-src 'self'",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
@@ -35,6 +38,20 @@ const nextConfig: NextConfig = {
     // Local media only — nothing is hotlinked from the production sites.
     formats: ["image/avif", "image/webp"],
     deviceSizes: [320, 375, 430, 640, 768, 1024, 1280, 1440, 1920, 2560],
+  },
+
+  /**
+   * The popup shop page is a standalone static file in public/popup/. It is
+   * served with a trailing slash so its relative asset paths resolve inside
+   * its own folder; /popup without one would look for /images and /media at
+   * the site root.
+   */
+  async redirects() {
+    return [{ source: "/popup", destination: "/popup/", permanent: false }];
+  },
+
+  async rewrites() {
+    return [{ source: "/popup/", destination: "/popup/index.html" }];
   },
 
   async headers() {
