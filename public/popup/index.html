@@ -24,6 +24,7 @@
      same page. It ships in one weight, so the hierarchy here is built from
      size, tracking and colour rather than from weight. -->
 <link rel="preload" href="/popup/fonts/Sanchez-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/popup/fonts/CormorantGaramond-Variable.woff2" as="font" type="font/woff2" crossorigin />
 <style>
   @font-face {
     font-family: "Sanchez";
@@ -34,6 +35,19 @@
     font-family: "Sanchez";
     src: url("/popup/fonts/Sanchez-Italic.woff2") format("woff2");
     font-weight: 400; font-style: italic; font-display: swap;
+  }
+  /* The three big headings keep the original face. Variable, so they can go
+     back to the light weight the design was drawn at — which Sanchez, at one
+     weight, cannot do. */
+  @font-face {
+    font-family: "Cormorant Garamond";
+    src: url("/popup/fonts/CormorantGaramond-Variable.woff2") format("woff2");
+    font-weight: 300 700; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: "Cormorant Garamond";
+    src: url("/popup/fonts/CormorantGaramond-VariableItalic.woff2") format("woff2");
+    font-weight: 300 700; font-style: italic; font-display: swap;
   }
 </style>
 
@@ -82,6 +96,10 @@
      Sanchez, self-hosted, for everyone else. Near-identical colour, so the
      page does not change shape between them. */
   --font-display: "Sanchez", "Superclarendon", Georgia, "Times New Roman", serif;
+  /* The page headline voice, kept as it was: PADRE65 — Popup Shop, the
+     details heading in all its states, and Find us. Everything else is the
+     slab. */
+  --font-heading: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --font-ui: "Sanchez", "Superclarendon", Georgia, "Times New Roman", serif;
   --font-mark: "Sanchez", "Superclarendon", Georgia, serif;
 
@@ -411,7 +429,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 }
 
 .hero__title {
-  font-family: var(--font-display); font-weight: 400;
+  font-family: var(--font-heading); font-weight: 300;
   font-size: var(--step-4); line-height: 0.94; letter-spacing: -0.022em;
   margin-bottom: clamp(0.85rem, 2vw, 1.4rem);
 }
@@ -524,7 +542,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 .details__index { display: flex; align-items: center; gap: 0.9rem; }
 .details__indexRule { flex: 1; max-width: 5rem; height: 1px; background: var(--line); }
 .details__heading {
-  font-family: var(--font-display); font-weight: 400;
+  font-family: var(--font-heading); font-weight: 300;
   font-size: var(--step-3); line-height: 0.98; letter-spacing: -0.018em;
 }
 .details__heading em { font-style: italic; color: var(--deep); }
@@ -837,7 +855,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
 }
 .location__heading {
-  font-family: var(--font-display); font-weight: 400;
+  font-family: var(--font-heading); font-weight: 300;
   font-size: var(--step-3); line-height: 0.98; letter-spacing: -0.018em;
 }
 .location__address {
