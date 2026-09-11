@@ -60,6 +60,25 @@ export const HEADER_ROW = [
 const FIRST_COLUMN = "A";
 const LAST_COLUMN = "N";
 
+/**
+ * Mobile numbers live on their own tab, not in a column of the RSVP sheet.
+ *
+ * They arrive from the popup page, where the first question is "mobile or
+ * email" — so they are a different kind of record from a house-party RSVP,
+ * they are gathered on a different page, and keeping them apart means the
+ * RSVP sheet's shape (and the admin dashboard that reads it) does not change.
+ */
+export const MOBILE_TAB = process.env.GOOGLE_SHEET_MOBILE_TAB ?? "Mobiles";
+
+export const MOBILE_HEADER_ROW = [
+  "Captured at (UTC)",
+  "Event",
+  "Name",
+  "Mobile",
+  "Source",
+  "RSVP row",
+] as const;
+
 export function isSheetsConfigured(): boolean {
   return Boolean(
     process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
@@ -230,6 +249,92 @@ export async function attachNewsletterOptIn(
 
   if (!response.ok) {
     throw new Error(`Sheets newsletter update failed (${response.status})`);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Mobile numbers
+ * -------------------------------------------------------------------------- */
+
+/**
+ * Tabs this process has already confirmed exist. Sheets charges a metadata
+ * request to find out, and the answer cannot become false while the server is
+ * running — nobody deletes a tab mid-event — so it is worth remembering.
+ */
+const knownTabs = new Set<string>();
+
+/**
+ * Creates the tab and writes its header if it is not there yet.
+ *
+ * Doing this in code rather than asking the organiser to make the tab by hand
+ * removes the failure everybody hits once: a 400 from Sheets that reads like a
+ * credentials problem but is actually a missing worksheet.
+ */
+async function ensureTab(title: string, header: readonly string[]): Promise<void> {
+  if (knownTabs.has(title)) return;
+
+  const metadata = await sheetsFetch("?fields=sheets.properties.title");
+  if (!metadata.ok) throw new Error(`Sheets metadata failed (${metadata.status})`);
+
+  const data = (await metadata.json()) as { sheets?: { properties?: { title?: string } }[] };
+  const exists = (data.sheets ?? []).some((sheet) => sheet.properties?.title === title);
+
+  if (!exists) {
+    const created = await sheetsFetch(":batchUpdate", {
+      method: "POST",
+      body: JSON.stringify({ requests: [{ addSheet: { properties: { title } } }] }),
+    });
+    // A 400 here is very likely a race with another request that just made it.
+    if (!created.ok && created.status !== 400) {
+      throw new Error(`Sheets addSheet failed (${created.status})`);
+    }
+
+    const written = await sheetsFetch(
+      `/values/${encodeURIComponent(title)}!A1?valueInputOption=RAW`,
+      { method: "PUT", body: JSON.stringify({ values: [header] }) },
+    );
+    if (!written.ok) throw new Error(`Sheets header write failed (${written.status})`);
+  }
+
+  knownTabs.add(title);
+}
+
+export type NewMobile = {
+  name: string;
+  phone: string;
+  /** Which page captured it, so the popup and the invitation stay separable. */
+  source: string;
+  /** The row of the RSVP this came in with, for reconciling the two tabs. */
+  rsvpRow: number | null;
+};
+
+/**
+ * Appends one mobile number to its own tab.
+ *
+ * `valueInputOption: RAW` matters more here than anywhere else: a number typed
+ * as `+44 7700 900123` starts with a `+`, which the Sheets UI would treat as
+ * the beginning of a formula. RAW stores it as the text it is.
+ */
+export async function appendMobile(entry: NewMobile): Promise<void> {
+  await ensureTab(MOBILE_TAB, MOBILE_HEADER_ROW);
+
+  const row = [
+    new Date().toISOString().replace("T", " ").slice(0, 19),
+    eventConfig.slug,
+    entry.name,
+    entry.phone,
+    entry.source,
+    entry.rsvpRow === null ? "" : String(entry.rsvpRow),
+  ];
+
+  const response = await sheetsFetch(
+    `/values/${encodeURIComponent(MOBILE_TAB)}!A:F:append` +
+      `?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+    { method: "POST", body: JSON.stringify({ values: [row] }) },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Sheets mobile append failed (${response.status})`);
   }
 }
 
