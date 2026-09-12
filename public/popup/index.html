@@ -359,7 +359,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
        image reads as less soft — an overlay cannot add detail, but it takes
        the glare off the out-of-focus highlights where the softness shows
        most. Paired with a light unsharp at transcode. */
-    rgba(26, 18, 14, 0.22);
+    rgba(26, 18, 14, 0.34);
 }
 
 /* Typographic composition — what the frame shows when no photograph is set,
@@ -375,7 +375,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   font-size: clamp(20rem, 62vw, 58rem); line-height: 1; letter-spacing: -0.015em;
   font-variant-numeric: lining-nums;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(160, 44, 44, 0.40);
+  -webkit-text-stroke: 1px rgba(160, 44, 44, 0.52);
   animation: drift 64s var(--ease) infinite alternate;
   will-change: transform;
 }
@@ -390,9 +390,9 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
     /* Lining figures are taller than the 0.72 line box, so the mark is seated
        by measurement rather than by eye: any less top and the 6 loses its
        crown off the edge of the frame. */
-    right: 0; bottom: auto; top: 6vh;
-    font-size: clamp(12rem, 45vw, 16rem);
-    -webkit-text-stroke-color: rgba(160, 44, 44, 0.42);
+    right: 0; bottom: auto; top: 4vh;
+    font-size: clamp(13rem, 50vw, 18rem);
+    -webkit-text-stroke-color: rgba(160, 44, 44, 0.54);
   }
 }
 .hero__hairline {
@@ -1024,12 +1024,12 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
      frame it was painted over by the 0.97 wash under the type and vanished;
      up here it reads against the open sky, at the same size and weight. */
   .hero__driftMark {
-    bottom: auto; top: 6vh; right: clamp(1rem, 2vw, 2.5rem);
+    bottom: auto; top: 4vh; right: clamp(1rem, 2vw, 2.5rem);
     /* Sized and seated so the whole 65 sits in the corner above the name.
        Measured, not eyeballed: with lining figures the glyphs are taller than
        the line box, so anything higher than 6vh loses the crown of the 6 off
        the top of the frame and the mark reads as stray lines again. */
-    font-size: clamp(14rem, 20vw, 22rem);
+    font-size: clamp(16rem, 22vw, 25rem);
   }
 
   /* Details: heading and body in different columns, with real negative space */
@@ -1249,10 +1249,8 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
           </p>
           <p data-reveal style="--reveal-delay:90ms">
             Saturday 26th we will be open till 9pm with a small evening event
-            afterwards. We will also be running a scheme to win a ticket to
-            Brazil in October on our next shoot.
+            afterwards. See below for more details.
           </p>
-          <p data-reveal style="--reveal-delay:150ms">See below for more details.</p>
         </div>
 
         <!-- Rows are written from CONFIG.event at runtime. -->
