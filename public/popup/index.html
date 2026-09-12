@@ -500,6 +500,29 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   white-space: nowrap;
 }
 
+/* A quiet aside under one day's hours. Set in the headline italic at the
+   small label size and introduced by a short red rule rather than by weight
+   or colour — it should read as an extra, not compete with the time above. */
+.hours__note {
+  display: flex; align-items: baseline; gap: 0.5rem;
+  margin-top: 0.45rem;
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: var(--step--1);
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--on-film-muted);
+}
+.hours__note::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.85rem; height: 1px;
+  background: var(--red-on-dark);
+  /* Sits on the italic's optical centre rather than its baseline. */
+  transform: translateY(-0.3em);
+}
+
 .hero__place {
   display: flex; align-items: flex-start; gap: 0.7rem;
   margin: 0;
@@ -1065,6 +1088,20 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
  * Everything in this section is meant to sit inside one viewport. On a small
  * screen that means the type steps down rather than the section growing.
  * ---------------------------------------------------------------------- */
+/* ---- Shortish viewports (a phone in portrait) --------------------------
+ * The reading state is three paragraphs now, and on a 390x844 screen that
+ * was 31px taller than the viewport. Gentle: the passage keeps its size and
+ * gives up a little leading and a little air between the blocks. The 46rem
+ * tier below takes over from here and is more aggressive.
+ * ---------------------------------------------------------------------- */
+@media (max-height: 56rem) {
+  .details__body p { line-height: 1.5; }
+  .details__body { gap: 1rem; }
+  .details__state { gap: 1.2rem; }
+  .dlist__row { padding-block: 0.55rem; }
+  .reply { padding-top: 1rem; }
+}
+
 @media (max-height: 46rem) {
   .details { padding-block: 1rem; }
   .details__grid { gap: 1rem; }
@@ -1206,15 +1243,16 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
       <!-- ---- READING STATE -------------------------------------------- -->
       <div class="details__state" id="js-reading">
         <div class="details__body">
-          <!-- PLACEHOLDER COPY — replace both paragraphs. -->
           <p data-reveal>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod nisl
-            eget consectetur sagittis, nisl nunc egestas nisi.
+            Join us for Padre’s first popup shop showcasing our full collection
+            with drinks, music, competitions and good vibes.
           </p>
           <p data-reveal style="--reveal-delay:90ms">
-            Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-            Nullam quis risus eget urna mollis ornare.
+            Saturday 26th we will be open till 9pm with a small evening event
+            afterwards. We will also be running a scheme to win a ticket to
+            Brazil in October on our next shoot.
           </p>
+          <p data-reveal style="--reveal-delay:150ms">See below for more details.</p>
         </div>
 
         <!-- Rows are written from CONFIG.event at runtime. -->
@@ -1471,7 +1509,11 @@ const CONFIG = {
         start: "10:00",
         end: "21:00",
         display: "10AM — 9PM",
-        tableTime: "10am — 9pm"
+        tableTime: "10am — 9pm",
+        /* A note under this day alone in the hero. Leave it off a day and
+           nothing is rendered. The details table stays plain — the body copy
+           above it already says this in full. */
+        note: "Evening event to follow"
       },
       {
         label: "Sunday 27 September",
@@ -1657,6 +1699,9 @@ function icsEscape(value) {
     '<div class="hours__day">' +
       '<span class="hours__date">' + (day.heroLabel || day.label) + "</span>" +
       '<span class="hours__time">' + day.display + "</span>" +
+      // Only the day that has one. It reads as an aside precisely because the
+      // other column does not carry it.
+      (day.note ? '<span class="hours__note">' + day.note + "</span>" : "") +
     "</div>"
   ).join("");
 
