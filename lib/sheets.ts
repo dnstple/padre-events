@@ -402,6 +402,101 @@ export async function markPopupCalendarAdded(rowNumber: number): Promise<void> {
   if (!response.ok) throw new Error(`Popup calendar update failed (${response.status})`);
 }
 
+/**
+ * The same question as describeSheet(), asked of the popup spreadsheet.
+ *
+ * Reports what is wrong rather than throwing, because the three failures look
+ * identical from the outside and are fixed in three different places: the
+ * variable is missing (Vercel, then redeploy), the ID is wrong (404), or the
+ * document was never shared with the service account (403).
+ */
+export type PopupSheetStatus =
+  | { configured: false; reason: string; hint: string }
+  | {
+      configured: true;
+      spreadsheetId: string;
+      title: string;
+      url: string;
+      tabs: string[];
+      configuredTab: string;
+      tabExists: boolean;
+      rows: number | null;
+      reachable: true;
+    }
+  | { configured: true; spreadsheetId: string; reachable: false; error: string; hint: string };
+
+export async function describePopupSheet(): Promise<PopupSheetStatus> {
+  const id = process.env.GOOGLE_POPUP_SHEET_ID;
+  if (!id) {
+    return {
+      configured: false,
+      reason: "GOOGLE_POPUP_SHEET_ID is not set on this deployment.",
+      hint:
+        "Add it in Vercel → Settings → Environment Variables, then REDEPLOY. " +
+        "Vercel only applies new variables to deployments built after they are added.",
+    };
+  }
+
+  try {
+    const response = await sheetsFetch("?fields=properties.title,sheets.properties.title", undefined, id);
+    if (!response.ok) {
+      return {
+        configured: true,
+        spreadsheetId: id,
+        reachable: false,
+        error: `Google returned ${response.status}`,
+        hint:
+          response.status === 403
+            ? "403 means the spreadsheet is not shared with the service account. Share it as Editor."
+            : response.status === 404
+              ? "404 means GOOGLE_POPUP_SHEET_ID does not match any spreadsheet. Check the ID in the sheet's URL."
+              : "Check the ID and the sharing, then try again.",
+      };
+    }
+
+    const data = (await response.json()) as {
+      properties?: { title?: string };
+      sheets?: { properties?: { title?: string } }[];
+    };
+    const tabs = (data.sheets ?? [])
+      .map((sheet) => sheet.properties?.title)
+      .filter((title): title is string => Boolean(title));
+
+    let rows: number | null = null;
+    if (tabs.includes(POPUP_TAB)) {
+      const values = await sheetsFetch(
+        `/values/${encodeURIComponent(POPUP_TAB)}!A2:A?majorDimension=COLUMNS`,
+        undefined,
+        id,
+      );
+      if (values.ok) {
+        const parsed = (await values.json()) as { values?: string[][] };
+        rows = parsed.values?.[0]?.length ?? 0;
+      }
+    }
+
+    return {
+      configured: true,
+      spreadsheetId: id,
+      title: data.properties?.title ?? "(untitled)",
+      url: `https://docs.google.com/spreadsheets/d/${id}/edit`,
+      tabs,
+      configuredTab: POPUP_TAB,
+      tabExists: tabs.includes(POPUP_TAB),
+      rows,
+      reachable: true,
+    };
+  } catch (error) {
+    return {
+      configured: true,
+      spreadsheetId: id,
+      reachable: false,
+      error: error instanceof Error ? error.message : "unknown",
+      hint: "The request to Google failed before it got an answer.",
+    };
+  }
+}
+
 /* -----------------------------------------------------------------------------
  * Diagnostics
  * -------------------------------------------------------------------------- */

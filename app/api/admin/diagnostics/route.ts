@@ -4,7 +4,12 @@ import { NextResponse } from "next/server";
 import { eventConfig } from "@/config/event";
 import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
 import { PrivateKeyFormatError, normalisePrivateKey } from "@/lib/private-key.mjs";
-import { describeSheet, isSheetsConfigured, readRsvps } from "@/lib/sheets";
+import {
+  describePopupSheet,
+  describeSheet,
+  isSheetsConfigured,
+  readRsvps,
+} from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,10 +18,11 @@ export const revalidate = 0;
 /**
  * "Where are the responses actually going?"
  *
- * Reports which spreadsheet this deployment is writing to, what its tabs are
- * called, and how many rows are in it. Answers the one question that cannot be
- * answered from the outside: whether the sheet on your screen is the sheet the
- * server holds the ID for.
+ * Reports which spreadsheets this deployment is writing to — the house-party
+ * sheet and the popup page's own — what their tabs are called, and how many
+ * rows are in each. Answers the one question that cannot be answered from the
+ * outside: whether the sheet on your screen is the sheet the server holds the
+ * ID for.
  *
  * Administrator session required — the sheet ID and service-account address are
  * not secrets on their own, but they are nobody else's business.
@@ -74,6 +80,11 @@ export async function GET() {
     throw error;
   }
 
+  // Reported whatever happens to the house-party sheet: if the popup is
+  // misconfigured, that is the answer, and it should not be hidden behind an
+  // unrelated failure.
+  const popupSheet = await describePopupSheet();
+
   try {
     const sheet = await describeSheet();
     const rows = await readRsvps();
@@ -82,6 +93,7 @@ export async function GET() {
       {
         ok: true,
         sheet,
+        popupSheet,
         eventSlug: eventConfig.slug,
         // readRsvps() ignores rows belonging to a different event, so a gap
         // between these two numbers means rows exist under another slug.
@@ -100,6 +112,7 @@ export async function GET() {
         // Safe to surface: this is a status code from Google, not a credential.
         message: `Could not reach the spreadsheet. ${message}`,
         hint: "403 means the sheet is not shared with the service account. 404 means GOOGLE_SHEET_ID is wrong.",
+        popupSheet,
       },
       { status: 502, headers: privateHeaders },
     );
