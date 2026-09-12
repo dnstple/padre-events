@@ -4,7 +4,12 @@ import { eventConfig } from "@/config/event";
 import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
 import { toCsv } from "@/lib/csv";
 import { guestNames } from "@/lib/rsvp-types";
-import { isSheetsConfigured, readRsvps } from "@/lib/sheets";
+import {
+  isPopupSheetConfigured,
+  isSheetsConfigured,
+  readPopupSignups,
+  readRsvps,
+} from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,10 +21,13 @@ const textHeaders = {
 } as const;
 
 /**
- * Authenticated CSV export. Same gate as the dashboard, and the output is
- * escaped against spreadsheet formula injection in lib/csv.ts.
+ * Authenticated CSV export for either event. Same gate as the dashboard, and
+ * the output is escaped against spreadsheet formula injection in lib/csv.ts.
+ *
+ * `?event=popup` exports the popup signups; anything else exports the
+ * house-party guest list, so existing links keep working.
  */
-export async function GET() {
+export async function GET(request: Request) {
   if (!isAdminConfigured()) {
     return new Response("Not authorised.", { status: 403, headers: textHeaders });
   }
@@ -27,6 +35,53 @@ export async function GET() {
   const jar = await cookies();
   if (!verifySession(jar.get(ADMIN_COOKIE)?.value)) {
     return new Response("Please sign in.", { status: 401, headers: textHeaders });
+  }
+
+  const wantsPopup = new URL(request.url).searchParams.get("event") === "popup";
+
+  if (wantsPopup) {
+    if (!isPopupSheetConfigured()) {
+      return new Response("The popup spreadsheet is not configured.", {
+        status: 503,
+        headers: textHeaders,
+      });
+    }
+
+    let signups;
+    try {
+      signups = await readPopupSignups();
+    } catch (error) {
+      console.error(
+        "[admin/export] popup read failed:",
+        error instanceof Error ? error.message : "unknown",
+      );
+      return new Response("Export failed.", { status: 500, headers: textHeaders });
+    }
+
+    const popupCsv = toCsv([
+      ["Submitted at (UTC)", "Name", "Email", "Phone", "Added to calendar"],
+      ...signups.map((row) => [
+        row.created_at ? row.created_at.replace("T", " ").replace("Z", "") : "",
+        row.name,
+        row.email,
+        row.phone,
+        row.calendar,
+      ]),
+    ]);
+
+    const popupStamp = new Date().toISOString().slice(0, 10);
+
+    return new Response(popupCsv, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="popup-signups-${popupStamp}.csv"`,
+        "Cache-Control": "no-store, no-cache, must-revalidate, private, max-age=0",
+        "CDN-Cache-Control": "no-store",
+        "Vercel-CDN-Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
   }
 
   if (!isSheetsConfigured()) {

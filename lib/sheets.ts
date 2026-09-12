@@ -5,6 +5,7 @@ import { createSign } from "node:crypto";
 import { eventConfig } from "@/config/event";
 import type { Guest, RsvpStatus } from "@/lib/name-rules";
 import { normalisePrivateKey } from "@/lib/private-key.mjs";
+import type { PopupRow } from "@/lib/popup-types";
 import type { RsvpRow } from "@/lib/rsvp-types";
 
 /**
@@ -400,6 +401,46 @@ export async function markPopupCalendarAdded(rowNumber: number): Promise<void> {
   );
 
   if (!response.ok) throw new Error(`Popup calendar update failed (${response.status})`);
+}
+
+/**
+ * Reads every popup signup, newest first.
+ *
+ * A missing tab is not an error: it simply means nobody has signed up yet,
+ * because the tab is created by the first write.
+ */
+export async function readPopupSignups(): Promise<PopupRow[]> {
+  const id = popupSheetId();
+
+  const response = await sheetsFetch(
+    `/values/${encodeURIComponent(POPUP_TAB)}!A2:E?majorDimension=ROWS`,
+    undefined,
+    id,
+  );
+
+  if (response.status === 400) return [];
+  if (!response.ok) throw new Error(`Popup sheet read failed (${response.status})`);
+
+  const data = (await response.json()) as { values?: string[][] };
+  const rows = data.values ?? [];
+
+  const parsed: PopupRow[] = rows.map((cells, index) => {
+    const [submittedAt = "", name = "", email = "", phone = "", calendar = ""] = cells;
+    return {
+      // The sheet row number, so the key is stable across refreshes.
+      id: String(index + 2),
+      // Stored as "YYYY-MM-DD HH:MM:SS" in UTC. Spelling out the Z matters:
+      // without it the browser reads it as local time and every row shifts by
+      // the offset.
+      created_at: submittedAt ? `${submittedAt.replace(" ", "T")}Z` : "",
+      name,
+      email,
+      phone,
+      calendar,
+    };
+  });
+
+  return parsed.reverse();
 }
 
 /**

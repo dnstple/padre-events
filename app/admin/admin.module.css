@@ -55,6 +55,45 @@
   margin-inline: auto;
 }
 
+/* ---- Event nav ----------------------------------------------------------
+ * Two events, sitting above the title they change. A rule under the active
+ * one rather than a filled tab: this is a switch between two views, not a
+ * button, and it should not compete with the controls below it.
+ * ---------------------------------------------------------------------- */
+.eventNav {
+  display: flex;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.eventTab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-bottom: 0.65rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  /* Reserves the active rule's space on every tab, so nothing shifts. */
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.eventTab:hover {
+  color: var(--ink);
+}
+
+.eventTab[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--red);
+}
+
 .title {
   font-family: var(--font-display);
   font-variant-numeric: lining-nums;

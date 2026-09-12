@@ -41,17 +41,27 @@ const nextConfig: NextConfig = {
   },
 
   /**
-   * The popup shop page is a standalone static file in public/popup/.
+   * The popup shop is the live event, so it is what the site root serves. It
+   * answers on /popup too, because that URL has been shared.
    *
-   * A rewrite, not a redirect. The site runs with Next's default
-   * `trailingSlash: false`, which already redirects /popup/ to /popup — so a
-   * redirect the other way puts the two in a loop. This serves the file at
-   * /popup with the URL unchanged, and the page's own asset paths are
-   * absolute (/popup/images/..., /popup/media/...) so nothing depends on how
-   * the browser resolves a relative path against that URL.
+   * Rewrites, not redirects, and `beforeFiles` so they are applied before the
+   * app router looks for a page. Two things to know:
+   *
+   *   - The site runs with Next's default `trailingSlash: false`, which
+   *     already redirects /popup/ to /popup. A redirect the other way puts
+   *     the two in a loop, which is exactly what happened the first time.
+   *   - The page's asset paths are absolute (/popup/images/…, /popup/media/…)
+   *     so it does not matter which of these URLs it is being served at.
    */
   async rewrites() {
-    return [{ source: "/popup", destination: "/popup/index.html" }];
+    return {
+      beforeFiles: [
+        { source: "/", destination: "/popup/index.html" },
+        { source: "/popup", destination: "/popup/index.html" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
   },
 
   async headers() {
