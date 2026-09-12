@@ -1496,27 +1496,36 @@ const CONFIG = {
     }
   },
 
-  /* ---- RSVP BACKEND -----------------------------------------------------
-     Reuses the existing events.padre65.com API. Two calls, exactly as the
-     live RSVP flow makes them:
+  /* ---- SIGNUP BACKEND ---------------------------------------------------
+     Two calls into the events app, which writes to the popup's own Google
+     spreadsheet (GOOGLE_POPUP_SHEET_ID):
 
-       POST {apiBase}{rsvpPath}
-         { rsvp_status:"attending", first_name, last_name,
-           additional_guests: [], company }
-         → 201 { ok:true, rsvp:{...}, emailToken:"<row>.<expiry>.<sig>" }
+       POST {apiBase}{signupPath}
+         { name, email | phone, company }
+         → 200 { ok:true, token:"popup.<row>.<expiry>.<sig>" }
 
-       POST {apiBase}{contactPath}          (only when an email was given)
-         { token: emailToken, email, company }
+       POST {apiBase}{calendarPath}      (only if they take the calendar file)
+         { token }
          → 200 { ok:true }
 
-     apiBase "" means same-origin, which is what you want once this page is
+     The token is signed, scoped to the popup sheet, and expires in half an
+     hour, so the calendar flag can only ever land on the visitor's own row.
+
+     apiBase "" means same-origin, which is what you want while this page is
      served from events.padre65.com. Point it at the full origin only if the
      page is hosted elsewhere AND the API has been given CORS headers.
      -------------------------------------------------------------------- */
   rsvp: {
     apiBase: "",
-    rsvpPath: "/api/rsvp",
-    contactPath: "/api/newsletter",
+
+    /** One endpoint, one row, one spreadsheet of its own — name plus a single
+     *  contact detail. The house-party RSVP sheet has a different shape
+     *  (party size, guests, attending/declined) and none of it applies here. */
+    signupPath: "/api/popup",
+
+    /** Called when the visitor asks for the calendar file, carrying the signed
+     *  token the signup returned, so the flag lands on their own row. */
+    calendarPath: "/api/popup/calendar",
 
     /** "auto" | "live" | "preview".
      *  auto  — live when served over http(s) from the API's origin,
@@ -1524,17 +1533,7 @@ const CONFIG = {
      *          the flow still runs so the design can be reviewed).
      *  live  — always call the API.
      *  preview — never call the API. */
-    mode: "auto",
-
-    /** Mobile numbers have nowhere to go in the current backend — the sheet
-     *  runs A–N and none of those columns is a phone number. Leave this null
-     *  and a number typed here is validated, the name is still recorded, and
-     *  onPhoneCaptured() below is called so nothing is lost silently.
-     *  Set it to a path (e.g. "/api/contact") once the backend accepts one. */
-    /* Mobile numbers go to their own tab in the same spreadsheet, through
-       the events app's /api/phone endpoint. Same signed-row-token rule as the
-       newsletter: a number can only be written by someone who just RSVP'd. */
-    phonePath: "/api/phone"
+    mode: "auto"
   },
 
   /* ---- GOOGLE MAPS ------------------------------------------------------
@@ -1615,16 +1614,15 @@ const CONFIG = {
 };
 
 /**
- * The last resort for a mobile number: phonePath is unset, or the write to
- * the sheet failed. Deliberately loud rather than silent — a number the
- * organiser believes was saved but was not is worse than no number at all.
+ * The last resort: the signup did not reach the sheet. Deliberately loud
+ * rather than silent — a contact the organiser believes was saved but was
+ * not is worse than no contact at all.
  */
-function onPhoneCaptured(phone, name) {
+function onSignupLost(details) {
   console.warn(
-    "[padre65] A mobile number was submitted but did NOT reach the sheet. " +
-    "The RSVP itself was recorded. Check CONFIG.rsvp.phonePath and the " +
-    "/api/phone endpoint.",
-    { name: name, phone: phone }
+    "[padre65] A signup did NOT reach the sheet. Check GOOGLE_POPUP_SHEET_ID " +
+    "and that the spreadsheet is shared with the service account.",
+    details
   );
 }
 
@@ -1939,15 +1937,6 @@ const RSVP = (function () {
     return null;
   }
 
-  /** "Ada Lovelace" → { first_name:"Ada", last_name:"Lovelace" }.
-   *  The API requires both, so a single word becomes the first name and the
-   *  last name falls back to a dash rather than failing the guest's RSVP. */
-  function splitName(full) {
-    const parts = normaliseName(full).split(" ");
-    if (parts.length === 1) return { first_name: parts[0], last_name: "—" };
-    return { first_name: parts[0], last_name: parts.slice(1).join(" ") };
-  }
-
   /* ---- Inline error display -------------------------------------------- */
   function setFieldError(input, message) {
     const slot = document.getElementById(input.id + "-error");
@@ -2020,7 +2009,13 @@ const RSVP = (function () {
    * Sends the RSVP exactly as the events site does, then attaches the email
    * to the same row through the newsletter endpoint if one was given.
    */
-  async function submitRsvp(payload) {
+  /** The row this visitor's signup landed on, signed. Needed if they then
+   *  ask for the calendar file. */
+  let signupToken = null;
+
+  async function submitSignup(payload) {
+    signupToken = null;
+
     if (isPreview()) {
       console.info(
         "[padre65] Preview mode — no request was sent. Serve this page from " +
@@ -2030,59 +2025,38 @@ const RSVP = (function () {
       return { ok: true, preview: true };
     }
 
-    const names = splitName(payload.name);
-    const rsvp = await postJson(CONFIG.rsvp.rsvpPath, {
-      rsvp_status: "attending",
-      first_name: names.first_name,
-      last_name: names.last_name,
-      additional_guests: [],
+    const response = await postJson(CONFIG.rsvp.signupPath, {
+      name: payload.name,
+      email: payload.method === "email" ? payload.email : "",
+      phone: payload.method === "mobile" ? payload.phone : "",
       company: payload.company || ""
     });
 
-    if (!rsvp.ok || !rsvp.data || !rsvp.data.ok) {
+    if (!response.ok || !response.data || !response.data.ok) {
+      onSignupLost({ name: payload.name, status: response.status });
       return {
         ok: false,
-        message: (rsvp.data && rsvp.data.message) ||
-                 "We could not save your response. Please try again.",
-        errors: (rsvp.data && rsvp.data.errors) || {}
+        message: (response.data && response.data.message) ||
+                 "We could not save your details. Please try again.",
+        errors: (response.data && response.data.errors) || {}
       };
     }
 
-    // Email rides on the row the RSVP just created.
-    if (payload.method === "email" && payload.email && rsvp.data.emailToken) {
-      const contact = await postJson(CONFIG.rsvp.contactPath, {
-        token: rsvp.data.emailToken,
-        email: payload.email,
-        company: payload.company || ""
-      });
-      if (!contact.ok) {
-        // The RSVP itself succeeded; only the address failed to attach.
-        console.warn("[padre65] Email could not be attached to the RSVP row.", contact.status);
-      }
-    }
-
-    // The mobile rides on the signed token the RSVP row just issued.
-    if (payload.method === "mobile" && payload.phone) {
-      if (CONFIG.rsvp.phonePath && rsvp.data.emailToken) {
-        const mobile = await postJson(CONFIG.rsvp.phonePath, {
-          token: rsvp.data.emailToken,
-          phone: payload.phone,
-          name: payload.name,
-          source: "popup",
-          company: payload.company || ""
-        });
-        if (!mobile.ok) {
-          // The RSVP itself succeeded; only the number failed to land. Do not
-          // fail the visitor's response over it, and do not lose it silently.
-          console.warn("[padre65] Mobile could not be saved.", mobile.status);
-          onPhoneCaptured(payload.phone, payload.name);
-        }
-      } else {
-        onPhoneCaptured(payload.phone, payload.name);
-      }
-    }
-
+    signupToken = response.data.token || null;
     return { ok: true };
+  }
+
+  /**
+   * Records that the visitor asked for the calendar file.
+   *
+   * Fire-and-forget on purpose: the calendar file is already downloading by
+   * the time this runs, and a failed note in a spreadsheet is no reason to
+   * interrupt someone who has just done what we asked.
+   */
+  function noteCalendarAdded() {
+    if (!signupToken || isPreview() || !CONFIG.rsvp.calendarPath) return;
+    postJson(CONFIG.rsvp.calendarPath, { token: signupToken })
+      .catch(() => { /* nothing useful to do, and nothing to tell the guest */ });
   }
 
   /* ---- Steps ------------------------------------------------------------
@@ -2187,7 +2161,7 @@ const RSVP = (function () {
 
     let result;
     try {
-      result = await submitRsvp({
+      result = await submitSignup({
         name: captured.name,
         method: captured.method,
         phone: captured.phone,
@@ -2203,17 +2177,19 @@ const RSVP = (function () {
     submitBtn.innerHTML = "Continue&nbsp;→";
 
     if (!result.ok) {
-      if (result.errors && result.errors.email) {
-        // The address is wrong, and the address lives a step back. Take them
+      const contactError = result.errors && (result.errors.email || result.errors.phone);
+      if (contactError) {
+        // The contact detail is wrong, and it lives a step back. Take them
         // there rather than showing an error against a field they cannot see.
-        setFieldError(emailInput, result.errors.email);
+        const field = result.errors.email ? emailInput : mobileInput;
+        setFieldError(field, contactError);
         showStep("contact");
-        window.requestAnimationFrame(() => emailInput.focus());
+        window.requestAnimationFrame(() => field.focus());
         return;
       }
       showFormError(result.message);
-      if (result.errors && (result.errors.first_name || result.errors.last_name)) {
-        setFieldError(nameInput, result.errors.first_name || result.errors.last_name);
+      if (result.errors && result.errors.name) {
+        setFieldError(nameInput, result.errors.name);
       }
       return;
     }
@@ -2278,7 +2254,10 @@ const RSVP = (function () {
   $$("[data-open-flow]").forEach((btn) => btn.addEventListener("click", openFlow));
   $("#js-flow-close").addEventListener("click", closeFlow);
 
-  return { openFlow: openFlow, closeFlow: closeFlow, goToConfirmation: goToConfirmation };
+  return {
+    openFlow: openFlow, closeFlow: closeFlow, goToConfirmation: goToConfirmation,
+    noteCalendarAdded: noteCalendarAdded
+  };
 })();
 
 /* =============================================================================
@@ -2513,6 +2492,13 @@ const Calendar = (function () {
     prepare();
     icsLink.click();
     status.textContent = DONE[platform()];
+    RSVP.noteCalendarAdded();
+  });
+
+  // Taking the Google link counts too — it is the same intent by another
+  // route, and a sheet that only counted the .ics would undercount Android.
+  $("#js-google-links").addEventListener("click", (event) => {
+    if (event.target.closest("a")) RSVP.noteCalendarAdded();
   });
 
   return {

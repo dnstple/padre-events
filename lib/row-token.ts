@@ -10,9 +10,9 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  * browser therefore has to tell the server which row — and a row number the
  * browser can choose is a way to overwrite somebody else's cells.
  *
- * So the row number is signed here and verified on the way back. The token
- * grants exactly one thing: permission to write columns M and N of that one
- * row, for thirty minutes. It carries no personal data, so it is not a
+ * So the row number is signed here and verified on the way back, together
+ * with the sheet it belongs to. The token grants exactly one thing:
+ * permission to write a named few cells of that one row, for thirty minutes. It carries no personal data, so it is not a
  * disclosure risk if it leaks; the worst an attacker can do with a stolen token
  * is overwrite the email address of the guest who was given it.
  */
@@ -42,25 +42,37 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(hashA, hashB);
 }
 
+/**
+ * Which sheet a token is for.
+ *
+ * Row numbers are just integers, so a token issued for row 7 of the popup
+ * spreadsheet would otherwise verify perfectly against row 7 of the RSVP
+ * sheet, and one endpoint could be used to overwrite the other's data. The
+ * scope is inside the signed payload, so it cannot be swapped.
+ */
+export type RowScope = "rsvp" | "popup";
+
 /** Returns null when no secret is configured, which disables the feature. */
-export function issueRowToken(rowNumber: number): string | null {
+export function issueRowToken(rowNumber: number, scope: RowScope = "rsvp"): string | null {
   const secret = key();
   if (!secret || !Number.isInteger(rowNumber) || rowNumber < 2) return null;
 
-  const payload = `${rowNumber}.${Date.now() + TTL_MS}`;
+  const payload = `${scope}.${rowNumber}.${Date.now() + TTL_MS}`;
   return `${payload}.${sign(payload, secret)}`;
 }
 
-/** Returns the row number, or null if the token is forged, stale or malformed. */
-export function verifyRowToken(token: unknown): number | null {
+/** Returns the row number, or null if the token is forged, stale, malformed
+ *  or issued for a different sheet. */
+export function verifyRowToken(token: unknown, scope: RowScope = "rsvp"): number | null {
   const secret = key();
   if (!secret || typeof token !== "string") return null;
 
   const parts = token.split(".");
-  if (parts.length !== 3) return null;
+  if (parts.length !== 4) return null;
 
-  const [row, expiry, signature] = parts;
-  if (!safeEqual(signature, sign(`${row}.${expiry}`, secret))) return null;
+  const [tokenScope, row, expiry, signature] = parts;
+  if (tokenScope !== scope) return null;
+  if (!safeEqual(signature, sign(`${tokenScope}.${row}.${expiry}`, secret))) return null;
 
   const expiresAt = Number(expiry);
   if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) return null;
