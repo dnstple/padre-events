@@ -400,7 +400,6 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   background: rgba(244, 241, 234, 0.09);
 }
 .hero__hairline--l { left: var(--gutter); }
-.hero__hairline--r { right: var(--gutter); background: rgba(244, 241, 234, 0.06); }
 .hero__grain {
   position: absolute; inset: 0; opacity: 0.5;
   background-image: radial-gradient(rgba(244, 241, 234, 0.055) 0.5px, transparent 0.5px);
@@ -603,7 +602,9 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   display: grid; place-items: center;
   padding: 0.9rem;
   border-radius: 50%;
-  background: var(--red);
+  /* The same oxblood as the two answers below it, so the section has one
+     accent rather than two reds a shade apart. */
+  background: var(--deep);
   color: var(--bg);
 
   font-family: var(--font-ui);
@@ -1353,7 +1354,6 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
     <div class="hero__composition" aria-hidden="true">
       <span class="hero__driftMark">65</span>
       <span class="hero__hairline hero__hairline--l"></span>
-      <span class="hero__hairline hero__hairline--r"></span>
       <span class="hero__grain"></span>
     </div>
 
