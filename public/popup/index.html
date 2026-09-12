@@ -585,6 +585,50 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
    block of website copy. */
 .details__body p:first-child::first-line { letter-spacing: 0.005em; }
 
+/* ---- The stamp ----------------------------------------------------------
+ * A roundel in the top right of the section, the way a sticker lands on a
+ * lookbook cover. It hangs off the index row rather than sitting in it, so a
+ * device this decorative cannot push the section past one screen.
+ * ---------------------------------------------------------------------- */
+.details__index { position: relative; }
+
+.stamp {
+  position: absolute;
+  right: 0;
+  /* Centred on the rule it sits beside. */
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: var(--stamp, 8rem); height: var(--stamp, 8rem);
+  display: grid; place-items: center;
+  padding: 0.9rem;
+  border-radius: 50%;
+  background: var(--red);
+  color: var(--bg);
+
+  font-family: var(--font-ui);
+  font-size: clamp(0.5rem, 0.34rem + 0.5vw, 0.625rem);
+  font-weight: 400;
+  letter-spacing: var(--track-mid);
+  text-transform: uppercase;
+  line-height: 1.6;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* It is a hint about the page, not part of answering, so it stands down the
+   moment the flow opens. That also keeps it clear of the longer headings
+   those states carry. */
+.details[data-open="true"] .stamp { display: none; }
+
+/* One column: the roundel would otherwise sit on the end of the heading, so
+   the heading is told to stop short of it. Reserving the space costs nothing
+   in height — pushing the stamp into the flow would. */
+@media (max-width: 59.99rem) {
+  .stamp { --stamp: 6.5rem; }
+  .details__heading { padding-right: calc(6.5rem + 1rem); }
+}
+
 /* Key details as hairline-ruled rows — heading over subheading, the same
    device as the events site's details list. */
 .dlist { border-top: 1px solid var(--line); width: 100%; }
@@ -652,20 +696,8 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   gap: 0.75rem;
 }
 
-/* An aside, not an instruction: it should be findable without announcing
-   itself louder than the two answers above it. */
-.reply__hint {
-  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 400;
-  letter-spacing: var(--track-mid); text-transform: uppercase;
-  line-height: 1.5;
-  color: var(--muted);
-}
-[data-surface="dark"] .reply__hint { color: var(--on-dark-muted); }
-
 @media (min-width: 40rem) {
   .reply { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
-  /* Below both columns, ranged right so it sits under the answers. */
-  .reply__hint { grid-column: 1 / -1; justify-self: end; text-align: right; }
   .reply__actions {
     grid-template-columns: none;
     grid-auto-flow: column;
@@ -1368,6 +1400,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
       <div class="details__index" data-reveal>
         <span class="eyebrow" id="js-details-eyebrow">Details</span>
         <span class="details__indexRule" role="presentation"></span>
+        <p class="stamp">Find the hidden easter egg on this page for a prize</p>
       </div>
 
       <h2 class="details__heading" id="details-heading" tabindex="-1" data-reveal>
@@ -1399,7 +1432,6 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
             <button class="action action--ink" type="button" data-open-flow>Of course</button>
             <button class="action action--ink" type="button" data-open-flow>Most definitely</button>
           </div>
-          <p class="reply__hint">Find the hidden easter egg on this page for a free hat</p>
         </div>
       </div>
 
@@ -1581,9 +1613,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
               <!-- The three numerals are placed here at runtime, shuffled. -->
               <div class="egg__stage" id="js-egg-stage"></div>
 
-              <p class="egg__prompt" id="js-egg-prompt">
-                Sixty-five. Drag them into place.
-              </p>
+              <p class="egg__prompt" id="js-egg-prompt">Sixty-five</p>
 
               <div class="egg__win" id="js-egg-win" hidden>
                 <span class="egg__win65" aria-hidden="true">65</span>
