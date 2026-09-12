@@ -652,8 +652,20 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   gap: 0.75rem;
 }
 
+/* An aside, not an instruction: it should be findable without announcing
+   itself louder than the two answers above it. */
+.reply__hint {
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 400;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--muted);
+}
+[data-surface="dark"] .reply__hint { color: var(--on-dark-muted); }
+
 @media (min-width: 40rem) {
   .reply { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  /* Below both columns, ranged right so it sits under the answers. */
+  .reply__hint { grid-column: 1 / -1; justify-self: end; text-align: right; }
   .reply__actions {
     grid-template-columns: none;
     grid-auto-flow: column;
@@ -714,6 +726,128 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 /* Mobile: the dominant frame full width, then a tidy two-by-two beneath it. */
 .gLarge { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
 .gTall, .gRow { aspect-ratio: 1 / 1; }
+
+/* ---- The easter egg ------------------------------------------------------
+ * The large frame turns over to a panel exactly its own size. Three Roman
+ * numerals sit on it in a shuffled scatter; put them in the order LXV and
+ * they burn off and leave a 65.
+ *
+ * The 3D lives on .egg__inner rather than on the figure: the figure clips
+ * (overflow: hidden), and a clipping ancestor flattens a preserved-3d
+ * subtree in some engines.
+ * ---------------------------------------------------------------------- */
+.egg { perspective: 1400px; }
+
+.egg__inner {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 900ms var(--ease-editorial);
+}
+.egg[data-open="true"] .egg__inner { transform: rotateY(180deg); }
+
+.egg__face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* An invisible target over the photograph. It is a real button, so the panel
+   is reachable by keyboard and announced to a screen reader — an easter egg
+   nobody can open is just an exclusion. */
+.egg__open {
+  position: absolute; inset: 0;
+  background: transparent; border: 0; padding: 0;
+  cursor: pointer;
+}
+.egg__open:focus-visible { outline: 2px solid var(--bg); outline-offset: -6px; }
+
+.egg__back {
+  transform: rotateY(180deg);
+  background: var(--ink-bg); color: var(--on-dark);
+  display: grid; align-content: end;
+  gap: 0.75rem;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  /* The grain from the hero, so the back of the frame belongs to the page. */
+  background-image: radial-gradient(rgba(244, 241, 234, 0.05) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+}
+
+/* The numerals live here, positioned in px against this box. */
+.egg__stage { position: absolute; inset: 0; }
+
+.egg__piece {
+  position: absolute;
+  display: grid; place-items: center;
+  width: var(--piece); height: var(--piece);
+  margin: 0; padding: 0;
+  font-family: var(--font-heading); font-weight: 300;
+  font-size: calc(var(--piece) * 0.66); line-height: 1;
+  color: var(--on-dark);
+  background: transparent;
+  border: 1px solid rgba(244, 241, 234, 0.22);
+  cursor: grab;
+  /* Without this a drag on a touchscreen scrolls the page instead. */
+  touch-action: none;
+  user-select: none; -webkit-user-select: none;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+              opacity 700ms var(--ease), filter 700ms var(--ease),
+              transform 700ms var(--ease);
+}
+.egg__piece:hover { border-color: rgba(244, 241, 234, 0.5); }
+.egg__piece:focus-visible { outline: 2px solid var(--red-on-dark); outline-offset: 3px; }
+.egg__piece[data-dragging="true"] { cursor: grabbing; border-color: var(--red-on-dark); }
+
+/* Burning off, staggered by the script. */
+.egg__piece[data-gone="true"] {
+  opacity: 0;
+  filter: blur(7px);
+  transform: scale(0.55);
+  pointer-events: none;
+}
+
+.egg__prompt {
+  position: relative;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 400;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: var(--on-dark-muted);
+  transition: opacity var(--dur) var(--ease);
+}
+.egg[data-solved="true"] .egg__prompt { opacity: 0; }
+
+.egg__close {
+  position: absolute; top: clamp(0.5rem, 2vw, 1rem); right: clamp(0.5rem, 2vw, 1rem);
+  z-index: 2;
+}
+
+/* The reward, centred in the panel. */
+.egg__win {
+  position: absolute; inset: 0;
+  display: grid; align-content: center; justify-items: center;
+  gap: 0.4rem;
+  padding: clamp(1rem, 4vw, 2rem);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 900ms var(--ease-editorial);
+}
+.egg__win[data-shown="true"] { opacity: 1; }
+
+.egg__win65 {
+  font-family: var(--font-heading); font-weight: 300;
+  font-variant-numeric: lining-nums;
+  font-size: clamp(4rem, 14vw, 8rem); line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--on-dark);
+}
+.egg__winTitle {
+  margin-top: 0.5rem;
+  font-family: var(--font-heading); font-size: var(--step-1); font-weight: 300;
+  line-height: 1.3; color: var(--on-dark); max-width: 24ch;
+}
+.egg__winBody {
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 400;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: var(--red-on-dark);
+}
 
 /* =============================================================================
    8. RSVP FLOW — lives inside the details section
@@ -1265,6 +1399,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
             <button class="action action--ink" type="button" data-open-flow>Of course</button>
             <button class="action action--ink" type="button" data-open-flow>Most definitely</button>
           </div>
+          <p class="reply__hint">Find the hidden easter egg on this page for a free hat</p>
         </div>
       </div>
 
@@ -1429,8 +1564,38 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 
       <!-- Paths come from CONFIG.images.gallery, in this DOM order. -->
       <div class="gallery__set" id="js-gallery">
-        <figure class="figure gLarge" data-reveal data-placeholder="/popup/images/event-01.jpg">
-          <img src="/popup/images/event-01.jpg" alt="Guests at the last Padre65 party" loading="lazy" decoding="async" width="1800" height="1194" />
+        <!-- The easter egg. The frame turns over to a panel exactly its own
+             size; the puzzle is LXV — sixty-five in Roman numerals. -->
+        <figure class="figure gLarge egg" id="js-egg" data-open="false" data-reveal data-placeholder="/popup/images/event-01.jpg">
+          <div class="egg__inner" id="js-egg-inner">
+
+            <div class="egg__face egg__front" id="js-egg-front">
+              <img src="/popup/images/event-01.jpg" alt="Guests at the last Padre65 party" loading="lazy" decoding="async" width="1800" height="1194" />
+              <button class="egg__open" type="button" id="js-egg-open"
+                      aria-expanded="false" aria-controls="js-egg-panel">
+                <span class="visually-hidden">Open the hidden panel</span>
+              </button>
+            </div>
+
+            <div class="egg__face egg__back" id="js-egg-panel">
+              <!-- The three numerals are placed here at runtime, shuffled. -->
+              <div class="egg__stage" id="js-egg-stage"></div>
+
+              <p class="egg__prompt" id="js-egg-prompt">
+                Sixty-five. Drag them into place.
+              </p>
+
+              <div class="egg__win" id="js-egg-win" hidden>
+                <span class="egg__win65" aria-hidden="true">65</span>
+                <p class="egg__winTitle">Congratulations. You are worthy of a Padre hat</p>
+                <p class="egg__winBody">Take a screenshot to claim your prize</p>
+              </div>
+
+              <button class="skip egg__close" type="button" id="js-egg-close">Close</button>
+              <p class="visually-hidden" role="status" id="js-egg-live"></p>
+            </div>
+
+          </div>
         </figure>
         <figure class="figure gTall" data-reveal style="--reveal-delay:90ms" data-placeholder="/popup/images/event-03.jpg">
           <img src="/popup/images/event-03.jpg" alt="The DJ booth at the last Padre65 party" loading="lazy" decoding="async" width="1150" height="1734" />
@@ -2820,6 +2985,244 @@ const MiniMap = (function () {
 
   script.addEventListener("load", () => { window.__padreMapInit(); });
   document.head.appendChild(script);
+})();
+
+/* =============================================================================
+   9. EASTER EGG
+   The large gallery frame turns over to a panel its own size. Three Roman
+   numerals sit on it in a shuffled scatter; drag them into the order LXV —
+   sixty-five — and they burn off, leaving a 65.
+
+   Dragging uses pointer events, so mouse, pen and touch are one code path.
+   The numerals are real buttons and answer to the arrow keys as well, because
+   an easter egg only a mouse can open is not much of a reward.
+   ========================================================================== */
+(function EasterEgg() {
+
+  const egg    = $("#js-egg");
+  const front  = $("#js-egg-front");
+  const panel  = $("#js-egg-panel");
+  const openBtn  = $("#js-egg-open");
+  const closeBtn = $("#js-egg-close");
+  const stage  = $("#js-egg-stage");
+  const win    = $("#js-egg-win");
+  const live   = $("#js-egg-live");
+
+  if (!egg || !stage) return;
+
+  /* The answer, left to right. */
+  const ANSWER = ["L", "X", "V"];
+
+  let pieces = [];
+  let solved = false;
+  let built = false;
+
+  /* ---- Geometry ---------------------------------------------------------
+     Everything is measured from the stage, so the puzzle scales with the
+     frame rather than assuming a size.
+     ------------------------------------------------------------------- */
+  function pieceSize() {
+    const box = stage.getBoundingClientRect();
+    // Big enough to be a comfortable touch target at every frame size.
+    return Math.max(48, Math.min(96, Math.round(box.width * 0.15)));
+  }
+
+  function stageBox() {
+    return stage.getBoundingClientRect();
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function place(piece, x, y) {
+    const box = stageBox();
+    const size = piece.offsetWidth || pieceSize();
+    piece.dataset.x = String(clamp(x, 0, Math.max(0, box.width - size)));
+    piece.dataset.y = String(clamp(y, 0, Math.max(0, box.height - size)));
+    piece.style.left = piece.dataset.x + "px";
+    piece.style.top = piece.dataset.y + "px";
+  }
+
+  function centre(piece) {
+    const size = piece.offsetWidth || pieceSize();
+    return {
+      x: Number(piece.dataset.x) + size / 2,
+      y: Number(piece.dataset.y) + size / 2,
+    };
+  }
+
+  /* ---- Is it solved? ----------------------------------------------------
+     Left to right they must read L, X, V; each neighbour roughly a piece
+     apart; and all three on much the same line. Deliberately forgiving —
+     this is a puzzle, not a pixel test.
+     ------------------------------------------------------------------- */
+  function check() {
+    if (solved || pieces.length < 3) return;
+
+    const size = pieces[0].offsetWidth || pieceSize();
+    const sorted = [...pieces].sort((a, b) => centre(a).x - centre(b).x);
+
+    const order = sorted.map((p) => p.dataset.letter).join("");
+    if (order !== ANSWER.join("")) return;
+
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = centre(sorted[i]).x - centre(sorted[i - 1]).x;
+      if (gap < size * 0.62 || gap > size * 1.7) return;
+      if (Math.abs(centre(sorted[i]).y - centre(sorted[i - 1]).y) > size * 0.6) return;
+    }
+
+    solve(sorted);
+  }
+
+  function solve(sorted) {
+    solved = true;
+    egg.dataset.solved = "true";
+
+    const reduced = prefersReducedMotion();
+    sorted.forEach((piece, i) => {
+      piece.disabled = true;
+      window.setTimeout(() => { piece.dataset.gone = "true"; }, reduced ? 0 : i * 180);
+    });
+
+    window.setTimeout(() => {
+      win.hidden = false;
+      // A frame later, so the transition has something to move from.
+      window.requestAnimationFrame(() => { win.dataset.shown = "true"; });
+    }, reduced ? 0 : 760);
+
+    live.textContent =
+      "Congratulations. You are worthy of a Padre hat. Take a screenshot to claim your prize.";
+  }
+
+  /* ---- Dragging --------------------------------------------------------- */
+  function startDrag(event) {
+    const piece = event.currentTarget;
+    if (solved) return;
+
+    const box = stageBox();
+    const grabX = event.clientX - box.left - Number(piece.dataset.x);
+    const grabY = event.clientY - box.top - Number(piece.dataset.y);
+
+    piece.dataset.dragging = "true";
+    piece.setPointerCapture(event.pointerId);
+
+    const move = (moveEvent) => {
+      const now = stageBox();
+      place(piece, moveEvent.clientX - now.left - grabX, moveEvent.clientY - now.top - grabY);
+      check();
+    };
+
+    const end = () => {
+      piece.removeAttribute("data-dragging");
+      piece.removeEventListener("pointermove", move);
+      piece.removeEventListener("pointerup", end);
+      piece.removeEventListener("pointercancel", end);
+      check();
+    };
+
+    piece.addEventListener("pointermove", move);
+    piece.addEventListener("pointerup", end);
+    piece.addEventListener("pointercancel", end);
+  }
+
+  function onKey(event) {
+    const piece = event.currentTarget;
+    const step = event.shiftKey ? 24 : 8;
+    const moves = {
+      ArrowLeft: [-step, 0], ArrowRight: [step, 0],
+      ArrowUp: [0, -step], ArrowDown: [0, step],
+    };
+    const delta = moves[event.key];
+    if (!delta || solved) return;
+    event.preventDefault();
+    place(piece, Number(piece.dataset.x) + delta[0], Number(piece.dataset.y) + delta[1]);
+    check();
+  }
+
+  /* ---- Building the puzzle ---------------------------------------------- */
+  function build() {
+    const box = stageBox();
+    const size = pieceSize();
+    stage.style.setProperty("--piece", size + "px");
+
+    const letters = ["V", "L", "X"];
+    // Shuffled, so it is not the same puzzle twice.
+    for (let i = letters.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [letters[i], letters[j]] = [letters[j], letters[i]];
+    }
+
+    // Three scattered spots, well apart, and never already in a row.
+    const spots = [
+      { x: 0.10, y: 0.16 },
+      { x: 0.62, y: 0.10 },
+      { x: 0.30, y: 0.52 },
+    ];
+    for (let i = spots.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [spots[i], spots[j]] = [spots[j], spots[i]];
+    }
+
+    stage.innerHTML = "";
+    pieces = letters.map((letter, i) => {
+      const piece = document.createElement("button");
+      piece.type = "button";
+      piece.className = "egg__piece";
+      piece.textContent = letter;
+      piece.dataset.letter = letter;
+      piece.setAttribute(
+        "aria-label",
+        "Numeral " + letter + ". Drag it, or use the arrow keys to move it."
+      );
+      stage.appendChild(piece);
+      place(piece, spots[i].x * box.width, spots[i].y * box.height);
+      piece.addEventListener("pointerdown", startDrag);
+      piece.addEventListener("keydown", onKey);
+      return piece;
+    });
+
+    built = true;
+  }
+
+  /* ---- Opening and closing ---------------------------------------------- */
+  function open() {
+    egg.dataset.open = "true";
+    openBtn.setAttribute("aria-expanded", "true");
+    // The face turned away must not keep its tab stop.
+    front.inert = true;
+    panel.inert = false;
+
+    if (!built) build();
+    live.textContent = "A panel. Arrange the numerals to read sixty-five.";
+    window.setTimeout(() => closeBtn.focus(), prefersReducedMotion() ? 0 : 500);
+  }
+
+  function close() {
+    egg.dataset.open = "false";
+    openBtn.setAttribute("aria-expanded", "false");
+    front.inert = false;
+    panel.inert = true;
+    window.setTimeout(() => openBtn.focus(), prefersReducedMotion() ? 0 : 500);
+  }
+
+  panel.inert = true;
+  openBtn.addEventListener("click", open);
+  closeBtn.addEventListener("click", close);
+
+  // The stage is sized in pixels, so a resize has to move the pieces with it.
+  let lastWidth = 0;
+  window.addEventListener("resize", () => {
+    if (!built || solved) return;
+    const box = stageBox();
+    if (!box.width || box.width === lastWidth) return;
+    const ratio = lastWidth ? box.width / lastWidth : 1;
+    lastWidth = box.width;
+    stage.style.setProperty("--piece", pieceSize() + "px");
+    pieces.forEach((piece) => {
+      place(piece, Number(piece.dataset.x) * ratio, Number(piece.dataset.y) * ratio);
+    });
+  });
 })();
 </script>
 </body>
