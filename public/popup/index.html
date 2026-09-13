@@ -1762,6 +1762,11 @@ const CONFIG = {
      *  token the signup returned, so the flag lands on their own row. */
     calendarPath: "/api/popup/calendar",
 
+    /** Called once when someone finishes the easter egg. Needs no token —
+     *  the puzzle is on the page, not behind the form — but sends one when
+     *  the visitor has signed up, so the solve can be matched to their row. */
+    eggPath: "/api/popup/egg",
+
     /** "auto" | "live" | "preview".
      *  auto  — live when served over http(s) from the API's origin,
      *          preview when opened as a local file (no network call is made,
@@ -2494,7 +2499,12 @@ const RSVP = (function () {
 
   return {
     openFlow: openFlow, closeFlow: closeFlow, goToConfirmation: goToConfirmation,
-    noteCalendarAdded: noteCalendarAdded
+    noteCalendarAdded: noteCalendarAdded,
+    /* Null until they sign up. The easter egg uses it to attach a solve to a
+       row, and works perfectly well without one. */
+    token: () => signupToken,
+    /* One definition of "are we live?", shared rather than repeated. */
+    isPreview: isPreview
   };
 })();
 
@@ -3123,6 +3133,40 @@ const MiniMap = (function () {
 
     live.textContent =
       "Congratulations. You are worthy of a Padre hat. Take a screenshot to claim your prize.";
+
+    report();
+  }
+
+  /**
+   * Tells the sheet one more person got there.
+   *
+   * Fire and forget, and once per browser: a reload should not add to the
+   * count, and a failed tally is nobody's problem but the organiser's. The
+   * storage read is wrapped because a private window can throw on access
+   * rather than simply returning nothing.
+   */
+  const SOLVED_KEY = "padre65:egg-solved";
+
+  function report() {
+    let already = false;
+    try { already = window.localStorage.getItem(SOLVED_KEY) === "1"; } catch (e) { /* no storage */ }
+    if (already) return;
+    try { window.localStorage.setItem(SOLVED_KEY, "1"); } catch (e) { /* no storage */ }
+
+    // Not `live` — that name already means the announcement element here.
+    const isLive = typeof RSVP !== "undefined" && RSVP.isPreview ? !RSVP.isPreview() : true;
+    if (!isLive || !CONFIG.rsvp.eggPath) {
+      console.info("[padre65] Preview mode — the solve was not reported.");
+      return;
+    }
+
+    const token = (typeof RSVP !== "undefined" && RSVP.token) ? RSVP.token() : null;
+    fetch(CONFIG.rsvp.apiBase + CONFIG.rsvp.eggPath, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: token }),
+      keepalive: true
+    }).catch(() => { /* nothing useful to do, and nothing to tell the winner */ });
   }
 
   /* ---- Dragging --------------------------------------------------------- */

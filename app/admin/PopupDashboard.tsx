@@ -18,7 +18,7 @@ import styles from "./admin.module.css";
 
 const POLL_INTERVAL_MS = 10_000;
 
-type Filter = "all" | "mobile" | "email" | "calendar";
+type Filter = "all" | "mobile" | "email" | "calendar" | "egg";
 
 type Payload = {
   ok: boolean;
@@ -33,6 +33,7 @@ const EMPTY_TOTALS: PopupTotals = {
   withMobile: 0,
   withEmail: 0,
   addedToCalendar: 0,
+  eggSolved: 0,
 };
 
 function formatTime(iso: string): string {
@@ -147,6 +148,7 @@ export default function PopupDashboard() {
       if (filter === "mobile" && !row.phone) return false;
       if (filter === "email" && !row.email) return false;
       if (filter === "calendar" && !row.calendar) return false;
+      if (filter === "egg" && !row.egg) return false;
       if (!needle) return true;
       return [row.name, row.email, row.phone].join(" ").toLowerCase().includes(needle);
     });
@@ -157,6 +159,7 @@ export default function PopupDashboard() {
     { label: "Mobile numbers", value: totals.withMobile },
     { label: "Email addresses", value: totals.withEmail },
     { label: "Added to calendar", value: totals.addedToCalendar },
+    { label: "Easter egg solved", value: totals.eggSolved },
   ];
 
   return (
@@ -207,6 +210,7 @@ export default function PopupDashboard() {
                 ["mobile", "Mobile"],
                 ["email", "Email"],
                 ["calendar", "Calendar"],
+                ["egg", "Egg"],
               ] as const
             ).map(([value, label]) => (
               <button
@@ -295,6 +299,7 @@ export default function PopupDashboard() {
                   <th scope="col">Mobile</th>
                   <th scope="col">Email</th>
                   <th scope="col">Calendar</th>
+                  <th scope="col">Egg</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,6 +311,9 @@ export default function PopupDashboard() {
                     <td>{row.email || <span className={styles.none}>—</span>}</td>
                     <td>
                       <CalendarTag taken={Boolean(row.calendar)} />
+                    </td>
+                    <td>
+                      <CalendarTag taken={row.egg} />
                     </td>
                   </tr>
                 ))}

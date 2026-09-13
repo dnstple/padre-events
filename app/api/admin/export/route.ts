@@ -7,6 +7,7 @@ import { guestNames } from "@/lib/rsvp-types";
 import {
   isPopupSheetConfigured,
   isSheetsConfigured,
+  readEggSolves,
   readPopupSignups,
   readRsvps,
 } from "@/lib/sheets";
@@ -49,7 +50,8 @@ export async function GET(request: Request) {
 
     let signups;
     try {
-      signups = await readPopupSignups();
+      const egg = await readEggSolves();
+      signups = await readPopupSignups(new Set(egg.signupRows));
     } catch (error) {
       console.error(
         "[admin/export] popup read failed:",
@@ -59,13 +61,14 @@ export async function GET(request: Request) {
     }
 
     const popupCsv = toCsv([
-      ["Submitted at (UTC)", "Name", "Email", "Phone", "Added to calendar"],
+      ["Submitted at (UTC)", "Name", "Email", "Phone", "Added to calendar", "Easter egg"],
       ...signups.map((row) => [
         row.created_at ? row.created_at.replace("T", " ").replace("Z", "") : "",
         row.name,
         row.email,
         row.phone,
         row.calendar,
+        row.egg ? "Solved" : "",
       ]),
     ]);
 

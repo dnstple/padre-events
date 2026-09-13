@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
 import { summarisePopup, type PopupTotals } from "@/lib/popup-types";
-import { isPopupSheetConfigured, readPopupSignups } from "@/lib/sheets";
+import { isPopupSheetConfigured, readEggSolves, readPopupSignups } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,8 +51,9 @@ export async function GET() {
   }
 
   try {
-    const rows = await readPopupSignups();
-    const totals: PopupTotals = summarisePopup(rows);
+    const egg = await readEggSolves();
+    const rows = await readPopupSignups(new Set(egg.signupRows));
+    const totals: PopupTotals = summarisePopup(rows, egg.total);
     return NextResponse.json(
       { ok: true, rows, totals, fetchedAt: new Date().toISOString() },
       { status: 200, headers: privateHeaders },

@@ -409,7 +409,7 @@ export async function markPopupCalendarAdded(rowNumber: number): Promise<void> {
  * A missing tab is not an error: it simply means nobody has signed up yet,
  * because the tab is created by the first write.
  */
-export async function readPopupSignups(): Promise<PopupRow[]> {
+export async function readPopupSignups(solvedRows?: Set<number>): Promise<PopupRow[]> {
   const id = popupSheetId();
 
   const response = await sheetsFetch(
@@ -437,10 +437,73 @@ export async function readPopupSignups(): Promise<PopupRow[]> {
       email,
       phone,
       calendar,
+      egg: solvedRows ? solvedRows.has(index + 2) : false,
     };
   });
 
   return parsed.reverse();
+}
+
+/* ---- The easter egg ------------------------------------------------------
+ * One row per completed puzzle, on its own tab of the popup spreadsheet, so
+ * the count is just "how many rows" and each one carries when it happened.
+ *
+ * A solve is logged whether or not the visitor signed up — the puzzle is on
+ * the page, not behind the form, and a count that only saw signups would not
+ * answer the question. When they did sign up, their row number is recorded
+ * alongside, so a solve can be matched to a person.
+ * ---------------------------------------------------------------------- */
+export const EGG_TAB = process.env.GOOGLE_POPUP_EGG_TAB ?? "Easter egg";
+
+export const EGG_HEADER_ROW = ["Solved at (UTC)", "Signup row"] as const;
+
+export async function appendEggSolve(signupRow: number | null): Promise<void> {
+  const id = popupSheetId();
+  await ensureTab(EGG_TAB, EGG_HEADER_ROW, id);
+
+  const row = [
+    new Date().toISOString().replace("T", " ").slice(0, 19),
+    signupRow === null ? "" : String(signupRow),
+  ];
+
+  const response = await sheetsFetch(
+    `/values/${encodeURIComponent(EGG_TAB)}!A:B:append` +
+      `?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+    { method: "POST", body: JSON.stringify({ values: [row] }) },
+    id,
+  );
+
+  if (!response.ok) throw new Error(`Egg append failed (${response.status})`);
+}
+
+export type EggTally = {
+  /** Every completed puzzle. */
+  total: number;
+  /** The signup rows among them, so the dashboard can mark who solved it. */
+  signupRows: number[];
+};
+
+/** A missing tab means nobody has solved it yet — not an error. */
+export async function readEggSolves(): Promise<EggTally> {
+  const id = popupSheetId();
+
+  const response = await sheetsFetch(
+    `/values/${encodeURIComponent(EGG_TAB)}!A2:B?majorDimension=ROWS`,
+    undefined,
+    id,
+  );
+
+  if (response.status === 400) return { total: 0, signupRows: [] };
+  if (!response.ok) throw new Error(`Egg read failed (${response.status})`);
+
+  const data = (await response.json()) as { values?: string[][] };
+  const rows = (data.values ?? []).filter((cells) => cells[0]);
+
+  const signupRows = rows
+    .map((cells) => Number(cells[1]))
+    .filter((n) => Number.isInteger(n) && n > 1);
+
+  return { total: rows.length, signupRows };
 }
 
 /**

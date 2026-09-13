@@ -9,6 +9,8 @@ export type PopupRow = {
   phone: string;
   /** The raw cell: "" when they did not take the calendar file. */
   calendar: string;
+  /** True when this signup also finished the easter egg. */
+  egg: boolean;
 };
 
 export type PopupTotals = {
@@ -16,9 +18,14 @@ export type PopupTotals = {
   withMobile: number;
   withEmail: number;
   addedToCalendar: number;
+  /** Every completed puzzle, including visitors who never signed up. */
+  eggSolved: number;
 };
 
-export function summarisePopup(rows: readonly PopupRow[]): PopupTotals {
+export function summarisePopup(
+  rows: readonly PopupRow[],
+  eggSolved = 0,
+): PopupTotals {
   let withMobile = 0;
   let withEmail = 0;
   let addedToCalendar = 0;
@@ -29,5 +36,5 @@ export function summarisePopup(rows: readonly PopupRow[]): PopupTotals {
     if (row.calendar) addedToCalendar += 1;
   }
 
-  return { signups: rows.length, withMobile, withEmail, addedToCalendar };
+  return { signups: rows.length, withMobile, withEmail, addedToCalendar, eggSolved };
 }
