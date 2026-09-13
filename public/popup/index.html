@@ -395,11 +395,6 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
     -webkit-text-stroke-color: rgba(160, 44, 44, 0.54);
   }
 }
-.hero__hairline {
-  position: absolute; top: 0; bottom: 0; width: 1px;
-  background: rgba(244, 241, 234, 0.09);
-}
-.hero__hairline--l { left: var(--gutter); }
 .hero__grain {
   position: absolute; inset: 0; opacity: 0.5;
   background-image: radial-gradient(rgba(244, 241, 234, 0.055) 0.5px, transparent 0.5px);
@@ -1353,7 +1348,6 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 
     <div class="hero__composition" aria-hidden="true">
       <span class="hero__driftMark">65</span>
-      <span class="hero__hairline hero__hairline--l"></span>
       <span class="hero__grain"></span>
     </div>
 
@@ -1416,7 +1410,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
           </p>
           <p data-reveal style="--reveal-delay:90ms">
             Saturday 26th we will be open till 9pm with a small evening event
-            afterwards. See below for more details.
+            afterwards.
           </p>
         </div>
 
@@ -1429,7 +1423,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
             <span class="reply__rule" role="presentation"></span>
           </div>
           <div class="reply__actions">
-            <button class="action action--ink" type="button" data-open-flow>Of course</button>
+            <button class="action action--ink" type="button" data-open-flow>Of course!</button>
             <button class="action action--ink" type="button" data-open-flow>Most definitely</button>
           </div>
         </div>
@@ -1706,7 +1700,7 @@ const CONFIG = {
         /* A note under this day alone in the hero. Leave it off a day and
            nothing is rendered. The details table stays plain — the body copy
            above it already says this in full. */
-        note: "Evening event to follow"
+        note: "Evening drinks 6–9pm"
       },
       {
         label: "Sunday 27 September",
@@ -3236,6 +3230,19 @@ const MiniMap = (function () {
     for (let i = spots.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [spots[i], spots[j]] = [spots[j], spots[i]];
+    }
+
+    // Two independent shuffles will, one time in six, deal the numerals so
+    // that they already read L X V across the panel — scattered, so not a
+    // win, but the puzzle is then only a tidying job. One swap guarantees
+    // there is always something to work out.
+    const reading = letters
+      .map((letter, i) => ({ letter: letter, x: spots[i].x }))
+      .sort((a, b) => a.x - b.x)
+      .map((entry) => entry.letter)
+      .join("");
+    if (reading === ANSWER.join("")) {
+      [letters[0], letters[1]] = [letters[1], letters[0]];
     }
 
     stage.innerHTML = "";
