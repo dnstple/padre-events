@@ -1286,6 +1286,21 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   .hero__frame { padding-block: 5rem 2rem; }
 }
 
+/* ---- Clearance for the stamp -------------------------------------------
+ * The roundel is centred on the index row and hangs roughly half its height
+ * below it, over the top of row two — which on the editorial layout is where
+ * the copy column begins. Row two therefore has a floor on how close it may
+ * come, and it is set here, after the short-viewport tiers, because those
+ * tiers pull the grid gap down to 1rem and would otherwise drag the copy
+ * straight back under the circle.
+ *
+ * Last in the file on purpose. Moving it above those tiers silently
+ * reintroduces the overlap at 1280x720 and 1024x768.
+ * ---------------------------------------------------------------------- */
+@media (min-width: 60rem) {
+  .details__grid { row-gap: max(2.5rem, calc(var(--stamp, 8rem) / 2 + 0.75rem)); }
+}
+
 /* =============================================================================
    12. REDUCED MOTION & PRINT
    ========================================================================== */
