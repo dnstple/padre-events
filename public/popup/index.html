@@ -673,6 +673,17 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
  * Lifted from the events site: an eyebrow and a rule on the left, the action
  * on the right, sitting on the same surface as the reading above it.
  * ---------------------------------------------------------------------- */
+/* The question above, the two answers beneath it, at every width.
+ *
+ * It used to go side by side past 40rem of viewport, and that was the bug:
+ * this block sits in a grid column six of twelve wide and capped at 607px, so
+ * the media query was reading 1200px of screen and deciding there was room in
+ * a column half that size — the question ended up running underneath the
+ * buttons. Worse, the type scales with the viewport while the column does
+ * not, so at the sizes where the two arrangements were close the layout
+ * flipped between them every few tens of pixels.
+ *
+ * One arrangement, no breakpoint, nothing to collide with. */
 .reply {
   display: grid;
   gap: clamp(1.1rem, 2.5vw, 1.75rem);
@@ -682,24 +693,14 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 .reply__index { display: flex; align-items: center; gap: 0.9rem; }
 /* The question is a label, not a paragraph — it should not break in half. */
 .reply__index .eyebrow { white-space: nowrap; }
-.reply__rule { flex: 1; min-width: 1.5rem; max-width: 8rem; height: 1px; background: var(--line); }
+.reply__rule { flex: 1; min-width: 1.5rem; height: 1px; background: var(--line); }
 
-/* Twin answers, so they carry equal weight — stacked and full width when the
-   column is too narrow to hold both, side by side and equal when it is not. */
+/* Twin answers, so they carry equal weight — side by side while the column
+   can hold both, stacked and full width when it cannot. */
 .reply__actions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
   gap: 0.75rem;
-}
-
-@media (min-width: 40rem) {
-  .reply { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
-  .reply__actions {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: 1fr;
-    gap: 1rem;
-  }
 }
 
 /* =============================================================================
