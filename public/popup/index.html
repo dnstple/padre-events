@@ -798,12 +798,15 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 .slide { scroll-snap-align: start; }
 .slide .figure { aspect-ratio: 2 / 3; }
 
+/* The product name, set as a micro-label rather than a product-listing line.
+   Long names wrap to a second line on a narrow phone; the frames above keep
+   their own aspect-ratio, so a taller caption moves nothing but itself. */
 .slide__caption {
   display: flex; align-items: baseline; gap: 0.7rem;
   margin-top: 0.9rem;
   font-family: var(--font-ui); font-size: var(--step--2); font-weight: 400;
   letter-spacing: var(--track-tight); text-transform: uppercase;
-  color: var(--ink);
+  line-height: 1.5; color: var(--ink);
 }
 .slide__no {
   flex: 0 0 auto;
@@ -1729,16 +1732,15 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
     <div class="rail" id="js-rail" tabindex="0" role="group"
          aria-labelledby="collection-heading" data-reveal style="--reveal-delay:160ms">
 
-      <!-- ---- Captions: edit these freely, they are the only copy here ---- -->
       <figure class="slide">
         <div class="figure" data-placeholder="/popup/images/collection-01.jpg">
           <img src="/popup/images/collection-01.jpg"
                srcset="/popup/images/collection-01.jpg 800w, /popup/images/collection-01@2x.jpg 1200w"
                sizes="(min-width: 48rem) 20rem, 74vw"
-               alt="A model in a bone long-sleeve tee with the Padre65 oval logo, a denim trucker cap and washed jeans"
+               alt="The Club Long Sleeve in vintage white, worn with a denim trucker cap and washed jeans"
                width="800" height="1200" loading="lazy" decoding="async" />
         </div>
-        <figcaption class="slide__caption"><span class="slide__no">01</span><span>Bone long sleeve</span></figcaption>
+        <figcaption class="slide__caption"><span class="slide__no">01</span><span>Club Long Sleeve – Vintage White</span></figcaption>
       </figure>
 
       <figure class="slide">
@@ -1746,10 +1748,10 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
           <img src="/popup/images/collection-02.jpg"
                srcset="/popup/images/collection-02.jpg 800w, /popup/images/collection-02@2x.jpg 1200w"
                sizes="(min-width: 48rem) 20rem, 74vw"
-               alt="The back of a washed olive tee carrying the Flowstate print"
+               alt="The back of the Famara Tee in vintage olive, carrying its printed graphic"
                width="800" height="1200" loading="lazy" decoding="async" />
         </div>
-        <figcaption class="slide__caption"><span class="slide__no">02</span><span>Flowstate tee, washed olive</span></figcaption>
+        <figcaption class="slide__caption"><span class="slide__no">02</span><span>Famara Tee – Vintage Olive</span></figcaption>
       </figure>
 
       <figure class="slide">
@@ -1757,10 +1759,10 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
           <img src="/popup/images/collection-03.jpg"
                srcset="/popup/images/collection-03.jpg 800w, /popup/images/collection-03@2x.jpg 1200w"
                sizes="(min-width: 48rem) 20rem, 74vw"
-               alt="A model wearing a gold and brown silk scarf tied over a bone tee"
+               alt="The Revised Foulard in Famara yellow, worn as a headscarf"
                width="800" height="1200" loading="lazy" decoding="async" />
         </div>
-        <figcaption class="slide__caption"><span class="slide__no">03</span><span>Silk scarf, gold</span></figcaption>
+        <figcaption class="slide__caption"><span class="slide__no">03</span><span>Revised Foulard – Famara Yellow</span></figcaption>
       </figure>
 
       <figure class="slide">
@@ -1768,10 +1770,10 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
           <img src="/popup/images/collection-04.jpg"
                srcset="/popup/images/collection-04.jpg 800w, /popup/images/collection-04@2x.jpg 1200w"
                sizes="(min-width: 48rem) 20rem, 74vw"
-               alt="A model in a charcoal long-sleeve tee and a camouflage trucker cap"
+               alt="The Club Long Sleeve in vintage black, worn with a camouflage trucker cap"
                width="800" height="1200" loading="lazy" decoding="async" />
         </div>
-        <figcaption class="slide__caption"><span class="slide__no">04</span><span>Charcoal long sleeve</span></figcaption>
+        <figcaption class="slide__caption"><span class="slide__no">04</span><span>Club Long Sleeve – Vintage Black</span></figcaption>
       </figure>
 
       <figure class="slide">
@@ -1779,10 +1781,10 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
           <img src="/popup/images/collection-05.jpg"
                srcset="/popup/images/collection-05.jpg 800w, /popup/images/collection-05@2x.jpg 1200w"
                sizes="(min-width: 48rem) 20rem, 74vw"
-               alt="The back of a white tee with the Padre65 oval logo, worn with a denim trucker cap"
+               alt="The Denim Patchwork Club Cap seen from behind, over the Club Long Sleeve in vintage white"
                width="800" height="1200" loading="lazy" decoding="async" />
         </div>
-        <figcaption class="slide__caption"><span class="slide__no">05</span><span>Oval logo tee, white</span></figcaption>
+        <figcaption class="slide__caption"><span class="slide__no">05</span><span>Denim Patchwork Club Cap</span></figcaption>
       </figure>
 
       <figure class="slide">
@@ -1790,10 +1792,10 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
           <img src="/popup/images/collection-06.jpg"
                srcset="/popup/images/collection-06.jpg 800w, /popup/images/collection-06@2x.jpg 1200w"
                sizes="(min-width: 48rem) 20rem, 74vw"
-               alt="The back of washed jeans with the Padre signature embroidered at the waistband"
+               alt="The Marea Jeans in burn light blue from behind, with the Padre script embroidered at the pocket"
                width="800" height="1200" loading="lazy" decoding="async" />
         </div>
-        <figcaption class="slide__caption"><span class="slide__no">06</span><span>Embroidered denim</span></figcaption>
+        <figcaption class="slide__caption"><span class="slide__no">06</span><span>Marea Jeans – Burn Light Blue</span></figcaption>
       </figure>
     </div>
 
@@ -2119,9 +2121,9 @@ const CONFIG = {
 
     /**
      * The collection rail's frames are not listed here. Each one carries a
-     * srcset, an alt and a caption, and splitting three attributes of the
-     * same photograph across two files is how they drift apart — so they
-     * live together in the #collection markup. Add or reorder them there.
+     * srcset, an alt and the product's name from padre65.com, and splitting
+     * those across two files is how they drift apart — so they live together
+     * in the #collection markup. Add, rename or reorder them there.
      */
 
     /** In the order the figures appear in the markup. */
