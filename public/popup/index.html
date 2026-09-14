@@ -10,6 +10,41 @@
 <meta name="format-detection" content="telephone=no" />
 
 <!-- ==========================================================================
+     LINK PREVIEWS
+     What WhatsApp, iMessage, Instagram, Slack and the rest show when this
+     link is pasted. Nothing to do with the favicon, which is the small icon
+     in the browser tab.
+
+     >>> THE ORIGIN IS HARD-CODED BELOW <<<
+     Open Graph requires absolute URLs — a scraper has no page to resolve a
+     relative path against. A standalone HTML file cannot know where it is
+     served from, so if this ever moves off events.padre65.com, every
+     https://events.padre65.com below has to change with it.
+
+     The image is 1200x630, the size every platform crops from. Rebuild it
+     from og-source.html if the film or the dates change.
+     ========================================================================== -->
+<link rel="canonical" href="https://events.padre65.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Padre65" />
+<meta property="og:locale" content="en_GB" />
+<meta property="og:url" content="https://events.padre65.com/" />
+<meta property="og:title" content="PADRE65 — Popup Shop" />
+<meta property="og:description" content="Our first popup shop. 353 Portobello Road, London — Saturday 26 and Sunday 27 September. The full collection, drinks, music and competitions." />
+<meta property="og:image" content="https://events.padre65.com/popup/images/og.jpg" />
+<meta property="og:image:secure_url" content="https://events.padre65.com/popup/images/og.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="PADRE65 — Popup Shop. 26 and 27 September, 353 Portobello Road, London W10 5SA." />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="PADRE65 — Popup Shop" />
+<meta name="twitter:description" content="Our first popup shop. 353 Portobello Road, London — Saturday 26 and Sunday 27 September." />
+<meta name="twitter:image" content="https://events.padre65.com/popup/images/og.jpg" />
+<meta name="twitter:image:alt" content="PADRE65 — Popup Shop. 26 and 27 September, 353 Portobello Road, London W10 5SA." />
+
+<!-- ==========================================================================
      TYPEFACES
      The production site self-hosts these three as variable woff2 via
      next/font/local (app/fonts/index.ts). A standalone file cannot, so they
@@ -704,7 +739,116 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 }
 
 /* =============================================================================
-   7. GALLERY  (#gallery)
+   7. COLLECTION  (#collection)
+   A lookbook rail, not a slideshow. Native overflow scrolling with snap
+   points does the hard part — momentum, trackpads, touch, the arrow keys —
+   and does it the way the visitor's platform already behaves. The script
+   adds only what scrolling cannot: the two buttons, the counter and the
+   progress rule. With the script gone the rail still scrolls.
+   ========================================================================== */
+.collection {
+  background: var(--bg); color: var(--ink);
+  padding-block: var(--section-y);
+  /* Details and collection are both bone. Two light sections meeting need a
+     seam, and this page has no cards — so it is a hairline, not a panel. */
+  border-top: 1px solid var(--line);
+}
+
+.collection__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 0.75rem 2rem; flex-wrap: wrap;
+  margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
+}
+.collection__lede {
+  max-width: 30rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: var(--step--1); color: var(--muted);
+}
+
+/* ---- The rail ----------------------------------------------------------- */
+.rail {
+  --slide: min(74vw, 19rem);
+  --rail-gap: clamp(0.5rem, 1.4vw, 1rem);
+  /* Full bleed to the right, but the first slide lines up with the text
+     column at every width. Past --max the wrap stops growing and centres,
+     so the gutter alone would let the rail drift off the grid; the max()
+     falls back to the plain gutter on narrower screens, where the first
+     term goes negative. */
+  --edge: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter)));
+
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--slide);
+  gap: var(--rail-gap);
+  padding-inline: var(--edge);
+
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline-start: var(--edge);
+  scroll-behavior: smooth;
+
+  /* A scrollbar under a lookbook is noise. The progress rule underneath says
+     the same thing in the page's own voice. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+
+.slide { scroll-snap-align: start; }
+.slide .figure { aspect-ratio: 2 / 3; }
+
+.slide__caption {
+  display: flex; align-items: baseline; gap: 0.7rem;
+  margin-top: 0.9rem;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 400;
+  letter-spacing: var(--track-tight); text-transform: uppercase;
+  color: var(--ink);
+}
+.slide__no {
+  flex: 0 0 auto;
+  color: var(--muted); font-variant-numeric: lining-nums;
+}
+
+/* ---- Controls ----------------------------------------------------------- */
+.rail__controls {
+  display: flex; align-items: center; gap: clamp(1rem, 3vw, 2rem);
+  margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.rail__progress { position: relative; flex: 1 1 auto; height: 1px; background: var(--line); }
+.rail__bar {
+  position: absolute; top: 0; height: 1px;
+  left: var(--bar-x, 0%); width: var(--bar-w, 100%);
+  background: var(--ink);
+  transition: left var(--dur) var(--ease), width var(--dur) var(--ease);
+}
+
+.rail__count {
+  flex: 0 0 auto;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 400;
+  letter-spacing: var(--track-mid); color: var(--muted);
+  font-variant-numeric: lining-nums; white-space: nowrap;
+}
+
+/* Below 48rem the rail is swiped, and two buttons beside a thumb are just
+   something else to hit by accident. */
+.rail__nav { display: none; flex: 0 0 auto; gap: 0.5rem; }
+.rail__btn {
+  width: 2.75rem; height: 2.75rem;
+  display: grid; place-items: center;
+  border: 1px solid var(--line); color: var(--ink);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
+              border-color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.rail__btn:hover:not(:disabled), .rail__btn:focus-visible:not(:disabled) {
+  background: var(--ink); color: var(--bg); border-color: var(--ink);
+}
+.rail__btn:disabled { opacity: 0.28; cursor: not-allowed; }
+.rail__btn svg { width: 0.9rem; height: 0.9rem; fill: none; stroke: currentColor; stroke-width: 1.4; }
+
+/* =============================================================================
+   8. GALLERY  (#gallery)
    Editorial composition, not a grid of equal tiles. Mobile gets its own
    sequence rather than a squeezed version of the desktop one.
    ========================================================================== */
@@ -879,7 +1023,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 }
 
 /* =============================================================================
-   8. RSVP FLOW — lives inside the details section
+   9. RSVP FLOW — lives inside the details section
    Answering happens where the reading happened. The surface turns over, the
    way the events site's reply section does, so it reads as the same page
    changing its mind rather than a jump to somewhere else.
@@ -1037,7 +1181,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 .miniMap:hover .miniMap__label, .miniMap:focus-visible .miniMap__label { color: var(--red-on-dark); }
 
 /* =============================================================================
-   9. LOCATION  (#location)
+   10. LOCATION  (#location)
    ========================================================================== */
 .location {
   background: var(--ink-bg); color: var(--on-dark);
@@ -1125,7 +1269,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 .map__pin { width: 1.5rem; height: 1.5rem; color: var(--red-on-dark); }
 
 /* =============================================================================
-   10. FOOTER
+   11. FOOTER
    ========================================================================== */
 .footer {
   background: var(--ink-bg); color: var(--on-dark);
@@ -1161,12 +1305,18 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 }
 
 /* =============================================================================
-   11. RESPONSIVE
+   12. RESPONSIVE
    Desktop is a deliberate re-composition, not the mobile layout stretched.
    ========================================================================== */
 
 /* ---- 40rem / 640px — small tablets, large phones landscape -------------- */
 @media (min-width: 40rem) {
+}
+
+/* ---- 48rem / 768px — the rail gets two slides and its buttons ----------- */
+@media (min-width: 48rem) {
+  .rail { --slide: min(42vw, 20rem); }
+  .rail__nav { display: flex; }
 }
 
 /* ---- 60rem / 960px — the editorial layout switches on ------------------- */
@@ -1205,6 +1355,10 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   .details__index   { grid-column: 1 / span 12; }
   .details__heading { grid-column: 1 / span 4; align-self: start; }
   .details__state   { grid-column: 6 / span 6; display: grid; gap: clamp(1.25rem, 2.5vw, 2rem); }
+
+  /* Three slides and a deliberate sliver of the fourth — the peek is what
+     tells you the rail keeps going without a scrollbar to say so. */
+  .rail { --slide: min(31vw, 20rem); }
 
   .gallery__head { margin-bottom: clamp(2rem, 4vw, 3.5rem); }
 
@@ -1302,7 +1456,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 }
 
 /* =============================================================================
-   12. REDUCED MOTION & PRINT
+   13. REDUCED MOTION & PRINT
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -1551,7 +1705,124 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   </section>
 
   <!-- ========================================================================
-       3. LOCATION
+       3. COLLECTION — the lookbook rail
+       Six frames, scrolled rather than faded. Everything the visitor needs
+       is in the markup: with the script gone the rail still scrolls, and
+       the controls below it are hidden rather than left dead.
+       ===================================================================== -->
+  <section class="collection" id="collection" aria-labelledby="collection-heading">
+    <div class="wrap">
+      <div class="collection__head">
+        <h2 class="eyebrow" id="collection-heading" data-reveal>The collection</h2>
+        <a class="tlink" id="js-shop-collection" href="#" target="_blank" rel="noopener noreferrer"
+           data-reveal style="--reveal-delay:80ms">
+          Shop online <span class="tlink__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+      <p class="collection__lede" data-reveal style="--reveal-delay:120ms">
+        Pieces from the current run. All of it will be on the rails at Portobello.
+      </p>
+    </div>
+
+    <!-- The rail sits outside .wrap so it can bleed off the right edge; its
+         own padding lines the first frame up with the text column. -->
+    <div class="rail" id="js-rail" tabindex="0" role="group"
+         aria-labelledby="collection-heading" data-reveal style="--reveal-delay:160ms">
+
+      <!-- ---- Captions: edit these freely, they are the only copy here ---- -->
+      <figure class="slide">
+        <div class="figure" data-placeholder="/popup/images/collection-01.jpg">
+          <img src="/popup/images/collection-01.jpg"
+               srcset="/popup/images/collection-01.jpg 800w, /popup/images/collection-01@2x.jpg 1200w"
+               sizes="(min-width: 48rem) 20rem, 74vw"
+               alt="A model in a bone long-sleeve tee with the Padre65 oval logo, a denim trucker cap and washed jeans"
+               width="800" height="1200" loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="slide__caption"><span class="slide__no">01</span><span>Bone long sleeve</span></figcaption>
+      </figure>
+
+      <figure class="slide">
+        <div class="figure" data-placeholder="/popup/images/collection-02.jpg">
+          <img src="/popup/images/collection-02.jpg"
+               srcset="/popup/images/collection-02.jpg 800w, /popup/images/collection-02@2x.jpg 1200w"
+               sizes="(min-width: 48rem) 20rem, 74vw"
+               alt="The back of a washed olive tee carrying the Flowstate print"
+               width="800" height="1200" loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="slide__caption"><span class="slide__no">02</span><span>Flowstate tee, washed olive</span></figcaption>
+      </figure>
+
+      <figure class="slide">
+        <div class="figure" data-placeholder="/popup/images/collection-03.jpg">
+          <img src="/popup/images/collection-03.jpg"
+               srcset="/popup/images/collection-03.jpg 800w, /popup/images/collection-03@2x.jpg 1200w"
+               sizes="(min-width: 48rem) 20rem, 74vw"
+               alt="A model wearing a gold and brown silk scarf tied over a bone tee"
+               width="800" height="1200" loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="slide__caption"><span class="slide__no">03</span><span>Silk scarf, gold</span></figcaption>
+      </figure>
+
+      <figure class="slide">
+        <div class="figure" data-placeholder="/popup/images/collection-04.jpg">
+          <img src="/popup/images/collection-04.jpg"
+               srcset="/popup/images/collection-04.jpg 800w, /popup/images/collection-04@2x.jpg 1200w"
+               sizes="(min-width: 48rem) 20rem, 74vw"
+               alt="A model in a charcoal long-sleeve tee and a camouflage trucker cap"
+               width="800" height="1200" loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="slide__caption"><span class="slide__no">04</span><span>Charcoal long sleeve</span></figcaption>
+      </figure>
+
+      <figure class="slide">
+        <div class="figure" data-placeholder="/popup/images/collection-05.jpg">
+          <img src="/popup/images/collection-05.jpg"
+               srcset="/popup/images/collection-05.jpg 800w, /popup/images/collection-05@2x.jpg 1200w"
+               sizes="(min-width: 48rem) 20rem, 74vw"
+               alt="The back of a white tee with the Padre65 oval logo, worn with a denim trucker cap"
+               width="800" height="1200" loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="slide__caption"><span class="slide__no">05</span><span>Oval logo tee, white</span></figcaption>
+      </figure>
+
+      <figure class="slide">
+        <div class="figure" data-placeholder="/popup/images/collection-06.jpg">
+          <img src="/popup/images/collection-06.jpg"
+               srcset="/popup/images/collection-06.jpg 800w, /popup/images/collection-06@2x.jpg 1200w"
+               sizes="(min-width: 48rem) 20rem, 74vw"
+               alt="The back of washed jeans with the Padre signature embroidered at the waistband"
+               width="800" height="1200" loading="lazy" decoding="async" />
+        </div>
+        <figcaption class="slide__caption"><span class="slide__no">06</span><span>Embroidered denim</span></figcaption>
+      </figure>
+    </div>
+
+    <!-- Hidden until the script confirms it can drive them. -->
+    <div class="wrap">
+      <div class="rail__controls" id="js-rail-controls" hidden>
+        <div class="rail__progress" aria-hidden="true">
+          <div class="rail__bar" id="js-rail-bar"></div>
+        </div>
+        <!-- Decorative: it repeats the rail's position for sighted visitors.
+             A screen reader moves through the figures themselves, and a
+             live region that fires on every frame of a swipe is a nuisance. -->
+        <p class="rail__count" id="js-rail-count" aria-hidden="true"></p>
+        <div class="rail__nav">
+          <button class="rail__btn" type="button" id="js-rail-prev">
+            <span class="visually-hidden">Previous pieces</span>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2 4 8l6 6" stroke-linecap="square"/></svg>
+          </button>
+          <button class="rail__btn" type="button" id="js-rail-next">
+            <span class="visually-hidden">More pieces</span>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2l6 6-6 6" stroke-linecap="square"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       4. LOCATION
        ===================================================================== -->
   <section class="location" id="location" data-surface="dark" aria-labelledby="location-heading">
     <div class="wrap location__head">
@@ -1595,7 +1866,7 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   </section>
 
   <!-- ========================================================================
-       4. GALLERY — the photography closes the page
+       5. GALLERY — the photography closes the page
        ===================================================================== -->
   <section class="gallery" id="gallery" aria-labelledby="gallery-heading">
     <div class="wrap">
@@ -1846,6 +2117,13 @@ const CONFIG = {
       posterMobile: "/popup/media/hero-poster-720.jpg"
     },
 
+    /**
+     * The collection rail's frames are not listed here. Each one carries a
+     * srcset, an alt and a caption, and splitting three attributes of the
+     * same photograph across two files is how they drift apart — so they
+     * live together in the #collection markup. Add or reorder them there.
+     */
+
     /** In the order the figures appear in the markup. */
     gallery: [
       "/popup/images/event-01.jpg",  // large frame, top left
@@ -1952,6 +2230,7 @@ function icsEscape(value) {
   // External links + year
   $("#js-instagram").href = CONFIG.links.instagram;
   $("#js-shop").href = CONFIG.links.shop;
+  $("#js-shop-collection").href = CONFIG.links.shop;
   $("#js-year").textContent = String(new Date().getFullYear());
 
   mountHeroFilm();
@@ -1964,6 +2243,14 @@ function icsEscape(value) {
       figure.dataset.placeholder = path;
       img.src = path;
     }
+    img.addEventListener("error", () => { figure.dataset.missing = "true"; });
+  });
+
+  // The collection paths are in the markup, so the frames are painted before
+  // any of this runs; all that is needed here is the same courtesy on a
+  // missing file — a labelled panel rather than a broken-image icon.
+  $$("#js-rail .figure").forEach((figure) => {
+    const img = $("img", figure);
     img.addEventListener("error", () => { figure.dataset.missing = "true"; });
   });
 })();
@@ -3320,6 +3607,138 @@ const MiniMap = (function () {
       place(piece, Number(piece.dataset.x) * ratio, Number(piece.dataset.y) * ratio);
     });
   });
+})();
+
+/* =============================================================================
+   10. COLLECTION RAIL
+   The scrolling itself is the browser's. This adds the three things native
+   overflow does not give you: buttons that move by a whole screenful rather
+   than one frame, a rule that shows how much of the rail is on screen, and
+   the arrow keys snapping instead of nudging.
+
+   Everything is derived from measurement at the moment it is needed, because
+   the slide width is a clamp of the viewport — there is no constant to cache.
+   ========================================================================== */
+(function CollectionRail() {
+
+  const rail = $("#js-rail");
+  if (!rail) return;
+
+  const slides   = $$(".slide", rail);
+  const controls = $("#js-rail-controls");
+  const bar      = $("#js-rail-bar");
+  const count    = $("#js-rail-count");
+  const prevBtn  = $("#js-rail-prev");
+  const nextBtn  = $("#js-rail-next");
+  if (!slides.length || !controls) return;
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const gapPx = () => parseFloat(getComputedStyle(rail).columnGap) || 0;
+  const pitch = () => slides[0].getBoundingClientRect().width + gapPx();
+  const maxScroll = () => rail.scrollWidth - rail.clientWidth;
+
+  /** How many whole frames are on screen. At least one, always. */
+  function perView() {
+    const p = pitch();
+    if (!p) return 1;
+    return Math.max(1, Math.floor((rail.clientWidth + gapPx()) / p));
+  }
+
+  /**
+   * A press moves by a screenful, not by one frame. On a desktop showing
+   * three, stepping by one would leave two of them exactly where they were,
+   * which reads as a stutter rather than a turn of the page.
+   */
+  function nudge(direction) {
+    const p = pitch();
+    const max = maxScroll();
+    let target = rail.scrollLeft + direction * perView() * p;
+
+    // Land on a frame edge, then absorb a short remainder. Without this the
+    // last press before the end can move eleven pixels — the rail is a whole
+    // number of frames wide, the viewport is not — and a button that visibly
+    // does nothing reads as broken.
+    target = Math.round(target / p) * p;
+    if (target > max - p * 0.5) target = max;
+    if (target < p * 0.5) target = 0;
+
+    rail.scrollTo({ left: Math.max(0, Math.min(target, max)) });
+  }
+
+  function update() {
+    const max = maxScroll();
+
+    // If the whole run fits, there is nothing to drive and nothing to say.
+    if (max <= 1) { controls.hidden = true; return; }
+    controls.hidden = false;
+
+    // The bar is the slice of the rail currently on screen, drawn in place:
+    // its width is the proportion visible, its offset how far along that
+    // slice has travelled. It is a scrollbar in the page's own voice.
+    const visible = Math.min(1, rail.clientWidth / rail.scrollWidth);
+    const travel  = (rail.scrollLeft / max) * (1 - visible);
+    bar.style.setProperty("--bar-w", (visible * 100).toFixed(3) + "%");
+    bar.style.setProperty("--bar-x", (travel * 100).toFixed(3) + "%");
+
+    // The counter names the frames actually on screen — "01 / 06" would be a
+    // small lie whenever three of them are showing. Measured rather than
+    // derived from scrollLeft: the rail is padded at both ends, so arithmetic
+    // on the scroll offset is a frame out by the time you reach the end.
+    const box = rail.getBoundingClientRect();
+    const shown = [];
+    slides.forEach((slide, i) => {
+      const r = slide.getBoundingClientRect();
+      const overlap = Math.min(r.right, box.right) - Math.max(r.left, box.left);
+      if (r.width && overlap / r.width >= 0.6) shown.push(i + 1);
+    });
+    const from = shown[0] || 1;
+    const to   = shown[shown.length - 1] || from;
+    count.textContent =
+      (from === to ? pad(from) : pad(from) + "–" + pad(to)) +
+      " / " + pad(slides.length);
+
+    // A single pixel of slack: sub-pixel layout means scrollLeft rarely lands
+    // exactly on 0 or on max, and a button that never enables is worse than
+    // one that enables a pixel early.
+    prevBtn.disabled = rail.scrollLeft <= 1;
+    nextBtn.disabled = rail.scrollLeft >= max - 1;
+  }
+
+  prevBtn.addEventListener("click", () => nudge(-1));
+  nextBtn.addEventListener("click", () => nudge(1));
+
+  // The rail is a focusable scroll region, so the arrow keys already work —
+  // but they nudge by a few pixels and fight the snap points. Take them over
+  // and turn them into page turns.
+  rail.addEventListener("keydown", (event) => {
+    const keys = { ArrowRight: 1, ArrowLeft: -1 };
+    if (event.key in keys) {
+      event.preventDefault();
+      nudge(keys[event.key]);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      rail.scrollTo({ left: 0 });
+    } else if (event.key === "End") {
+      event.preventDefault();
+      rail.scrollTo({ left: maxScroll() });
+    }
+  });
+
+  // Scroll fires far faster than the screen refreshes; one read per frame is
+  // enough, and it keeps the layout reads out of the event handler.
+  let queued = false;
+  rail.addEventListener("scroll", () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; update(); });
+  }, { passive: true });
+
+  // The columns are a fixed track width and every frame carries its own
+  // aspect-ratio, so the rail's scrollWidth is settled before a single photo
+  // arrives. Only a resize can change it.
+  window.addEventListener("resize", update);
+
+  update();
 })();
 </script>
 </body>
