@@ -1,0 +1,2678 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<title>PADRE65 — Popup Shop</title>
+<meta name="description" content="Padre65 popup shop. 353 Portobello Road, London. 26–27 September." />
+<meta name="theme-color" content="#12100e" />
+<meta name="format-detection" content="telephone=no" />
+
+<!-- ==========================================================================
+     TYPEFACES
+     The production site self-hosts these three as variable woff2 via
+     next/font/local (app/fonts/index.ts). A standalone file cannot, so they
+     come from Google here. On migration, delete these two <link> tags — the
+     CSS custom properties below already name the same families, and the
+     fallback stacks are metric-close enough that nothing shifts.
+     ========================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@400;500&family=Petrona:wght@700&display=swap" rel="stylesheet" />
+
+<style>
+/* =============================================================================
+   1. TOKENS
+   Lifted verbatim from the events site (app/globals.css) so the two pages are
+   the same design system, not two interpretations of it.
+   ========================================================================== */
+:root {
+  /* Colour — from the Padre65 lookbook :root */
+  --bg: #f4f1ea;            /* warm bone */
+  --ink: #1a1714;           /* warm near-black */
+  --line: #e2dccf;          /* hairline rule (decorative) */
+  --red: #a02c2c;           /* brick accent — the brief's #A02C2C */
+  --deep: #631c1c;          /* deep oxblood */
+  --panel: #faf8f2;
+
+  /* The lookbook taupe #8a7f70 is 3.48:1 on bone — below AA for small text.
+     Kept for non-text use; small text uses --muted at 4.6:1. */
+  --muted: #766c60;
+  --muted-soft: #8a7f70;
+
+  /* Dark counterparts */
+  --ink-bg: #12100e;
+  --ink-bg-soft: #1a1714;
+  --on-dark: #f4f1ea;
+  --on-dark-muted: #8f857a; /* 5.25:1 on --ink-bg */
+  /* Small quiet labels sitting over the film rather than over flat ink. The
+     veil never gets the frame all the way to --ink-bg, so --on-dark-muted
+     lands around 4.0:1 there — measurably short. This is the same voice,
+     lifted until it clears AA over the brightest veiled frame. See
+     contrast.mjs. */
+  --on-film-muted: #ada598;
+  --line-dark: #2e2823;
+
+  /* Form-control borders are UI components and need 3:1 */
+  --field-line: var(--muted-soft);
+  --field-line-dark: #6d5e53;
+
+  /* Oxblood lifted for legible text on near-black (5:1) */
+  --red-on-dark: #d35e5e;
+
+  /* Type */
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mark: "Petrona", Georgia, serif;
+
+  --step--2: clamp(0.625rem, 0.6rem + 0.12vw, 0.6875rem);
+  --step--1: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
+  --step-0: clamp(0.9375rem, 0.9rem + 0.19vw, 1.0625rem);
+  --step-1: clamp(1.125rem, 1.05rem + 0.38vw, 1.375rem);
+  --step-2: clamp(1.375rem, 1.2rem + 0.88vw, 2rem);
+  --step-3: clamp(1.875rem, 1.5rem + 1.88vw, 3rem);
+  --step-4: clamp(2.5rem, 1.7rem + 4vw, 5rem);
+  --step-5: clamp(3.25rem, 1.6rem + 8.25vw, 8.5rem);
+
+  --track-wide: 0.32em;
+  --track-mid: 0.18em;
+  --track-tight: 0.12em;
+
+  /* Space */
+  --gutter: clamp(1.25rem, 0.9rem + 1.75vw, 3.5rem);
+  --section-y: clamp(3.5rem, 2.2rem + 5vw, 7.5rem);
+  --measure: 34rem;
+  --max: 90rem;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-editorial: cubic-bezier(0.16, 0.84, 0.44, 1);
+  --dur-fast: 180ms;
+  --dur: 300ms;
+  --dur-slow: 900ms;
+  --dur-editorial: 1400ms;
+
+  /* The masked wordmark. One white source file, painted with currentColor. */
+  --logo-src: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAwLjAwMDAwMCA4MDIuMDAwMDAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4gPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsODAyLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIgZmlsbD0iIzAwMCIgc3Ryb2tlPSJub25lIj4gPHBhdGggZD0iTTExMDYwIDgwMDQgYy0zOTMgLTM3IC01ODIgLTU1IC03NDAgLTY5IC0xOTUgLTE4IC0yMTUgLTI1IC0yNjcgLTkzIC0zNCAtNDQgLTMyIC0zNSAtNTIgLTI2NyAtMTQgLTE2MSAtNDMgLTMyOCAtOTEgLTUxNSAtNjggLTI3MSAtMTMyIC00NDYgLTMwNSAtODQwIC00MyAtOTYgLTEwMiAtMjMxIC0xMzIgLTMwMCAtMzAgLTY5IC04MSAtMTgzIC0xMTMgLTI1NSAtMzIgLTcxIC05MiAtMjA4IC0xMzQgLTMwMiAtNDIgLTk1IC0xMTAgLTI0OSAtMTUxIC0zNDMgLTQxIC05MyAtMTA5IC0yNDggLTE1MSAtMzQyIC00MiAtOTUgLTExOCAtMjY3IC0xNjkgLTM4MyAtMTE4IC0yNjYgLTI3OCAtNjMwIC00NzEgLTEwNjcgLTQyIC05NSAtMTE4IC0yNjcgLTE2OSAtMzgzIC0yMzQgLTUyOSAtMjg5IC02NTUgLTM1NiAtODA3IC0xODIgLTQxNSAtMzAzIC02MjEgLTQ2OCAtNzkyIC0xNjQgLTE3MCAtMzQxIC0yNjcgLTY0MiAtMzUwIC03MSAtMjAgLTEwMSAtNDQgLTEzMSAtMTA0IC0yMiAtNDUgLTIzIC01OCAtMjYgLTMxMCAtMiAtMTY4IDEgLTI4MiA4IC0zMTUgMTQgLTY4IDUxIC0xMjIgMTAwIC0xNDcgMzkgLTIwIDQ5IC0yMCAxNTM4IC0xOCBsMTQ5OCAzIDM3IDI1IGMyMiAxNSA0OCA0NiA2MiA3NCAyNSA1MCAyNSA1MSAyNSAzNDYgMCAyOTUgMCAyOTYgLTI1IDM0NiAtMzMgNjUgLTczIDkwIC0xODYgMTE0IC01MzAgMTEzIC03NTIgMzA5IC03MDAgNjE2IDQxIDIzOSAxMjQgMzY3IDI2OSA0MTYgbDY3IDIzIDEwMzAgMyBjMTExMSAzIDExNDggMiAxMjUyIC00NyAxMDggLTUxIDE0NiAtMTA1IDIyMiAtMzEzIDg1IC0yMzEgMTExIC00MDAgNzUgLTQ4NiAtNDEgLTEwMCAtMTY4IC0xNzEgLTM4MyAtMjE2IC05MyAtMTkgLTEzNCAtNDcgLTE2NiAtMTEwIC0yNSAtNTAgLTI1IC01MSAtMjUgLTM0NiAwIC0yOTUgMCAtMjk2IDI1IC0zNDYgMTQgLTI4IDQwIC01OSA2MiAtNzQgbDM3IC0yNSAxODAwIC0zIGMxMzU3IC0yIDE4MDggMSAxODMxIDkgNDggMTkgOTMgNjggMTEwIDEyMCAxNCA0MCAxNiA5NCAxMyAzMzEgbC0zIDI4MyAtMjcgNDYgYy0zMyA1NiAtNTQgNzAgLTE1OSAxMDkgLTI5MiAxMDYgLTQ2MSAzMTcgLTcwOSA4ODUgLTE0MSAzMjIgLTI5MSA2NTggLTM3MCA4MzAgLTc4IDE2OSAtMjMzIDUwOCAtMzg1IDg0NSAtMjkgNjMgLTk4IDIxNiAtMTU1IDM0MCAtNTYgMTI0IC0xMjYgMjc3IC0xNTUgMzQwIC0yOSA2MyAtMTQzIDMxNSAtMjU1IDU2MCAtMTEyIDI0NSAtMjI0IDQ5MiAtMjUwIDU1MCAtNDIgOTIgLTEzMSAyODggLTM5MCA4NTUgLTcyIDE1NiAtMjQ2IDUzOSAtNDU1IDEwMDAgLTY4IDE0OSAtMTQ4IDMyNiAtMTgwIDM5NSAtMzEgNjkgLTg4IDE5NSAtMTI3IDI4MCAtNzUgMTYzIC0xMDIgMjAzIC0xNTcgMjI2IC0zOCAxNiAtNDcgMTYgLTIzMSAtMnogbS00OTAgLTQwMjQgYzE4OCAtNDEwIDM2MiAtNzg3IDM4NiAtODM4IDI0IC01MiA0NCAtOTggNDQgLTEwMyAwIC01IC0zMDcgLTkgLTc2NSAtOSAtNDIxIDAgLTc2NSAyIC03NjUgNCAwIDIgMzggODggODQgMTkyIDQ1IDEwNCAxMjggMjkzIDE4NCA0MTkgNTUgMTI3IDE2NSAzNzkgMjQ1IDU2MCA3OSAxODIgMTY0IDM3NiAxODggNDMyIDI0IDU2IDQ3IDk5IDUwIDk1IDMgLTQgMTYwIC0zNDIgMzQ5IC03NTJ6Ii8+IDxwYXRoIGQ9Ik05MyA3OTAzIGMtMjMgLTE0IC01MiAtNDUgLTY1IC02NyAtMjMgLTQxIC0yMyAtNDQgLTIzIC0zNTEgMCAtMzQwIDEgLTM0NCA2MyAtNDAyIDM2IC0zNCA1NyAtNDEgMTc2IC01OCAzNTkgLTU0IDU2NyAtMTkwIDYzOSAtNDIwIGwyMiAtNzAgMCAtMjU3NSAwIC0yNTc1IC0yMiAtNTcgYy04MyAtMjE4IC0yODcgLTM0NiAtNjQ4IC00MDggLTEzNCAtMjMgLTE3MSAtNDMgLTIwOSAtMTE2IC0yMCAtMzYgLTIxIC01OCAtMjQgLTMyNCAtMiAtMjAyIDEgLTI5OCA5IC0zMjkgMTYgLTU2IDcyIC0xMTYgMTI0IC0xMzAgNTQgLTE1IDM5NTMgLTE2IDQwMDcgLTEgNTAgMTQgOTcgNTUgMTE5IDEwNSAxNyAzNiAxOSA3MCAxOSAzMzUgMCAyNzAgLTIgMjk4IC0yMCAzMzUgLTM0IDcyIC04OCAxMTUgLTE0MyAxMTUgLTQ2IDAgLTI2MiA0MCAtMzUxIDY2IC0yODUgODAgLTQ0NyAyMTQgLTQ4NiA0MDEgLTggMzYgLTEwIDIwOSAtOCA1MzUgNCA0NjUgNSA0ODUgMjYgNTQ4IDI1IDc2IDc2IDE0MiAxMzMgMTcwIDc2IDM5IDE1MyA1MCAzNzQgNTAgODQ5IDIgMTQ0MiA3OCAxOTY1IDI1MSA2MjIgMjA1IDEwNzIgNTA2IDEzODggOTI5IDkyIDEyMyAxMzAgMTg3IDIwNyAzNDUgMTYyIDMzMiAyMzcgNjc4IDIzNyAxMTAwIDAgMzY3IC01NSA2NzEgLTE3NyA5NzUgLTM1OSA4OTQgLTEyNDMgMTQ0NyAtMjU3MCAxNjA2IC0zNTMgNDIgLTQ0OCA0NCAtMjYzMCA0NCBsLTIwOTEgMCAtNDEgLTI3eiBtNDIzOCAtMTAyMyBjNjQyIC0xMTIgOTUxIC01NTQgOTg5IC0xNDE0IDM4IC04OTUgLTE4NSAtMTQxOCAtNjk3IC0xNjM0IC03MiAtMzEgLTE3NyAtNjEgLTI4MyAtODIgLTE3MyAtMzQgLTcwMSAtMzcgLTgyNSAtNCAtMTQ0IDM4IC0yMTMgMTIzIC0yMzUgMjkwIC03IDUzIC0xMCA0ODUgLTggMTI5NCA0IDExMzUgNSAxMjE5IDIyIDEyNzUgNTYgMTg2IDE2MyAyNzEgMzcwIDI5NiAxMjggMTQgNTM3IDIgNjY3IC0yMXoiLz4gPHBhdGggZD0iTTE1NjY4IDc5MDEgYy0zMSAtMjAgLTUzIC00NCAtNjkgLTc3IC0yNCAtNDggLTI0IC01MyAtMjQgLTM0NCAwIC0yOTAgMCAtMjk2IDI0IC0zNDMgMzQgLTcwIDc5IC05NiAxOTggLTExMyAzOTIgLTU4IDYwMiAtMjA1IDY2NyAtNDY1IDE1IC01OSAxNiAtMjkxIDE2IC0yNTk4IDAgLTI3OTcgNSAtMjU4NyAtNjIgLTI3MTQgLTYxIC0xMTUgLTIxMCAtMjIyIC0zODkgLTI4MCAtNjcgLTIxIC0xNzAgLTQ0IC0yOTAgLTYyIC00NiAtNyAtOTcgLTQxIC0xMjYgLTgzIC0zOCAtNTcgLTQ1IC0xMjQgLTQxIC00MDAgMyAtMjIyIDYgLTI2MyAyMiAtMjk5IDIzIC01NCA3NSAtMTAwIDEyMyAtMTA5IDIyIC00IDEyNiAyIDI0OCAxNSAzMTUgMzMgMzgwIDM5IDYyMCA1NyAzMDIgMjEgNzg0IDMxIDExODUgMjMgMzIxIC03IDQ1NCAtMTIgMTA1NSAtNDQgNjE0IC0zMiA5MjEgLTM5IDExNjUgLTI2IDEwNDAgNTUgMTg3MiAzMzUgMjU0MCA4NTUgMTk0IDE1MCA0NjAgNDMwIDYxNiA2NDYgMzExIDQzMCA1MzUgMTAxNiA2MzAgMTY0NSA4NyA1NzkgNzQgMTM1MiAtMzIgMTg5MCAtMzMwIDE2ODAgLTE0NDYgMjU5NyAtMzQxOSAyODExIC0zODcgNDIgLTUwNSA0NCAtMjYwMSA0NCBsLTIwMTAgMCAtNDYgLTI5eiBtNDEwMiAtMTAwNiBjNzA0IC0xNTUgMTIwNSAtODAzIDEzOTQgLTE4MDUgNjUgLTM0MCA5MCAtNjM1IDkwIC0xMDU1IDAgLTY0MSAtNzMgLTExNjcgLTIyNyAtMTYyMCAtMjU5IC03NjAgLTY5NiAtMTIwMyAtMTMyMCAtMTMzNyAtMTM5IC0yOSAtNDY2IC0zMyAtNTY3IC01IC0xMjYgMzUgLTIwNyA5MCAtMjUzIDE3NCAtNjAgMTEyIC01NyAtNTkgLTU3IDI3MDggMCAxNjk4IDQgMjU1MSAxMSAyNTk1IDEyIDc4IDU0IDE3MiA5OSAyMjMgNTggNjYgMTQ3IDEwOCAyODAgMTMyIDEwNCAxOSA0NDcgMTMgNTUwIC0xMHoiLz4gPHBhdGggZD0iTTI0MTY1IDc5MDcgYy0yOSAtMTYgLTQ4IC0zNyAtNjcgLTc2IGwtMjggLTU1IDAgLTI5MyAwIC0yOTQgMjUgLTQ5IGMzOCAtNzQgNzcgLTk1IDIxNCAtMTE1IDI0NSAtMzYgMzk0IC05OCA1MTIgLTIxNSA3OSAtNzkgMTE1IC0xMzkgMTQwIC0yNDAgMjEgLTgyIDIxIC01MTE3IDAgLTUyMDAgLTQ2IC0xODIgLTE5NCAtMzE4IC00MzEgLTM5NCAtNTggLTE5IC0xNTIgLTQyIC0yMTAgLTUxIC0xMzIgLTIxIC0xNzMgLTM4IC0yMDQgLTg0IC00NCAtNjQgLTQ2IC04MCAtNDYgLTM4NCAwIC0yNjIgMiAtMjk2IDE5IC0zMzIgMjIgLTUwIDY5IC05MSAxMTkgLTEwNSA1NCAtMTUgMzk1MyAtMTQgNDAwNyAxIDU0IDE1IDEwOSA3NCAxMjQgMTMyIDE2IDY3IDE0IDU4MCAtMyA2MjkgLTE4IDUxIC01NSA5NCAtOTYgMTExIC0xOSA5IC04OSAyMyAtMTU1IDMyIC00MjUgNjAgLTY3MSAyMDQgLTczMSA0MjcgLTIwIDc2IC0yMCAxNTEzIDAgMTYwMyAzMSAxMzYgODQgMjAxIDE5MyAyMzUgODkgMjggMjg1IDMwIDM4MyA1IDI2OSAtNjkgNDQ5IC0zMTkgNzMwIC0xMDEwIDMyNiAtODA2IDY0OCAtMTMzNyA5OTMgLTE2NDIgMzgxIC0zMzcgODE0IC00OTAgMTQ3NyAtNTIzIDI2NyAtMTMgMTEwNSAtMTMgMTE1MiAxIDIxIDUgNTQgMjYgNzMgNDYgNTggNjAgNjUgMTAxIDY1IDM5NyAwIDI3MSAtNSAzMTAgLTQzIDM2NyAtMzcgNTUgLTc3IDc1IC0xNTkgODIgLTk1IDcgLTE1NyAyOSAtMjQwIDg0IC0xOTAgMTI0IC0zMTcgMzQ4IC01OTMgMTA0MyAtMjI2IDU2OCAtMzUyIDgxOSAtNTMzIDEwNjMgLTg4IDEyMCAtMjQ0IDI3NyAtMzU3IDM2MiAtODQgNjMgLTI3NiAxNzcgLTMzMiAxOTcgLTQyIDE1IC00MiAyNCAyIDMyIDcyIDE0IDI4NSA5MCA0MDUgMTQ1IDIzOSAxMDkgNDMxIDI0MyA2MDYgNDIzIDExOCAxMjEgMTc0IDE5MSAyNDggMzA2IDM1NCA1NTMgNDE3IDEzMDQgMTYwIDE5MTIgLTMxNyA3NTMgLTExMTggMTI1NyAtMjIzNCAxNDA1IC0zMzIgNDQgLTM1NCA0NSAtMjgxMCA0NSBsLTIzMzUgMCAtNDAgLTIzeiBtNDMwNCAtMTAwNyBjNDI4IC00NCA3MTAgLTM0NiA4MjIgLTg4MSAzMSAtMTQ1IDM0IC01MTIgNSAtNjY0IC01OCAtMzE1IC0xNzUgLTU1NiAtMzU1IC03MzYgLTE4NSAtMTg1IC00MDUgLTI4MSAtNzE0IC0zMTAgLTE0MyAtMTMgLTU0MiAtNyAtNjE5IDEwIC0xMjUgMjcgLTIwMCA4OCAtMjQxIDE5OCAtMjIgNTggLTIyIDU5IC0yNSAxMDE1IC0zIDEwMjQgLTEgMTA2MSA0NyAxMTg4IDQwIDEwNSAxMTIgMTY0IDIyNCAxODAgODAgMTIgNzQyIDExIDg1NiAweiIvPiA8cGF0aCBkPSJNMzI5ODUgNzkxMSBjLTQ1IC0yOCAtNzMgLTYyIC05MCAtMTEwIC0xMiAtMzUgLTE1IC05NSAtMTUgLTMwNSBsMCAtMjYxIDQwIC03MiBjNDIgLTc1IDEwMSAtMTMzIDEzNiAtMTMzIDQ4IDAgMjE1IC0zNCAyOTkgLTYxIDI0MiAtNzggMzkxIC0yMzAgNDI1IC00MzQgOCAtNTIgMTAgLTcyOCA4IC0yNjE1IGwtMyAtMjU0NSAtMjIgLTU5IGMtNzMgLTE5MiAtMjQ4IC0zMTUgLTU0NCAtMzgyIC01OSAtMTMgLTExOCAtMjQgLTEzMSAtMjQgLTg3IDAgLTE2NiAtNjMgLTE5MyAtMTUyIC0yMiAtNzQgLTIyIC01MzEgMCAtNjA1IDE4IC02MiA3MSAtMTE5IDEyNCAtMTMzIDI3IC03IDEwMjQgLTkgMzE5OCAtOCBsMzE1OCAzIDY3IDMzIGM3NCAzNiAxMjcgOTAgMTYwIDE2MSAyMyA1MSA0MCAxMzUgNjMgMzE2IDU5IDQ3MCAxNTUgODc4IDI4NiAxMjE3IDUwIDEzMSA1NiAxNjYgMzkgMjMwIC0xNSA1MyAtNTAgOTAgLTExNSAxMjIgLTU2IDI3IC01OSAyNyAtMjE5IDI0IC0xNTQgLTMgLTE2NSAtNCAtMTk4IC0yOCAtMjUgLTE2IC05MyAtMTA4IC0yMTEgLTI4NSAtMTk5IC0yOTUgLTMwMSAtNDIyIC00MTAgLTUxMyAtMTc3IC0xNDYgLTM0MiAtMjE4IC02MTcgLTI3MCAtNzIgLTEzIC0yMDYgLTE2IC04NzggLTE5IC01NDIgLTMgLTgxMCAtMSAtODQ1IDcgLTE2NiAzNCAtMjY2IDEzOCAtMzI0IDMzNSAtMTYgNTUgLTE4IDEzMyAtMjEgODY1IC00IDg5OCAtMiA5MjcgNTUgMTA0MSA1NyAxMTUgMTUzIDE4MiAzMTAgMjE3IDY4IDE1IDEzNSAxNyA1MTggMTYgNDgyIC0xIDYxMSAtMTAgNzc5IC01OSAyNzQgLTc5IDM3MCAtMjA3IDQzMiAtNTc2IDIxIC0xMjcgMzMgLTE1NyA3OCAtMTk3IDUyIC00NSA5OSAtNTQgMjY1IC01MCAxNjggNCAxOTUgMTMgMjQ2IDg5IGwzMCA0NCAzIDEyNTMgYzEgODU4IC0xIDEyNjYgLTggMTI5MyAtMTIgNDUgLTYwIDEwMyAtMTAxIDEyNSAtMjEgMTAgLTY5IDE0IC0xOTQgMTQgLTE0NSAwIC0xNzEgLTIgLTIwNCAtMjAgLTcyIC0zNiAtOTYgLTg3IC0xMjEgLTI2MCAtNDMgLTI4OCAtMTI2IC00MjggLTMwMiAtNTA5IC0xODEgLTgzIC0yNjYgLTkzIC04NTQgLTk4IC00NzEgLTQgLTQ5NCAtNCAtNTc5IDE2IC0yMDEgNDggLTMwNCAxNTMgLTM0MSAzNDggLTEzIDY5IC0xNCAxOTIgLTExIDg0NCAzIDgzNSAxIDgwMyA2MyA5MjUgMzQgNjggMTE3IDE0OCAxODYgMTc5IDEzMSA2MCAxMzQgNjAgODM4IDYwIDcxMyAwIDcyMSAtMSA5MDggLTY2IDMwMSAtMTA3IDU0NiAtMzU2IDgzMSAtODQ5IDQwIC02OSA4MyAtMTM2IDk0IC0xNDggNDUgLTQ5IDYzIC01MiAyNzUgLTUyIDE5MCAwIDIwMCAxIDIzMyAyMyA0MiAyOCA3NiA3NyA5MCAxMzEgMTAgMzYgNCA3NiAtNTAgMzUxIC0xMDIgNTE2IC0xNTMgODY0IC0xODYgMTI1NSAtMTYgMTk1IC03MSAyOTkgLTE4OCAzNTEgbC01MiAyNCAtMzA5MCAyIGMtMzAwMiAzIC0zMDkxIDIgLTMxMjAgLTE2eiIvPiA8L2c+IDwvc3ZnPg==");
+  --logo-ratio: 4000 / 802;
+}
+
+/* =============================================================================
+   2. RESET
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Anchored sections clear the floating wordmark. */
+  scroll-padding-top: clamp(3.5rem, 6vw, 5rem);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* The `hidden` attribute has to beat every display rule below it — a class
+   like `.field { display: grid }` outranks the UA stylesheet and would leave a
+   hidden element on screen. */
+[hidden] { display: none !important; }
+
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; color: inherit; }
+/* The UA draws a bordered box around every fieldset and notches the legend
+   into it. This page has no cards, so both are reset. */
+fieldset { border: 0; min-width: 0; }
+legend { padding: 0; }
+button { background: none; border: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, h4 { font-weight: 400; line-height: 1.05; text-wrap: balance; }
+ul, ol { list-style: none; }
+
+:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+/* Headings are given focus so a screen reader announces the new state after
+   a step change. They are not interactive, so they should not then draw a
+   focus ring at everyone. Real keyboard focus still shows on real controls. */
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus,
+h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none; }
+[data-surface="dark"] :focus-visible { outline-color: var(--bg); }
+
+/* =============================================================================
+   3. UTILITIES — layout, wordmark, reveal
+   ========================================================================== */
+.wrap {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; top: 0; left: 0; z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--ink); color: var(--bg);
+  font-family: var(--font-ui); font-size: var(--step--1);
+  letter-spacing: var(--track-tight); text-transform: uppercase;
+  transform: translateY(-120%);
+  transition: transform var(--dur-fast) var(--ease);
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
+/* ---- Wordmark ---------------------------------------------------------- */
+.wordmark {
+  display: inline-flex; align-items: baseline; gap: 0.14em;
+  font-family: var(--font-mark); font-weight: 700;
+  font-size: var(--wordmark-size, 1.1875rem);
+  line-height: 1; letter-spacing: 0.01em;
+  color: currentColor; white-space: nowrap;
+}
+.wordmark__logo {
+  display: block;
+  height: calc(var(--wordmark-size, 1.1875rem) * 0.86);
+  aspect-ratio: var(--logo-ratio);
+  background-color: currentColor;
+  -webkit-mask-image: var(--logo-src); mask-image: var(--logo-src);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: left center; mask-position: left center;
+}
+
+/* ---- Eyebrow / micro-label --------------------------------------------- */
+.eyebrow {
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-wide); text-transform: uppercase;
+  color: var(--muted);
+}
+[data-surface="dark"] .eyebrow { color: var(--on-dark-muted); }
+
+.rule { height: 1px; background: var(--line); }
+[data-surface="dark"] .rule { background: var(--line-dark); }
+
+/* ---- Text links (this page has no nav bar; these are the navigation) ---- */
+.tlink {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  min-height: 44px;
+  font-family: var(--font-ui); font-size: var(--step--1); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: currentColor;
+  border-bottom: 1px solid currentColor;
+  padding-block: 0.35rem;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), gap var(--dur) var(--ease);
+}
+.tlink:hover, .tlink:focus-visible { color: var(--red); border-bottom-color: var(--red); gap: 0.85rem; }
+[data-surface="dark"] .tlink:hover, [data-surface="dark"] .tlink:focus-visible { color: var(--red-on-dark); border-bottom-color: var(--red-on-dark); }
+.tlink__arrow { display: inline-block; transition: transform var(--dur) var(--ease); }
+.tlink:hover .tlink__arrow { transform: translateY(2px); }
+
+/* ---- Filled action (matches padre65.com's oxblood CTA) ------------------ */
+.action {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 3rem; padding: 0.75rem 2.5rem;
+  background: var(--bg); color: var(--ink);
+  border: 1px solid var(--bg); border-radius: 0;
+  font-family: var(--font-ui); font-size: var(--step--1); font-weight: 500;
+  letter-spacing: var(--track-tight); text-transform: uppercase; white-space: nowrap;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease),
+              border-color var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.action:hover:not(:disabled), .action:focus-visible:not(:disabled) {
+  background: var(--red-on-dark); border-color: var(--red-on-dark); color: var(--ink-bg);
+}
+.action:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* The same button on the bone surface — padre65.com's filled oxblood. */
+.action--ink {
+  background: var(--deep); color: var(--bg); border-color: var(--deep);
+}
+.action--ink:hover:not(:disabled), .action--ink:focus-visible:not(:disabled) {
+  background: var(--ink); border-color: var(--ink); color: var(--bg);
+}
+
+.action--quiet {
+  background: transparent; color: var(--on-dark); border-color: var(--field-line-dark);
+}
+.action--quiet:hover:not(:disabled), .action--quiet:focus-visible:not(:disabled) {
+  background: transparent; color: var(--on-dark); border-color: var(--on-dark);
+}
+
+/* ---- Reveal ------------------------------------------------------------
+ * Opacity + transform only. Nothing here clips, because a fully clipped
+ * element has an empty intersection rect and can never trigger the observer.
+ * ---------------------------------------------------------------------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1.1rem, 0);
+  transition:
+    opacity var(--dur-slow) var(--ease-editorial),
+    transform var(--dur-slow) var(--ease-editorial);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal="rule"] { transform: scaleX(0); transform-origin: left center; }
+[data-reveal].is-in { opacity: 1; transform: none; }
+
+/* No JS, or reduced motion: everything is simply visible. */
+.no-js [data-reveal] { opacity: 1; transform: none; }
+
+/* =============================================================================
+   4. HEADER
+   ========================================================================== */
+.masthead {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 20;
+  padding-block: clamp(1.1rem, 2.5vw, 2rem);
+  color: var(--on-dark);
+}
+.masthead__inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.masthead .wordmark { --wordmark-size: clamp(1.25rem, 2.4vw, 1.75rem); }
+.masthead .eyebrow { display: none; color: var(--on-dark); }
+@media (min-width: 40rem) { .masthead .eyebrow { display: block; } }
+
+/* =============================================================================
+   5. HERO
+   ========================================================================== */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  background: var(--ink-bg);
+  color: var(--on-dark);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero__media { position: absolute; inset: 0; z-index: 0; }
+.hero__image,
+.hero__video {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  /* The film is wallpaper: it must never intercept a tap meant for the page. */
+  pointer-events: none;
+}
+.hero__scrim {
+  position: absolute; inset: 0;
+  background:
+    /* Masthead legibility. Measured against the brightest frame of the loop,
+       not assumed — see contrast.mjs. */
+    linear-gradient(to bottom,
+      rgba(18, 16, 14, 0.74) 0%,
+      rgba(18, 16, 14, 0.46) 8%,
+      rgba(18, 16, 14, 0.13) 18%,
+      rgba(18, 16, 14, 0) 28%),
+    /* A base wash to unify the frame. */
+    rgba(30, 19, 14, 0.06);
+}
+
+/* Typographic composition — what the frame shows when no photograph is set,
+   and what sits behind one when it is. Same device as the events site. */
+.hero__composition { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+/* Cormorant rather than the slab: the high-contrast serif numerals of the
+   brand's own 65, drawn as a hairline outline at the same size. */
+.hero__driftMark {
+  position: absolute; right: -0.06em; bottom: -0.24em;
+  font-family: var(--font-display); font-weight: 300;
+  font-size: clamp(20rem, 62vw, 58rem); line-height: 0.72; letter-spacing: -0.015em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(160, 44, 44, 0.40);
+  animation: drift 64s var(--ease) infinite alternate;
+  will-change: transform;
+}
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-3.5%, -2.5%, 0); }
+}
+/* On a phone the mark is pulled into frame and lifted clear of the type, so
+   the empty upper half of the composition still carries something. */
+@media (max-width: 48rem) {
+  .hero__driftMark {
+    right: -0.06em; bottom: auto; top: 8vh;
+    font-size: clamp(14rem, 74vw, 26rem);
+    -webkit-text-stroke-color: rgba(160, 44, 44, 0.42);
+  }
+}
+.hero__hairline {
+  position: absolute; top: 0; bottom: 0; width: 1px;
+  background: rgba(244, 241, 234, 0.09);
+}
+.hero__hairline--l { left: var(--gutter); }
+.hero__hairline--r { right: var(--gutter); background: rgba(244, 241, 234, 0.06); }
+.hero__grain {
+  position: absolute; inset: 0; opacity: 0.5;
+  background-image: radial-gradient(rgba(244, 241, 234, 0.055) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+}
+
+.hero__frame {
+  position: relative; z-index: 1;
+  width: 100%;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding-block: clamp(6rem, 14vh, 9rem) clamp(2rem, 5vh, 3.5rem);
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+/* Content-anchored legibility veil. A viewport-percentage gradient does not
+   track the type as the viewport height changes; this one is attached to the
+   text block itself, so it follows the words wherever they land. */
+.hero__bottom { position: relative; }
+.hero__bottom::before {
+  content: ""; position: absolute;
+  left: -100vw; right: -100vw; top: -9rem; bottom: -8rem; z-index: -1;
+  background: linear-gradient(to bottom,
+    rgba(24, 15, 11, 0) 0%,
+    rgba(24, 15, 11, 0.60) 22%,
+    rgba(22, 15, 12, 0.84) 48%,
+    rgba(18, 16, 14, 0.97) 100%);
+  pointer-events: none;
+}
+
+.hero__title {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: var(--step-4); line-height: 0.94; letter-spacing: -0.022em;
+  margin-bottom: clamp(0.85rem, 2vw, 1.4rem);
+}
+.hero__title span { display: block; }
+/* The second line is set in the same face, weight and size as the name above
+   it — one lockup in one voice, indented rather than italicised. */
+.hero__title .hero__accent {
+  display: block; color: var(--on-dark);
+  padding-left: clamp(1.75rem, 6vw, 5.5rem);
+  /* The accent line never breaks: it is a lockup, not a sentence. */
+  white-space: nowrap;
+}
+/* The dash is a rule introducing the accent, on its own line, aligned with the
+   indent. Deliberate rather than left to wrapping. */
+.hero__dash {
+  display: block;
+  color: var(--red-on-dark); font-style: normal;
+  line-height: 0.6;
+  margin-block: 0.12em 0.04em;
+}
+
+.hero__descriptor {
+  font-family: var(--font-display); font-size: var(--step-1); font-weight: 300;
+  line-height: 1.5; max-width: 30ch; color: var(--on-dark);
+}
+
+/* ---- Facts block --------------------------------------------------------
+ * Two days side by side split by a hairline, a rule beneath them, then the
+ * address behind a pin. Decorative rules are lifted off --line-dark, which
+ * disappears over a lit frame.
+ * ---------------------------------------------------------------------- */
+.hero__col--facts { margin-top: clamp(1.75rem, 5vw, 2.5rem); }
+
+.hours { display: grid; grid-template-columns: 1fr 1fr; }
+
+.hours__day {
+  display: grid; gap: 0.4rem; align-content: start;
+  /* Symmetric breathing room either side of the divider, so both day
+     strings get the same usable width. */
+  padding-inline: 0;
+  min-width: 0;
+}
+.hours__day:first-child  { padding-right: clamp(0.75rem, 1.1vw, 1rem); }
+.hours__day:nth-child(2) { padding-left:  clamp(0.75rem, 1.1vw, 1rem); }
+.hours__day + .hours__day { border-left: 1px solid rgba(244, 241, 234, 0.22); }
+
+.hours__date {
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: var(--on-film-muted);
+  white-space: nowrap;
+}
+.hours__time {
+  font-family: var(--font-display); font-weight: 300;
+  /* Not --step-2: the time is set to fit its half of the facts column with
+     the em dash intact, so neither day string can touch the divider or run
+     out over the gutter. Measured, not guessed. */
+  font-size: clamp(1.2rem, 1rem + 1vw, 1.55rem);
+  line-height: 1; letter-spacing: -0.012em;
+  color: var(--on-dark);
+  font-variant-numeric: lining-nums;
+  white-space: nowrap;
+}
+
+.hero__factsRule {
+  height: 1px; background: rgba(244, 241, 234, 0.22);
+  margin-top: clamp(0.9rem, 2.2vw, 1.35rem);
+}
+
+.hero__place {
+  display: flex; align-items: flex-start; gap: 0.7rem;
+  margin-top: clamp(0.9rem, 2.2vw, 1.35rem);
+}
+.hero__pin {
+  flex: 0 0 auto; width: 0.95rem; height: 0.95rem;
+  color: var(--red-on-dark); margin-top: 0.2rem;
+}
+.hero__address {
+  font-family: var(--font-ui); font-size: var(--step--1); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: var(--on-dark);
+  line-height: 1.65;
+  font-style: normal;
+}
+
+.hero__actions {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: clamp(1.25rem, 3vw, 2.75rem);
+  margin-top: clamp(0.5rem, 1.5vw, 1rem);
+}
+
+.hero__scroll {
+  display: inline-flex; align-items: center; gap: 0.85rem;
+  min-height: 44px; width: fit-content;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-wide); text-transform: uppercase;
+  color: var(--on-film-muted);
+  transition: color var(--dur) var(--ease);
+}
+.hero__scroll:hover, .hero__scroll:focus-visible { color: var(--on-dark); }
+.hero__scrollArrow { display: block; transition: transform var(--dur) var(--ease); }
+.hero__scroll:hover .hero__scrollArrow { transform: translateY(3px); }
+
+/* =============================================================================
+   6. DETAILS  (#details)
+   ========================================================================== */
+/* The section is a screen, not a scroll: everything in it — reading state or
+   flow — is sized to sit inside one viewport. */
+.details {
+  background: var(--bg); color: var(--ink);
+  padding-block: clamp(2.25rem, 5vh, 4.5rem);
+  min-height: 100svh;
+  display: grid; align-content: center;
+  /* The surface turn when the flow opens, borrowed from the events site. */
+  transition:
+    background-color 900ms var(--ease-editorial),
+    color 900ms var(--ease-editorial);
+}
+
+.details[data-open="true"] {
+  background: var(--ink-bg);
+  color: var(--on-dark);
+}
+.details[data-open="true"] .details__heading em { color: var(--red-on-dark); }
+.details[data-open="true"] .details__indexRule { background: var(--line-dark); }
+
+.details__grid { display: grid; gap: clamp(1.25rem, 3.2vw, 2.75rem); }
+.details__index { display: flex; align-items: center; gap: 0.9rem; }
+.details__indexRule { flex: 1; max-width: 5rem; height: 1px; background: var(--line); }
+.details__heading {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: var(--step-3); line-height: 0.98; letter-spacing: -0.018em;
+}
+.details__heading em { font-style: italic; color: var(--deep); }
+.details__body { display: grid; gap: 1.35rem; max-width: var(--measure); }
+.details__body p {
+  font-family: var(--font-display); font-size: var(--step-1); font-weight: 300;
+  line-height: 1.62; color: var(--ink); text-wrap: pretty;
+}
+/* A lead line, so the passage opens like an editorial column rather than a
+   block of website copy. */
+.details__body p:first-child::first-line { letter-spacing: 0.005em; }
+
+/* Key details as hairline-ruled rows — heading over subheading, the same
+   device as the events site's details list. */
+.dlist { border-top: 1px solid var(--line); width: 100%; }
+
+.dlist__row {
+  display: grid; gap: 0.15rem;
+  padding-block: clamp(0.6rem, 1.4vw, 0.9rem);
+  border-bottom: 1px solid var(--line);
+}
+
+/* The heading: the day, or the word Location. */
+.dlist__term {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: var(--step-1); line-height: 1.15; letter-spacing: -0.012em;
+  color: var(--ink);
+}
+
+/* The subheading: the hours, or the address. */
+.dlist__value {
+  font-family: var(--font-ui); font-size: var(--step--1); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  line-height: 1.5; color: var(--muted);
+}
+
+/* One row is a link down to the map. It carries an arrow rather than an
+   underline, so the table keeps its shape. */
+.dlist__link {
+  display: grid; grid-template-columns: 1fr auto; align-items: center;
+  gap: 0 1rem; color: inherit;
+  transition: color var(--dur) var(--ease);
+}
+.dlist__link > span { grid-column: 1; }
+/* Same-specificity child selector, so the arrow actually reaches column two:
+   `.dlist__go` alone loses to `.dlist__link > span` and the arrow gets
+   auto-placed above the heading. */
+.dlist__link > span.dlist__go {
+  grid-column: 2; grid-row: 1 / span 2; justify-self: end;
+  font-family: var(--font-ui); font-size: var(--step-0);
+  color: var(--deep);
+  transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.dlist__link:hover .dlist__term, .dlist__link:focus-visible .dlist__term { color: var(--deep); }
+.dlist__link:hover .dlist__go { transform: translateY(3px); }
+
+/* ---- Reply -------------------------------------------------------------
+ * Lifted from the events site: an eyebrow and a rule on the left, the action
+ * on the right, sitting on the same surface as the reading above it.
+ * ---------------------------------------------------------------------- */
+.reply {
+  display: grid;
+  gap: clamp(1.1rem, 2.5vw, 1.75rem);
+  padding-top: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+}
+
+.reply__index { display: flex; align-items: center; gap: 0.9rem; }
+/* The question is a label, not a paragraph — it should not break in half. */
+.reply__index .eyebrow { white-space: nowrap; }
+.reply__rule { flex: 1; min-width: 1.5rem; max-width: 8rem; height: 1px; background: var(--line); }
+
+/* Twin answers, so they carry equal weight — stacked and full width when the
+   column is too narrow to hold both, side by side and equal when it is not. */
+.reply__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 40rem) {
+  .reply { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .reply__actions {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* =============================================================================
+   7. GALLERY  (#gallery)
+   Editorial composition, not a grid of equal tiles. Mobile gets its own
+   sequence rather than a squeezed version of the desktop one.
+   ========================================================================== */
+.gallery {
+  background: var(--bg); color: var(--ink);
+  padding-block: 0 var(--section-y);
+}
+.gallery__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.figure { position: relative; overflow: hidden; background: var(--panel); margin: 0; }
+.figure img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform var(--dur-editorial) var(--ease-editorial);
+}
+@media (hover: hover) and (pointer: fine) {
+  .figure:hover img { transform: scale(1.028); }
+}
+
+/* Placeholder treatment — shown until real photography is dropped in, and if
+   a file is ever missing. Never a broken-image icon. */
+.figure[data-missing="true"] { background: var(--panel); border: 1px solid var(--line); }
+.figure[data-missing="true"] img { display: none; }
+.figure[data-missing="true"]::after {
+  content: attr(data-placeholder);
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-wide); text-transform: uppercase;
+  color: var(--muted-soft);
+  text-align: center; padding: 1rem;
+}
+
+/* ---- Mobile sequence (default) ----------------------------------------- */
+/* One block, one gutter, everything flush. The composition is asymmetric —
+   a dominant frame, a portrait beside it, three across the bottom — but the
+   edges all line up, so it reads as a plate rather than a scatter. */
+.gallery__set {
+  --gap: clamp(0.5rem, 1.4vw, 1rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+
+/* Mobile: the dominant frame full width, then a tidy two-by-two beneath it. */
+.gLarge { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+.gTall, .gRow { aspect-ratio: 1 / 1; }
+
+/* =============================================================================
+   8. RSVP FLOW — lives inside the details section
+   Answering happens where the reading happened. The surface turns over, the
+   way the events site's reply section does, so it reads as the same page
+   changing its mind rather than a jump to somewhere else.
+   ========================================================================== */
+.details__state {
+  min-width: 0; display: grid; gap: clamp(1.25rem, 3.5vw, 2rem);
+  /* Swapping states changes what is in the box; the browser must not try to
+     compensate by moving the page under the visitor. */
+  overflow-anchor: none;
+}
+.step { display: grid; gap: clamp(0.9rem, 2.4vw, 1.5rem); max-width: 34rem; }
+.step.is-entering { animation: stepIn 520ms var(--ease-editorial) both; }
+@keyframes stepIn {
+  from { opacity: 0; transform: translate3d(0, 0.9rem, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+.field { display: grid; gap: 0.4rem; min-width: 0; }
+.field__label {
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-wide); text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+.input {
+  width: 100%; min-height: 3rem;
+  padding: 0.6rem 0 0.55rem;
+  background: transparent; border: 0;
+  border-bottom: 1px solid var(--field-line-dark); border-radius: 0;
+  color: var(--on-dark);
+  font-family: var(--font-display); font-size: var(--step-1); font-weight: 300;
+  line-height: 1.3;
+  transition: border-color var(--dur) var(--ease);
+  /* 16px+ computed prevents iOS zoom-on-focus. */
+}
+.input::placeholder { color: var(--on-dark-muted); opacity: 1; }
+.input:hover { border-bottom-color: var(--on-dark-muted); }
+.input:focus { outline: none; border-bottom-color: var(--on-dark); }
+.input:focus-visible { outline: 2px solid var(--bg); outline-offset: 4px; }
+.input[aria-invalid="true"] { border-bottom-color: var(--red-on-dark); }
+
+/* Error text reserves its line, so showing it never reflows the panel. */
+.errorSlot { min-height: 1.15rem; }
+.error {
+  display: block; font-family: var(--font-ui); font-size: var(--step--2);
+  letter-spacing: 0.04em; color: var(--red-on-dark);
+}
+.formError {
+  padding: 0.85rem 1rem; border-left: 2px solid var(--red);
+  background: rgba(160, 44, 44, 0.12);
+  font-family: var(--font-ui); font-size: var(--step--1); color: var(--on-dark);
+}
+
+/* ---- Contact method toggle --------------------------------------------- */
+.toggle { display: grid; gap: 0.55rem; }
+.toggle__legend {
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-wide); text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+.toggle__set { display: flex; gap: 1.75rem; }
+.toggle__option { position: relative; }
+.toggle__input {
+  position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0;
+  cursor: pointer; inset: 0;
+}
+.toggle__face {
+  display: inline-flex; align-items: center; min-height: 44px;
+  font-family: var(--font-ui); font-size: var(--step--1); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: var(--on-dark-muted);
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.toggle__input:checked + .toggle__face { color: var(--on-dark); border-bottom-color: var(--red-on-dark); }
+.toggle__input:hover + .toggle__face { color: var(--on-dark); }
+.toggle__input:focus-visible + .toggle__face { outline: 2px solid var(--bg); outline-offset: 4px; }
+
+/* Continue leads on the left, Skip opposite it and quieter — a way out, not
+   an alternative of equal weight. */
+.flow__actions {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  padding-top: 0.35rem;
+}
+.skip {
+  min-height: 44px;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-wide); text-transform: uppercase;
+  color: var(--on-dark-muted);
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.skip:hover, .skip:focus-visible { color: var(--on-dark); border-bottom-color: currentColor; }
+
+/* ---- Confirmation ------------------------------------------------------- */
+.confirm__heading {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: var(--step-3); line-height: 1; letter-spacing: -0.018em;
+}
+.confirm__heading em { font-style: italic; color: var(--red-on-dark); }
+.confirm__heading:focus { outline: none; }
+.confirm__body {
+  font-family: var(--font-display); font-size: var(--step-1); font-weight: 300;
+  line-height: 1.55; max-width: 34ch;
+}
+
+/* ---- Calendar ----------------------------------------------------------
+ * One button. It knows what the visitor is on, and it carries both days.
+ * The Google line is there because Google Calendar cannot take two events in
+ * one link, so anyone who lives there needs a way in.
+ * ---------------------------------------------------------------------- */
+.cal__status {
+  font-family: var(--font-ui); font-size: var(--step--2); letter-spacing: 0.04em;
+  color: var(--on-dark-muted); min-height: 1.05rem;
+}
+
+.cal__alt {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.9rem;
+  font-family: var(--font-ui); font-size: var(--step--2);
+  letter-spacing: 0.04em; color: var(--on-dark-muted);
+}
+.cal__altLabel { text-transform: uppercase; letter-spacing: var(--track-mid); }
+.cal__link {
+  display: inline-flex; align-items: center; min-height: 32px;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: var(--on-dark);
+  border-bottom: 1px solid var(--field-line-dark);
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.cal__link + .cal__link { margin-left: 0.9rem; }
+.cal__link:hover, .cal__link:focus-visible { color: var(--red-on-dark); border-bottom-color: var(--red-on-dark); }
+
+/* ---- The place, shown in the confirmation ------------------------------- */
+.miniMap {
+  position: relative; display: block; overflow: hidden;
+  height: clamp(6.5rem, 17vh, 11rem);
+  background: #0a0a0a;
+  border: 1px solid var(--line-dark);
+  margin-top: 0.15rem;
+}
+.miniMap__canvas { position: absolute; inset: 0; display: block; }
+.miniMap__wash {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(10, 9, 8, 0.92) 0%, rgba(10, 9, 8, 0.30) 46%, rgba(10, 9, 8, 0.12) 100%);
+}
+.miniMap__label {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.7rem 0.9rem;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: var(--on-dark);
+}
+.miniMap:hover .miniMap__label, .miniMap:focus-visible .miniMap__label { color: var(--red-on-dark); }
+
+/* =============================================================================
+   9. LOCATION  (#location)
+   ========================================================================== */
+.location {
+  background: var(--ink-bg); color: var(--on-dark);
+  padding-block: 0 var(--section-y);
+}
+.location__head {
+  display: grid; gap: clamp(1.25rem, 3vw, 2rem);
+  margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+}
+.location__heading {
+  font-family: var(--font-display); font-weight: 300;
+  font-size: var(--step-3); line-height: 0.98; letter-spacing: -0.018em;
+}
+.location__address {
+  font-family: var(--font-ui); font-size: var(--step--1); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase;
+  line-height: 1.8; color: var(--on-dark);
+}
+
+/* The map is edge-to-edge on the dark surface — cinematic on desktop, still
+   tall enough to be useful on a phone. */
+.map {
+  position: relative;
+  width: 100%;
+  height: clamp(20rem, 52vh, 34rem);
+  background: #0a0a0a;
+  border-top: 1px solid var(--line-dark);
+  border-bottom: 1px solid var(--line-dark);
+}
+.map__canvas { position: absolute; inset: 0; }
+
+/* ---- Themed tiles -------------------------------------------------------
+ * Real OpenStreetMap raster tiles, filtered into the Padre palette. No API
+ * key and no library — the invert + hue-rotate pair turns a light basemap
+ * into a dark one while keeping road and water relationships intact.
+ * ---------------------------------------------------------------------- */
+.tilemap { position: absolute; inset: 0; overflow: hidden; background: #0a0a0a; }
+
+.tilemap__layer {
+  position: absolute; inset: 0;
+  filter: invert(1) hue-rotate(180deg) saturate(0.16) brightness(0.78) contrast(1.12);
+}
+.tilemap__tile { position: absolute; width: 256px; height: 256px; max-width: none; }
+
+/* A wash of the brand red, and a floor at the bottom so the credit reads. */
+.tilemap__wash {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(160, 44, 44, 0.16) 0%, rgba(160, 44, 44, 0) 55%),
+    linear-gradient(to top, rgba(10, 9, 8, 0.85) 0%, rgba(10, 9, 8, 0) 26%),
+    rgba(18, 16, 14, 0.22);
+}
+
+.tilemap__pin {
+  position: absolute; left: 50%; top: 50%;
+  width: 2.125rem; height: 2.75rem;
+  transform: translate(-50%, -100%);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55));
+}
+
+.tilemap__credit {
+  position: absolute; right: 0.6rem; bottom: 0.5rem;
+  font-family: var(--font-ui); font-size: 0.625rem; letter-spacing: 0.03em;
+  color: var(--on-dark-muted);
+}
+.tilemap__credit:hover, .tilemap__credit:focus-visible { color: var(--on-dark); }
+
+/* Fallback panel — same dimensions, no broken element, no console noise. */
+.map__fallback {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 1.25rem;
+  padding: var(--gutter);
+  background:
+    linear-gradient(135deg, rgba(160, 44, 44, 0.10) 0%, rgba(160, 44, 44, 0) 42%),
+    repeating-linear-gradient(90deg, rgba(244,241,234,0.045) 0 1px, transparent 1px 84px),
+    repeating-linear-gradient(0deg, rgba(244,241,234,0.045) 0 1px, transparent 1px 84px),
+    #0a0a0a;
+}
+.map__fallbackAddress {
+  font-family: var(--font-ui); font-size: var(--step--1); font-weight: 500;
+  letter-spacing: var(--track-mid); text-transform: uppercase; line-height: 1.8;
+  color: var(--on-dark);
+}
+.map__pin { width: 1.5rem; height: 1.5rem; color: var(--red-on-dark); }
+
+/* =============================================================================
+   10. FOOTER
+   ========================================================================== */
+.footer {
+  background: var(--ink-bg); color: var(--on-dark);
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+  border-top: 1px solid var(--line-dark);
+}
+.footer__statement {
+  font-family: var(--font-display); font-style: italic; font-weight: 300;
+  font-size: var(--step-2); line-height: 1.15; color: var(--on-dark);
+  max-width: 22ch;
+}
+.footer__row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem;
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  padding-top: clamp(1.25rem, 3vw, 1.75rem);
+  border-top: 1px solid var(--line-dark);
+}
+.footer .wordmark { --wordmark-size: 1.1875rem; }
+.footer__links { display: flex; gap: 1.75rem; margin-left: auto; }
+.footer__link {
+  min-height: 44px; display: inline-flex; align-items: center;
+  font-family: var(--font-ui); font-size: var(--step--2); font-weight: 500;
+  letter-spacing: var(--track-wide); text-transform: uppercase;
+  color: var(--on-dark-muted);
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.footer__link:hover, .footer__link:focus-visible { color: var(--on-dark); border-bottom-color: currentColor; }
+.footer__legal {
+  width: 100%;
+  font-family: var(--font-ui); font-size: var(--step--2);
+  letter-spacing: 0.04em; color: var(--on-dark-muted);
+}
+
+/* =============================================================================
+   11. RESPONSIVE
+   Desktop is a deliberate re-composition, not the mobile layout stretched.
+   ========================================================================== */
+
+/* ---- 40rem / 640px — small tablets, large phones landscape -------------- */
+@media (min-width: 40rem) {
+}
+
+/* ---- 60rem / 960px — the editorial layout switches on ------------------- */
+@media (min-width: 60rem) {
+  .hero__frame { padding-block: clamp(7rem, 16vh, 11rem) clamp(2.5rem, 6vh, 4rem); }
+
+  /* Hero: title left, hours and address as a right-hand column, so the frame
+     reads as a composition rather than a stack. */
+  .hero__bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 24rem);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: end;
+  }
+  .hero__col--facts { padding-bottom: 0.4rem; margin-top: 0; }
+
+  /* The mark is lifted clear of the legibility veil. Sat at the foot of the
+     frame it was painted over by the 0.97 wash under the type and vanished;
+     up here it reads against the open sky, at the same size and weight. */
+  .hero__driftMark {
+    bottom: auto; top: 6vh; right: clamp(1.5rem, 3vw, 3.5rem);
+    /* Sized to sit whole in the open upper right rather than run off three
+       edges: at 62vw only two arcs of it were ever on screen, which read as
+       stray lines, not as the numerals. */
+    font-size: clamp(18rem, 30vw, 32rem);
+  }
+
+  /* Details: heading and body in different columns, with real negative space */
+  .details__grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    row-gap: clamp(2.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .details__index   { grid-column: 1 / span 12; }
+  .details__heading { grid-column: 1 / span 4; align-self: start; }
+  .details__state   { grid-column: 6 / span 6; display: grid; gap: clamp(1.25rem, 2.5vw, 2rem); }
+
+  .gallery__head { margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+
+  /* ---- Gallery: two aligned rows -------------------------------------- */
+  .gallery__set { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+
+  /* Row one: the dominant frame, and a portrait that stretches to exactly its
+     height — so both rows share a baseline and the block stays square-edged. */
+  .gLarge { grid-column: 1 / span 8; grid-row: 1; aspect-ratio: 3 / 2; }
+  .gTall  { grid-column: 9 / span 4; grid-row: 1; aspect-ratio: auto; }
+  /* The portrait takes its height from the row, never the other way round:
+     in flow its own proportions would make the row taller than the large
+     frame and the two would stop sharing a bottom edge. */
+  .gTall > img { position: absolute; inset: 0; }
+
+  /* Row two: three equal frames, same proportion, same gutter. */
+  .gRow { grid-row: 2; aspect-ratio: 3 / 2; }
+  .gallery__set > .gRow:nth-of-type(3) { grid-column: 1 / span 4; }
+  .gallery__set > .gRow:nth-of-type(4) { grid-column: 5 / span 4; }
+  .gallery__set > .gRow:nth-of-type(5) { grid-column: 9 / span 4; }
+
+  /* ---- Location: address beside the heading --------------------------- */
+  .location__head {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+    align-items: end;
+  }
+  .location__heading { grid-column: 1 / span 5; }
+  .location__meta { grid-column: 7 / span 6; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.5rem; }
+
+  .map { height: clamp(26rem, 60vh, 42rem); }
+
+  .footer__statement { font-size: var(--step-3); }
+}
+
+/* ---- 90rem / 1440px+ — the type gets its full voice --------------------- */
+@media (min-width: 90rem) {
+  /* Sized to the title column, not the viewport: --step-5 overflowed it and
+     the lockup wrapped. */
+  .hero__title { font-size: clamp(5rem, 5.6vw, 7rem); line-height: 0.92; }
+}
+
+/* ---- The details screen on a short phone --------------------------------
+ * Everything in this section is meant to sit inside one viewport. On a small
+ * screen that means the type steps down rather than the section growing.
+ * ---------------------------------------------------------------------- */
+@media (max-height: 46rem) {
+  .details { padding-block: 1.5rem; }
+  .details__grid { gap: 1rem; }
+  .details__state { gap: 1.1rem; }
+  .details__heading { font-size: var(--step-2); }
+  .details__body p { font-size: var(--step-0); line-height: 1.45; }
+  .details__body { gap: 0.7rem; }
+  .dlist__term { font-size: var(--step-0); }
+  .dlist__row { padding-block: 0.45rem; }
+  .reply { padding-top: 0.9rem; }
+  .step { gap: 0.75rem; }
+  .confirm__body { font-size: var(--step-0); }
+  .miniMap { height: clamp(5rem, 13vh, 7rem); }
+}
+
+/* ---- Very short viewports (laptops at 720, phones in landscape) --------- */
+@media (max-height: 40rem) and (min-width: 60rem) {
+  .hero__title { font-size: var(--step-3); }
+  .hero__frame { padding-block: 5rem 2rem; }
+}
+
+/* =============================================================================
+   12. REDUCED MOTION & PRINT
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] { opacity: 1; transform: none; }
+  .figure:hover img { transform: none; }
+}
+
+@media print {
+  body { background: #fff; color: #000; }
+  .hero, .rsvp, .location, .footer { background: #fff; color: #000; }
+  .map, .hero__composition, #js-flow { display: none; }
+}
+</style>
+</head>
+
+<body class="no-js">
+<a class="skip-link" href="#details">Skip to content</a>
+
+<!-- ==========================================================================
+     HEADER — the wordmark, treated exactly as on events.padre65.com
+     ========================================================================== -->
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a href="#top" aria-label="Padre65 — top of page">
+      <span class="wordmark">
+        <span class="wordmark__logo" aria-hidden="true"></span>
+        <span class="visually-hidden">Padre65</span>
+      </span>
+    </a>
+    <p class="eyebrow" id="js-eyebrow">Portobello Road · London W10</p>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ========================================================================
+       1. HERO
+       ===================================================================== -->
+  <section class="hero" data-surface="dark" aria-labelledby="hero-title">
+    <!-- Hero film. Muted, looping, inline and decorative — it carries no
+         audio and is hidden from assistive tech. Sources are attached at
+         runtime so the viewport size and prefers-reduced-motion decide what
+         actually loads. Falls back to the poster frame, then to the
+         typographic composition below. -->
+    <div class="hero__media" id="js-hero-media" hidden aria-hidden="true">
+      <video class="hero__video" id="js-hero-video"
+             muted loop playsinline autoplay preload="metadata"
+             disablepictureinpicture tabindex="-1"></video>
+      <div class="hero__scrim"></div>
+    </div>
+
+    <div class="hero__composition" aria-hidden="true">
+      <span class="hero__driftMark">65</span>
+      <span class="hero__hairline hero__hairline--l"></span>
+      <span class="hero__hairline hero__hairline--r"></span>
+      <span class="hero__grain"></span>
+    </div>
+
+    <div class="wrap hero__frame">
+      <div class="hero__bottom">
+        <div class="hero__col--title">
+          <h1 class="hero__title" id="hero-title" data-reveal>
+            <span>PADRE65</span>
+            <span class="hero__accent"><span class="hero__dash" aria-hidden="true">—</span> Popup Shop</span>
+          </h1>
+
+          <p class="hero__descriptor" data-reveal style="--reveal-delay:120ms">
+            Experience Padre65’s first popup at 353 Portobello Rd.
+          </p>
+
+          <div class="hero__actions" data-reveal style="--reveal-delay:240ms">
+            <a class="action" href="#details" data-scroll>Learn more</a>
+            <a class="tlink" href="#location" data-scroll>
+              See location <span class="tlink__arrow" aria-hidden="true">↓</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero__col--facts" data-reveal style="--reveal-delay:180ms">
+          <!-- Opening hours are written from CONFIG.event.days at runtime. -->
+          <div class="hours" id="js-hours"></div>
+          <div class="hero__factsRule" role="presentation"></div>
+          <p class="hero__place">
+            <svg class="hero__pin" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+              <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/>
+            </svg>
+            <span class="hero__address" id="js-hero-address"></span>
+          </p>
+        </div>
+      </div>
+
+      <a class="hero__scroll" href="#details" data-scroll>
+        <span>Scroll</span>
+        <span class="hero__scrollArrow" aria-hidden="true">↓</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       2. DETAILS — the reading state and the RSVP flow share this section.
+       Answering does not take you anywhere; the section changes in place.
+       ===================================================================== -->
+  <section class="details" id="details" data-open="false" aria-labelledby="details-heading">
+    <div class="wrap details__grid">
+
+      <div class="details__index" data-reveal>
+        <span class="eyebrow" id="js-details-eyebrow">Details</span>
+        <span class="details__indexRule" role="presentation"></span>
+      </div>
+
+      <h2 class="details__heading" id="details-heading" tabindex="-1" data-reveal>
+        The <em>Popup</em>
+      </h2>
+
+      <!-- ---- READING STATE -------------------------------------------- -->
+      <div class="details__state" id="js-reading">
+        <div class="details__body">
+          <!-- PLACEHOLDER COPY — replace both paragraphs. -->
+          <p data-reveal>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod nisl
+            eget consectetur sagittis, nisl nunc egestas nisi.
+          </p>
+          <p data-reveal style="--reveal-delay:90ms">
+            Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
+            Nullam quis risus eget urna mollis ornare.
+          </p>
+        </div>
+
+        <!-- Rows are written from CONFIG.event at runtime. -->
+        <ul class="dlist" id="js-details-list" data-reveal style="--reveal-delay:150ms"></ul>
+
+        <div class="reply" data-reveal style="--reveal-delay:210ms">
+          <div class="reply__index">
+            <span class="eyebrow">See you there?</span>
+            <span class="reply__rule" role="presentation"></span>
+          </div>
+          <div class="reply__actions">
+            <button class="action action--ink" type="button" data-open-flow>Of course</button>
+            <button class="action action--ink" type="button" data-open-flow>Most definitely</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- RSVP FLOW ------------------------------------------------- -->
+      <div class="details__state" id="js-flow" hidden>
+
+        <!-- STEP 1 : name and one contact method -->
+        <form class="step" id="js-step-1" novalidate>
+          <!-- Honeypot. Matches the events site's field name so the same
+               server-side check catches bots on both pages. -->
+          <div class="visually-hidden" aria-hidden="true">
+            <label for="rsvp-company">Company</label>
+            <input id="rsvp-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="rsvp-name">Your name</label>
+            <input class="input" id="rsvp-name" name="name" type="text"
+                   autocomplete="name" autocapitalize="words" maxlength="160"
+                   aria-describedby="rsvp-name-error" />
+            <span class="errorSlot"><span class="error" id="rsvp-name-error" role="alert"></span></span>
+          </div>
+
+          <fieldset class="toggle">
+            <legend class="toggle__legend">How should we reach you?</legend>
+            <div class="toggle__set">
+              <span class="toggle__option">
+                <input class="toggle__input" type="radio" name="method" id="method-mobile" value="mobile" checked />
+                <label class="toggle__face" for="method-mobile">Mobile</label>
+              </span>
+              <span class="toggle__option">
+                <input class="toggle__input" type="radio" name="method" id="method-email" value="email" />
+                <label class="toggle__face" for="method-email">Email</label>
+              </span>
+            </div>
+          </fieldset>
+
+          <div class="field" id="js-field-mobile">
+            <label class="field__label" for="rsvp-mobile">Mobile number</label>
+            <input class="input" id="rsvp-mobile" name="mobile" type="tel"
+                   inputmode="tel" autocomplete="tel" maxlength="24"
+                   placeholder="07700 900123" aria-describedby="rsvp-mobile-error" />
+            <span class="errorSlot"><span class="error" id="rsvp-mobile-error" role="alert"></span></span>
+          </div>
+
+          <div class="field" id="js-field-email" hidden>
+            <label class="field__label" for="rsvp-email">Email address</label>
+            <input class="input" id="rsvp-email" name="email" type="email"
+                   inputmode="email" autocomplete="email" spellcheck="false" maxlength="254"
+                   placeholder="you@example.com" aria-describedby="rsvp-email-error" />
+            <span class="errorSlot"><span class="error" id="rsvp-email-error" role="alert"></span></span>
+          </div>
+
+          <p class="formError" id="js-form-error" hidden></p>
+
+          <!-- Continue leads on the left; Skip sits opposite it, quieter. -->
+          <div class="flow__actions">
+            <button class="action" type="submit" id="js-continue">Continue&nbsp;→</button>
+            <button class="skip" type="button" id="js-skip">Skip</button>
+          </div>
+        </form>
+
+        <!-- STEP 2 : confirmation, calendar and the place -->
+        <div class="step" id="js-step-2" hidden>
+          <p class="confirm__body" id="js-confirm-body"></p>
+
+          <div class="flow__actions">
+            <button class="action" type="button" id="js-add-calendar">Add to calendar&nbsp;→</button>
+            <button class="skip" type="button" id="js-flow-close">Back</button>
+          </div>
+
+          <!-- The .ics is generated in the browser; this anchor is the click
+               target the download is dispatched through. -->
+          <a id="js-ics" href="#" download hidden aria-hidden="true" tabindex="-1"></a>
+
+          <p class="cal__status" id="js-cal-status" role="status"></p>
+
+          <p class="cal__alt">
+            <span class="cal__altLabel">Prefer Google Calendar?</span>
+            <span id="js-google-links"></span>
+          </p>
+
+          <a class="miniMap" id="js-mini-map" href="#location" data-scroll>
+            <span class="miniMap__canvas" id="js-mini-map-canvas" aria-hidden="true"></span>
+            <span class="miniMap__wash" aria-hidden="true"></span>
+            <span class="miniMap__label">
+              <svg class="hero__pin" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+                <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/>
+              </svg>
+              <span id="js-mini-map-address"></span>
+            </span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       3. LOCATION
+       ===================================================================== -->
+  <section class="location" id="location" data-surface="dark" aria-labelledby="location-heading">
+    <div class="wrap location__head">
+      <h2 class="location__heading" id="location-heading" tabindex="-1" data-reveal>Find us</h2>
+      <div class="location__meta">
+        <address class="location__address" id="js-location-address" data-reveal style="--reveal-delay:80ms"></address>
+        <a class="tlink" id="js-maps-link" href="#" target="_blank" rel="noopener noreferrer"
+           data-reveal style="--reveal-delay:140ms">
+          Open in Google Maps <span class="tlink__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="map" id="js-map">
+      <!-- Google Maps renders here when an API key is configured. -->
+      <div class="map__canvas" id="js-map-canvas"></div>
+
+      <!-- Otherwise: real OpenStreetMap tiles, filtered to the Padre palette.
+           No key, no library, and it shows the actual streets. -->
+      <div class="tilemap" id="js-tilemap" hidden>
+        <div class="tilemap__wash" aria-hidden="true"></div>
+        <svg class="tilemap__pin" viewBox="0 0 24 32" aria-hidden="true">
+          <path fill="#a02c2c" d="M12 0a12 12 0 0 0-12 12c0 9 12 20 12 20s12-11 12-20A12 12 0 0 0 12 0Z"/>
+          <circle cx="12" cy="12" r="4.2" fill="#f4f1ea"/>
+        </svg>
+        <a class="tilemap__credit" href="https://www.openstreetmap.org/copyright"
+           target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
+      </div>
+
+      <!-- And if even the tiles cannot load, an elegant panel the same size. -->
+      <div class="map__fallback" id="js-map-fallback">
+        <svg class="map__pin" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+          <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/>
+        </svg>
+        <p class="map__fallbackAddress" id="js-map-fallback-address"></p>
+        <a class="tlink" id="js-maps-link-fallback" href="#" target="_blank" rel="noopener noreferrer">
+          Open in Google Maps <span class="tlink__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       4. GALLERY — the photography closes the page
+       ===================================================================== -->
+  <section class="gallery" id="gallery" aria-labelledby="gallery-heading">
+    <div class="wrap">
+      <div class="gallery__head">
+        <h2 class="eyebrow" id="gallery-heading" data-reveal>From the last event</h2>
+        <span class="eyebrow" data-reveal style="--reveal-delay:80ms">Padre65</span>
+      </div>
+
+      <!-- Paths come from CONFIG.images.gallery, in this DOM order. -->
+      <div class="gallery__set" id="js-gallery">
+        <figure class="figure gLarge" data-reveal data-placeholder="images/event-01.jpg">
+          <img src="images/event-01.jpg" alt="Guests at the last Padre65 party" loading="lazy" decoding="async" width="1800" height="1194" />
+        </figure>
+        <figure class="figure gTall" data-reveal style="--reveal-delay:90ms" data-placeholder="images/event-03.jpg">
+          <img src="images/event-03.jpg" alt="The DJ booth at the last Padre65 party" loading="lazy" decoding="async" width="1150" height="1734" />
+        </figure>
+        <figure class="figure gRow" data-reveal style="--reveal-delay:60ms" data-placeholder="images/event-02.jpg">
+          <img src="images/event-02.jpg" alt="Two guests in Padre65 caps" loading="lazy" decoding="async" width="1100" height="729" />
+        </figure>
+        <figure class="figure gRow" data-reveal style="--reveal-delay:130ms" data-placeholder="images/event-04.jpg">
+          <img src="images/event-04.jpg" alt="Guests writing on a mirror in lipstick" loading="lazy" decoding="async" width="1100" height="729" />
+        </figure>
+        <figure class="figure gRow" data-reveal style="--reveal-delay:200ms" data-placeholder="images/event-05.jpg">
+          <img src="images/event-05.jpg" alt="Padre65 pieces worn at the decks" loading="lazy" decoding="async" width="1100" height="729" />
+        </figure>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==========================================================================
+     FOOTER
+     ========================================================================== -->
+<footer class="footer" data-surface="dark">
+  <div class="wrap">
+    <p class="footer__statement" data-reveal>Created by friends and family</p>
+    <div class="footer__row">
+      <span class="wordmark">
+        <span class="wordmark__logo" aria-hidden="true"></span>
+        <span class="visually-hidden">Padre65</span>
+      </span>
+      <nav class="footer__links" aria-label="Padre65">
+        <a class="footer__link" id="js-instagram" href="#" target="_blank" rel="noopener noreferrer">
+          Instagram<span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+        <a class="footer__link" id="js-shop" href="#" target="_blank" rel="noopener noreferrer">
+          Shop<span class="visually-hidden"> (opens in a new tab)</span>
+        </a>
+      </nav>
+      <p class="footer__legal">© <span id="js-year"></span> Padre65 — All rights reserved</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+document.body.classList.remove("no-js");
+
+/* =============================================================================
+   1. CONFIGURATION
+   Everything you are likely to change lives in this one object.
+   ========================================================================== */
+const CONFIG = {
+
+  /* ---- EVENT ------------------------------------------------------------
+     Dates are ISO (YYYY-MM-DD) and times are 24-hour local wall-clock in the
+     timezone below. Nothing is written as UTC — the correct offset is resolved
+     at runtime from `timezone`, so BST/GMT can never be got wrong by hand.
+     -------------------------------------------------------------------- */
+  event: {
+    name: "Padre65 — Popup Shop",
+    descriptor: "Coffee, drinks and music",
+    timezone: "Europe/London",
+    /** Reminder before each day. iCalendar duration; -P1D is one day before. */
+    reminder: "-P1D",
+    days: [
+      {
+        label: "Saturday 26 September",
+        /** Hero column heading — abbreviated so two days fit side by side. */
+        heroLabel: "Sat 26 September",
+        /** Details table heading. */
+        tableLabel: "Saturday 26th Sept",
+        short: "Saturday 26th",
+        date: "2026-09-26",
+        start: "10:00",
+        end: "21:00",
+        display: "10AM — 9PM",
+        tableTime: "10am — 9pm"
+      },
+      {
+        label: "Sunday 27 September",
+        heroLabel: "Sun 27 September",
+        tableLabel: "Sunday 27th Sept",
+        short: "Sunday 27th",
+        date: "2026-09-27",
+        start: "10:00",
+        end: "18:00",
+        display: "10AM — 6PM",
+        tableTime: "10am — 6pm"
+      }
+    ],
+    location: {
+      line1: "353 Portobello Road",
+      line2: "London W10 5SA",
+      /** Used verbatim for the Google Maps query and the .ics LOCATION. */
+      full: "353 Portobello Road, London W10 5SA",
+      /** Approximate — drop a pin in Google Maps and paste exact values here. */
+      lat: 51.5241,
+      lng: -0.2062
+    }
+  },
+
+  /* ---- RSVP BACKEND -----------------------------------------------------
+     Reuses the existing events.padre65.com API. Two calls, exactly as the
+     live RSVP flow makes them:
+
+       POST {apiBase}{rsvpPath}
+         { rsvp_status:"attending", first_name, last_name,
+           additional_guests: [], company }
+         → 201 { ok:true, rsvp:{...}, emailToken:"<row>.<expiry>.<sig>" }
+
+       POST {apiBase}{contactPath}          (only when an email was given)
+         { token: emailToken, email, company }
+         → 200 { ok:true }
+
+     apiBase "" means same-origin, which is what you want once this page is
+     served from events.padre65.com. Point it at the full origin only if the
+     page is hosted elsewhere AND the API has been given CORS headers.
+     -------------------------------------------------------------------- */
+  rsvp: {
+    apiBase: "",
+    rsvpPath: "/api/rsvp",
+    contactPath: "/api/newsletter",
+
+    /** "auto" | "live" | "preview".
+     *  auto  — live when served over http(s) from the API's origin,
+     *          preview when opened as a local file (no network call is made,
+     *          the flow still runs so the design can be reviewed).
+     *  live  — always call the API.
+     *  preview — never call the API. */
+    mode: "auto",
+
+    /** Mobile numbers have nowhere to go in the current backend — the sheet
+     *  runs A–N and none of those columns is a phone number. Leave this null
+     *  and a number typed here is validated, the name is still recorded, and
+     *  onPhoneCaptured() below is called so nothing is lost silently.
+     *  Set it to a path (e.g. "/api/contact") once the backend accepts one. */
+    phonePath: null
+  },
+
+  /* ---- GOOGLE MAPS ------------------------------------------------------
+     >>> PASTE YOUR CREDENTIALS HERE <<<
+     Leave both empty and the page shows the fallback location panel instead
+     of a map. Nothing errors, nothing looks broken.
+
+     apiKey — Google Cloud console → APIs & Services → Credentials.
+              Restrict it by HTTP referrer to your domain before going live.
+     mapId  — Google Cloud console → Google Maps Platform → Map Management.
+              Optional. With a Map ID the styling comes from the cloud console
+              (paste the palette below into a cloud style); without one, the
+              inline MAP_STYLE further down is applied instead.
+     -------------------------------------------------------------------- */
+  maps: {
+    apiKey: "",
+    mapId: "",
+    zoom: 16,
+
+    /**
+     * No key? The map still shows the real streets.
+     *
+     * Google charges for both the JS API and the Embed API, and both need a
+     * key, so with an empty apiKey there is no Google map to show. These are
+     * OpenStreetMap raster tiles instead, filtered into the Padre palette in
+     * CSS — no key, no library, and it is the actual area rather than a
+     * decorative stand-in. Attribution is required by the ODbL licence and is
+     * rendered in the corner; leave it there.
+     *
+     * openstreetmap.org's own tiles are fine for a site this size but are not
+     * meant for heavy traffic. If this ends up busy, swap tileUrl for a paid
+     * provider (MapTiler, Stadia, Thunderforest) — same {z}/{x}/{y} shape.
+     *
+     * Setting apiKey makes Google take precedence and these are not used.
+     */
+    tiles: true,
+    tileUrl: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+  },
+
+  /* ---- IMAGES -----------------------------------------------------------
+     Drop files at these paths, or repoint them anywhere (a CDN, /media/...).
+     The gallery falls back to a labelled placeholder if a file is missing.
+     -------------------------------------------------------------------- */
+  images: {
+    /**
+     * Hero film, transcoded from JACK WATER REEL.mov. Muted, looping, 6s.
+     * Set every field to "" to fall back to the typographic composition.
+     *
+     *   webm / mp4          — 1080p, served to tablets and desktops
+     *   mp4Mobile           — 720p, served under 48rem to save the data
+     *   poster / posterMobile — first frame, shown before playback and
+     *                           instead of it under prefers-reduced-motion
+     */
+    hero: {
+      webm: "media/hero.webm",
+      mp4: "media/hero.mp4",
+      mp4Mobile: "media/hero-720.mp4",
+      webmMobile: "media/hero-720.webm",
+      poster: "media/hero-poster.jpg",
+      posterMobile: "media/hero-poster-720.jpg"
+    },
+
+    /** In the order the figures appear in the markup. */
+    gallery: [
+      "images/event-01.jpg",  // large frame, top left
+      "images/event-03.jpg",  // portrait frame beside it
+      "images/event-02.jpg",  // bottom row, left
+      "images/event-04.jpg",  // bottom row, middle
+      "images/event-05.jpg"   // bottom row, right
+    ]
+  },
+
+  /* ---- EXTERNAL LINKS --------------------------------------------------- */
+  links: {
+    instagram: "https://www.instagram.com/_padre65/",
+    shop: "https://padre65.com/"
+  }
+};
+
+/**
+ * Called when a mobile number is captured but CONFIG.rsvp.phonePath is null.
+ * Deliberately loud rather than silent: a number the organiser thinks was
+ * saved but was not is worse than no number at all.
+ */
+function onPhoneCaptured(phone, name) {
+  console.warn(
+    "[padre65] A mobile number was submitted but CONFIG.rsvp.phonePath is null, " +
+    "so it was NOT stored. Name was recorded normally. Set phonePath once the " +
+    "backend accepts a phone field.",
+    { name: name, phone: phone }
+  );
+}
+
+/* =============================================================================
+   2. SMALL UTILITIES
+   ========================================================================== */
+const $  = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+const prefersReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const pad = (n) => String(n).padStart(2, "0");
+
+/** Escapes a string for safe use inside an .ics value. */
+function icsEscape(value) {
+  return String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
+/* =============================================================================
+   3. CONTENT — write the configured event into the page
+   ========================================================================== */
+(function renderContent() {
+  const ev = CONFIG.event;
+
+  // Hero opening hours — the date leads, the times follow.
+  $("#js-hours").innerHTML = ev.days.map((day) =>
+    '<div class="hours__day">' +
+      '<span class="hours__date">' + (day.heroLabel || day.label) + "</span>" +
+      '<span class="hours__time">' + day.display + "</span>" +
+    "</div>"
+  ).join("");
+
+  // Addresses
+  const addressHtml = ev.location.line1 + "<br />" + ev.location.line2;
+  $("#js-hero-address").innerHTML = addressHtml;
+  $("#js-location-address").innerHTML = addressHtml;
+  $("#js-map-fallback-address").innerHTML = addressHtml;
+  $("#js-mini-map-address").textContent = ev.location.full;
+
+  // Key details: a heading and a subheading per row. The last one is a link
+  // down to the map rather than a dead line of address.
+  const rows = ev.days.map((day) => ({
+    term: day.tableLabel || day.label,
+    value: day.tableTime || day.display
+  }));
+
+  $("#js-details-list").innerHTML =
+    rows.map((row) =>
+      '<li class="dlist__row">' +
+        '<span class="dlist__term">' + row.term + "</span>" +
+        '<span class="dlist__value">' + row.value + "</span>" +
+      "</li>"
+    ).join("") +
+    '<li class="dlist__row">' +
+      '<a class="dlist__link" href="#location" data-scroll>' +
+        '<span class="dlist__term">Location</span>' +
+        '<span class="dlist__value">' + ev.location.full + "</span>" +
+        '<span class="dlist__go" aria-hidden="true">↓</span>' +
+        '<span class="visually-hidden"> — jump to the map</span>' +
+      "</a>" +
+    "</li>";
+
+  // Maps links
+  const mapsHref = "https://www.google.com/maps/search/?api=1&query=" +
+    encodeURIComponent(ev.location.full);
+  $("#js-maps-link").href = mapsHref;
+  $("#js-maps-link-fallback").href = mapsHref;
+
+  // External links + year
+  $("#js-instagram").href = CONFIG.links.instagram;
+  $("#js-shop").href = CONFIG.links.shop;
+  $("#js-year").textContent = String(new Date().getFullYear());
+
+  mountHeroFilm();
+
+  // Gallery paths from config, with a graceful placeholder on failure
+  $$("#js-gallery .figure").forEach((figure, i) => {
+    const img = $("img", figure);
+    const path = CONFIG.images.gallery[i];
+    if (path) {
+      figure.dataset.placeholder = path;
+      img.src = path;
+    }
+    img.addEventListener("error", () => { figure.dataset.missing = "true"; });
+  });
+})();
+
+/**
+ * Attaches the hero film.
+ *
+ * Three decisions are made here rather than in the markup, because they all
+ * depend on the visitor: which encode to fetch, whether to play it at all,
+ * and whether the frame should appear. Nothing is shown until something has
+ * actually loaded, so a missing or blocked file leaves the typographic
+ * composition in place rather than a black rectangle.
+ */
+function mountHeroFilm() {
+  const cfg = CONFIG.images.hero;
+  if (!cfg || (!cfg.mp4 && !cfg.webm && !cfg.poster)) return;
+
+  const media = $("#js-hero-media");
+  const video = $("#js-hero-video");
+  const small = window.matchMedia("(max-width: 48rem)").matches;
+  const poster = (small && cfg.posterMobile) || cfg.poster || "";
+
+  // Reduced motion: the still frame, and no video element at all — a paused
+  // <video> still downloads, and there is no reason to spend the data.
+  if (prefersReducedMotion()) {
+    if (!poster) return;
+    const still = document.createElement("img");
+    still.className = "hero__image";
+    still.src = poster;
+    still.alt = "";
+    still.decoding = "async";
+    still.addEventListener("load", () => { media.hidden = false; });
+    video.replaceWith(still);
+    return;
+  }
+
+  if (poster) video.poster = poster;
+
+  // 1080p where the screen can use it; 720p on a phone. WebM first — where it
+  // is supported it is the smaller file, and the browser skips the rest.
+  // The browser takes the first source it can play, so the order is the
+  // preference. On a phone MP4 is both smaller and universal, with WebM
+  // behind it purely as a fallback; on desktop WebM leads because there it
+  // is the smaller file.
+  const encodes = small
+    ? [[cfg.mp4Mobile || cfg.mp4, "video/mp4"],
+       [cfg.webmMobile || cfg.webm, "video/webm"]]
+    : [[cfg.webm, "video/webm"], [cfg.mp4, "video/mp4"]];
+
+  const wanted = encodes.filter((pair) => pair[0]);
+  if (!wanted.length) return;
+
+  let failed = 0;
+  wanted.forEach((pair) => {
+    const source = document.createElement("source");
+    source.src = pair[0];
+    source.type = pair[1];
+    // <source> errors do not bubble, so each one is counted individually.
+    source.addEventListener("error", () => {
+      failed += 1;
+      if (failed >= wanted.length) media.hidden = true;
+    });
+    video.appendChild(source);
+  });
+
+  // The poster is the first frame, so the frame can appear before playback
+  // begins — and stays if autoplay is refused, which some browsers do on a
+  // metered connection or in low-power mode.
+  video.addEventListener("loadedmetadata", () => { media.hidden = false; }, { once: true });
+  video.addEventListener("error", () => { media.hidden = true; });
+
+  video.load();
+  const played = video.play();
+  if (played && typeof played.catch === "function") {
+    played.catch(() => { media.hidden = false; });
+  }
+}
+
+/* =============================================================================
+   4. REVEAL ON SCROLL
+   ========================================================================== */
+(function reveals() {
+  const items = $$("[data-reveal]");
+
+  if (prefersReducedMotion() || !("IntersectionObserver" in window)) {
+    items.forEach((el) => el.classList.add("is-in"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-in");
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 });
+
+  items.forEach((el) => {
+    // Anything already in the opening frame shows immediately — a reveal the
+    // visitor never sees animate is just a delay.
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.9) {
+      el.classList.add("is-in");
+    } else {
+      observer.observe(el);
+    }
+  });
+})();
+
+/* =============================================================================
+   5. SMOOTH ANCHOR NAVIGATION
+   The CSS handles the scroll; this adds focus management so keyboard users
+   actually land in the section they asked for.
+   ========================================================================== */
+(function anchors() {
+  $$("a[data-scroll]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const id = link.getAttribute("href");
+      const target = id && id.length > 1 ? document.querySelector(id) : null;
+      if (!target) return;
+
+      event.preventDefault();
+      target.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "start"
+      });
+      history.replaceState(null, "", id);
+
+      // Move focus without a second scroll.
+      const heading = target.querySelector("h2, h1") || target;
+      const hadTabIndex = heading.hasAttribute("tabindex");
+      if (!hadTabIndex) heading.setAttribute("tabindex", "-1");
+      heading.focus({ preventScroll: true });
+      if (!hadTabIndex) {
+        heading.addEventListener("blur", function once() {
+          heading.removeAttribute("tabindex");
+          heading.removeEventListener("blur", once);
+        });
+      }
+    });
+  });
+})();
+
+/* =============================================================================
+   6. RSVP
+   ========================================================================== */
+const RSVP = (function () {
+
+  const form        = $("#js-step-1");
+  const stepOne     = $("#js-step-1");
+  const stepTwo     = $("#js-step-2");
+  const nameInput   = $("#rsvp-name");
+  const mobileInput = $("#rsvp-mobile");
+  const emailInput  = $("#rsvp-email");
+  const mobileField = $("#js-field-mobile");
+  const emailField  = $("#js-field-email");
+  const formError   = $("#js-form-error");
+  const submitBtn   = $("#js-continue");
+  const skipBtn     = $("#js-skip");
+  const honeypot    = $("#rsvp-company");
+
+  let submitting = false;
+
+  /* ---- Validation ------------------------------------------------------
+     Mirrors lib/name-rules.ts and lib/email-rules.ts from the events site,
+     so the browser and the server agree on what is acceptable and say the
+     same thing about it.
+     ------------------------------------------------------------------- */
+  const MAX_NAME = 80;
+  const FORBIDDEN   = /[<>{}\\`$|]/;
+  const HTML_TAG    = /<[^>]*>/;
+  const HTML_ENTITY = /&#?\w+;/;
+  /* A leading =, +, @ or - makes a spreadsheet cell a formula. */
+  const FORMULA_LEAD = /^[=+@\-]/;
+
+  const normaliseName = (v) => String(v).replace(/\s+/g, " ").trim();
+
+  function nameError(value) {
+    const name = normaliseName(value || "");
+    if (!name) return "Required";
+    if (name.length > MAX_NAME * 2) return "That name is too long";
+    if (FORBIDDEN.test(name) || HTML_TAG.test(name) || HTML_ENTITY.test(name)) {
+      return "Please use letters only";
+    }
+    if (FORMULA_LEAD.test(name)) return "Please start with a letter";
+    return null;
+  }
+
+  const EMAIL_SHAPE = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/;
+  const EMAIL_FORBIDDEN = /[<>{}\\`$|,;"']/;
+
+  function emailError(value) {
+    const email = String(value || "").trim();
+    if (!email) return "Required";
+    if (email.length > 254) return "That address is too long";
+    if (FORMULA_LEAD.test(email)) return "Please start with a letter or a number";
+    if (EMAIL_FORBIDDEN.test(email) || !EMAIL_SHAPE.test(email)) {
+      return "Please enter a valid email address";
+    }
+    return null;
+  }
+
+  /**
+   * UK-friendly, deliberately not strict. Accepts 07…, +44…, spaces, dashes
+   * and brackets, and any sensible international number — the point is to
+   * catch a typo, not to police the format.
+   */
+  function phoneError(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "Required";
+    if (/[^0-9+()\-.\s]/.test(raw)) return "Numbers only, please";
+    const digits = raw.replace(/\D/g, "");
+    if (digits.length < 9)  return "That number looks too short";
+    if (digits.length > 15) return "That number looks too long";
+    return null;
+  }
+
+  /** "Ada Lovelace" → { first_name:"Ada", last_name:"Lovelace" }.
+   *  The API requires both, so a single word becomes the first name and the
+   *  last name falls back to a dash rather than failing the guest's RSVP. */
+  function splitName(full) {
+    const parts = normaliseName(full).split(" ");
+    if (parts.length === 1) return { first_name: parts[0], last_name: "—" };
+    return { first_name: parts[0], last_name: parts.slice(1).join(" ") };
+  }
+
+  /* ---- Inline error display -------------------------------------------- */
+  function setFieldError(input, message) {
+    const slot = document.getElementById(input.id + "-error");
+    if (slot) slot.textContent = message || "";
+    if (message) input.setAttribute("aria-invalid", "true");
+    else input.removeAttribute("aria-invalid");
+  }
+
+  function clearErrors() {
+    [nameInput, mobileInput, emailInput].forEach((i) => setFieldError(i, ""));
+    formError.hidden = true;
+    formError.textContent = "";
+  }
+
+  function showFormError(message) {
+    formError.textContent = message;
+    formError.hidden = false;
+  }
+
+  /* ---- Contact-method toggle ------------------------------------------- */
+  function currentMethod() {
+    const checked = $('input[name="method"]:checked');
+    return checked ? checked.value : "mobile";
+  }
+
+  $$('input[name="method"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const method = currentMethod();
+      mobileField.hidden = method !== "mobile";
+      emailField.hidden  = method !== "email";
+      clearErrors();
+      // Only one field is ever present, so focus follows the choice.
+      const next = method === "mobile" ? mobileInput : emailInput;
+      window.requestAnimationFrame(() => next.focus());
+    });
+  });
+
+  [nameInput, mobileInput, emailInput].forEach((input) => {
+    input.addEventListener("input", () => {
+      if (input.getAttribute("aria-invalid")) setFieldError(input, "");
+    });
+  });
+
+  /* ---- Transport -------------------------------------------------------
+     Preview mode exists because a file:// page cannot post to the live API —
+     the browser blocks it as cross-origin. Rather than showing a network
+     error while the design is being reviewed, the flow completes locally and
+     says so in the console.
+     ------------------------------------------------------------------- */
+  function isPreview() {
+    if (CONFIG.rsvp.mode === "preview") return true;
+    if (CONFIG.rsvp.mode === "live") return false;
+    if (location.protocol === "file:") return true;
+    // Cross-origin without an explicit apiBase would fail CORS anyway.
+    return false;
+  }
+
+  async function postJson(path, body) {
+    const response = await fetch(CONFIG.rsvp.apiBase + path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    let data = null;
+    try { data = await response.json(); } catch (e) { /* empty body */ }
+    return { ok: response.ok, status: response.status, data: data };
+  }
+
+  /**
+   * Sends the RSVP exactly as the events site does, then attaches the email
+   * to the same row through the newsletter endpoint if one was given.
+   */
+  async function submitRsvp(payload) {
+    if (isPreview()) {
+      console.info(
+        "[padre65] Preview mode — no request was sent. Serve this page from " +
+        "the same origin as the API, or set CONFIG.rsvp.mode = 'live'.",
+        payload
+      );
+      return { ok: true, preview: true };
+    }
+
+    const names = splitName(payload.name);
+    const rsvp = await postJson(CONFIG.rsvp.rsvpPath, {
+      rsvp_status: "attending",
+      first_name: names.first_name,
+      last_name: names.last_name,
+      additional_guests: [],
+      company: payload.company || ""
+    });
+
+    if (!rsvp.ok || !rsvp.data || !rsvp.data.ok) {
+      return {
+        ok: false,
+        message: (rsvp.data && rsvp.data.message) ||
+                 "We could not save your response. Please try again.",
+        errors: (rsvp.data && rsvp.data.errors) || {}
+      };
+    }
+
+    // Email rides on the row the RSVP just created.
+    if (payload.method === "email" && payload.email && rsvp.data.emailToken) {
+      const contact = await postJson(CONFIG.rsvp.contactPath, {
+        token: rsvp.data.emailToken,
+        email: payload.email,
+        company: payload.company || ""
+      });
+      if (!contact.ok) {
+        // The RSVP itself succeeded; only the address failed to attach.
+        console.warn("[padre65] Email could not be attached to the RSVP row.", contact.status);
+      }
+    }
+
+    // Mobile numbers have no column yet — see CONFIG.rsvp.phonePath.
+    if (payload.method === "mobile" && payload.phone) {
+      if (CONFIG.rsvp.phonePath && rsvp.data.emailToken) {
+        await postJson(CONFIG.rsvp.phonePath, {
+          token: rsvp.data.emailToken,
+          phone: payload.phone,
+          company: payload.company || ""
+        });
+      } else {
+        onPhoneCaptured(payload.phone, payload.name);
+      }
+    }
+
+    return { ok: true };
+  }
+
+  /* ---- Step transition -------------------------------------------------- */
+  function goToConfirmation(didRsvp) {
+    const heading = $("#details-heading");
+    const body    = $("#js-confirm-body");
+
+    // Never claim someone is on the list if they skipped.
+    if (didRsvp) {
+      heading.innerHTML = "You’re <em>on the list.</em>";
+      body.textContent  = "We’ll see you on Portobello Road.";
+    } else {
+      heading.innerHTML = "Save the <em>date.</em>";
+      body.textContent  = "26 – 27 September, 353 Portobello Road.";
+    }
+    $("#js-details-eyebrow").textContent = didRsvp ? "Confirmed" : "Save the date";
+
+    stepOne.hidden = true;
+    stepTwo.hidden = false;
+    stepTwo.classList.add("is-entering");
+    Calendar.prepare();
+    MiniMap.draw();
+    window.requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+  }
+
+  /* ---- Submit ----------------------------------------------------------- */
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (submitting) return;
+
+    clearErrors();
+
+    const method = currentMethod();
+    const name   = nameInput.value;
+    const phone  = mobileInput.value;
+    const email  = emailInput.value;
+
+    // Name is required whenever someone actually RSVPs.
+    const nameMsg = nameError(name);
+    let contactMsg = null;
+    if (method === "mobile") contactMsg = phoneError(phone);
+    else contactMsg = emailError(email);
+
+    if (nameMsg) setFieldError(nameInput, nameMsg);
+    if (contactMsg) setFieldError(method === "mobile" ? mobileInput : emailInput, contactMsg);
+
+    if (nameMsg || contactMsg) {
+      const firstBad = nameMsg ? nameInput : (method === "mobile" ? mobileInput : emailInput);
+      firstBad.focus();
+      return;
+    }
+
+    submitting = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+
+    let result;
+    try {
+      result = await submitRsvp({
+        name: name,
+        method: method,
+        phone: phone,
+        email: email,
+        company: honeypot.value
+      });
+    } catch (error) {
+      result = { ok: false, message: "We could not reach the server. Please check your connection." };
+    }
+
+    submitting = false;
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = "Continue&nbsp;→";
+
+    if (!result.ok) {
+      showFormError(result.message);
+      if (result.errors) {
+        if (result.errors.first_name || result.errors.last_name) {
+          setFieldError(nameInput, result.errors.first_name || result.errors.last_name);
+        }
+        if (result.errors.email) setFieldError(emailInput, result.errors.email);
+      }
+      return;
+    }
+
+    goToConfirmation(true);
+  });
+
+  skipBtn.addEventListener("click", () => goToConfirmation(false));
+
+  /* ---- Opening the flow ------------------------------------------------
+     Answering happens inside the details section: the reading state gives
+     way, the surface turns over, and the heading takes on the new job. No
+     navigation, so nothing scrolls out from under the visitor.
+     ------------------------------------------------------------------- */
+  const section  = $("#details");
+  const reading  = $("#js-reading");
+  const flow     = $("#js-flow");
+  const heading  = $("#details-heading");
+  const eyebrow  = $("#js-details-eyebrow");
+  const READING_HEADING = heading.innerHTML;
+  const READING_EYEBROW = eyebrow.textContent;
+
+  /**
+   * The section is exactly one viewport tall, so it is squared to the top of
+   * the screen whenever the state changes. Without this the browser's own
+   * scroll anchoring shifts the page by whatever the swap changed, which
+   * reads as a lurch; scrollTo is used rather than scrollIntoView because
+   * the page's scroll-padding would otherwise leave the bottom cut off.
+   */
+  function squareUp() {
+    window.scrollTo({
+      top: section.offsetTop,
+      behavior: prefersReducedMotion() ? "auto" : "smooth"
+    });
+  }
+
+  function openFlow() {
+    reading.hidden = true;
+    flow.hidden = false;
+    stepOne.hidden = false;
+    stepTwo.hidden = true;
+    section.dataset.open = "true";
+    section.setAttribute("data-surface", "dark");
+    heading.innerHTML = "Come <em>through.</em>";
+    eyebrow.textContent = "RSVP";
+    stepOne.classList.add("is-entering");
+    squareUp();
+    // The heading takes focus rather than the first field: on a phone,
+    // focusing an input opens the keyboard, which halves the viewport the
+    // form was just sized to fit.
+    window.requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+  }
+
+  function closeFlow() {
+    flow.hidden = true;
+    reading.hidden = false;
+    section.dataset.open = "false";
+    section.removeAttribute("data-surface");
+    heading.innerHTML = READING_HEADING;
+    eyebrow.textContent = READING_EYEBROW;
+    clearErrors();
+    squareUp();
+    window.requestAnimationFrame(() => heading.focus({ preventScroll: true }));
+  }
+
+  $$("[data-open-flow]").forEach((btn) => btn.addEventListener("click", openFlow));
+  $("#js-flow-close").addEventListener("click", closeFlow);
+
+  return { openFlow: openFlow, closeFlow: closeFlow, goToConfirmation: goToConfirmation };
+})();
+
+/* =============================================================================
+   7. CALENDAR
+   Two separate days with different hours, so: one .ics carrying two VEVENTs
+   (each with its own one-day-before VALARM), and one Google Calendar link per
+   day. Times are wall-clock in Europe/London and the true offset is resolved
+   from the timezone database at runtime — never hardcoded — so BST and GMT
+   cannot be confused.
+   ========================================================================== */
+const Calendar = (function () {
+
+  /**
+   * The UTC offset, in minutes, that `timeZone` was on at a given instant.
+   * Uses the browser's own tz database rather than arithmetic.
+   */
+  function offsetMinutes(utcDate, timeZone) {
+    const dtf = new Intl.DateTimeFormat("en-GB", {
+      timeZone: timeZone,
+      hour12: false,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit"
+    });
+    const parts = {};
+    dtf.formatToParts(utcDate).forEach((p) => { parts[p.type] = p.value; });
+    const asUtc = Date.UTC(
+      Number(parts.year), Number(parts.month) - 1, Number(parts.day),
+      Number(parts.hour % 24), Number(parts.minute), Number(parts.second)
+    );
+    return (asUtc - utcDate.getTime()) / 60000;
+  }
+
+  /**
+   * "2026-09-26" + "10:00" in Europe/London → the correct UTC Date.
+   * Resolved in two passes because the offset itself depends on the instant.
+   */
+  function zonedToUtc(dateStr, timeStr, timeZone) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const [hh, mm]  = timeStr.split(":").map(Number);
+    const naive = Date.UTC(y, m - 1, d, hh, mm, 0);
+    let guess = new Date(naive - offsetMinutes(new Date(naive), timeZone) * 60000);
+    // Second pass settles the ambiguity around a DST boundary.
+    guess = new Date(naive - offsetMinutes(guess, timeZone) * 60000);
+    return guess;
+  }
+
+  const utcStamp = (date) =>
+    date.getUTCFullYear() + pad(date.getUTCMonth() + 1) + pad(date.getUTCDate()) +
+    "T" + pad(date.getUTCHours()) + pad(date.getUTCMinutes()) + pad(date.getUTCSeconds()) + "Z";
+
+  /** Local (floating with TZID) stamp: 20260926T100000 */
+  const localStamp = (dateStr, timeStr) =>
+    dateStr.replace(/-/g, "") + "T" + timeStr.replace(":", "") + "00";
+
+  /* ---- .ics ------------------------------------------------------------ */
+
+  /**
+   * Europe/London VTIMEZONE. Included so Apple Calendar, Outlook and anything
+   * else resolves the offset itself rather than trusting the file's author.
+   */
+  const VTIMEZONE = [
+    "BEGIN:VTIMEZONE",
+    "TZID:Europe/London",
+    "X-LIC-LOCATION:Europe/London",
+    "BEGIN:DAYLIGHT",
+    "TZOFFSETFROM:+0000",
+    "TZOFFSETTO:+0100",
+    "TZNAME:BST",
+    "DTSTART:19700329T010000",
+    "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU",
+    "END:DAYLIGHT",
+    "BEGIN:STANDARD",
+    "TZOFFSETFROM:+0100",
+    "TZOFFSETTO:+0000",
+    "TZNAME:GMT",
+    "DTSTART:19701025T020000",
+    "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU",
+    "END:STANDARD",
+    "END:VTIMEZONE"
+  ];
+
+  /** Folds one content line to 75 octets, continuing with a leading space. */
+  function foldLine(line) {
+    const encoder = new TextEncoder();
+    if (encoder.encode(line).length <= 75) return line;
+
+    const out = [];
+    let current = "";
+    let bytes = 0;
+    // A continuation line starts with a space, which costs one of its 75.
+    let limit = 75;
+
+    for (const char of line) {
+      const size = encoder.encode(char).length;
+      if (bytes + size > limit) {
+        out.push(current);
+        current = "";
+        bytes = 1;   // the leading space
+        limit = 75;
+      }
+      current += char;
+      bytes += size;
+    }
+    out.push(current);
+    return out.join("\r\n ");
+  }
+
+  function buildIcs() {
+    const ev = CONFIG.event;
+    const stamp = utcStamp(new Date());
+
+    const events = ev.days.map((day, i) => {
+      const uid = "padre65-popup-" + day.date + "@padre65.com";
+      return [
+        "BEGIN:VEVENT",
+        "UID:" + uid,
+        "DTSTAMP:" + stamp,
+        "SEQUENCE:0",
+        "DTSTART;TZID=Europe/London:" + localStamp(day.date, day.start),
+        "DTEND;TZID=Europe/London:"   + localStamp(day.date, day.end),
+        "SUMMARY:" + icsEscape(ev.name),
+        "DESCRIPTION:" + icsEscape(ev.descriptor + ". " + day.label + ", " + day.display + "."),
+        "LOCATION:" + icsEscape(ev.location.full),
+        "STATUS:CONFIRMED",
+        "TRANSP:OPAQUE",
+        // One reminder, one day before.
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        "DESCRIPTION:" + icsEscape(ev.name + " — tomorrow"),
+        "TRIGGER:" + ev.reminder,
+        "END:VALARM",
+        "END:VEVENT"
+      ];
+    });
+
+    const lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Padre65//Popup Shop//EN",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "X-WR-CALNAME:" + icsEscape(ev.name)
+    ]
+      .concat(VTIMEZONE)
+      .concat([].concat.apply([], events))
+      .concat(["END:VCALENDAR"]);
+
+    // RFC 5545: CRLF endings, and content lines folded at 75 octets. Folding
+    // counts bytes, not characters, so the em-dash in the title counts as
+    // three. Most clients tolerate long lines; some older ones do not.
+    return lines.map(foldLine).join("\r\n") + "\r\n";
+  }
+
+  /* ---- Google Calendar ------------------------------------------------- */
+  function googleUrl(day) {
+    const ev = CONFIG.event;
+    const start = zonedToUtc(day.date, day.start, ev.timezone);
+    const end   = zonedToUtc(day.date, day.end,   ev.timezone);
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: ev.name,
+      dates: utcStamp(start) + "/" + utcStamp(end),
+      details: ev.descriptor + ". " + day.label + ", " + day.display + ".",
+      location: ev.location.full,
+      ctz: ev.timezone
+    });
+    return "https://calendar.google.com/calendar/render?" + params.toString();
+  }
+
+  /* ---- Which calendar is this person likely to be using? ---------------
+     Only the label and the wording change; the payload is the same .ics
+     either way, because it is the one format that can carry two separate
+     days in a single action.
+     ------------------------------------------------------------------- */
+  function platform() {
+    const ua = navigator.userAgent || "";
+    const touch = navigator.maxTouchPoints || 0;
+    // iPadOS reports itself as a Mac, and only the touch count gives it away.
+    if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touch > 1)) return "ios";
+    if (/Macintosh|Mac OS X/.test(ua)) return "mac";
+    if (/Android/.test(ua)) return "android";
+    if (/Windows/.test(ua)) return "windows";
+    return "other";
+  }
+
+  const LABEL = {
+    ios: "Add to Apple Calendar",
+    mac: "Add to Apple Calendar",
+    windows: "Add to Outlook",
+    android: "Add to calendar",
+    other: "Add to calendar"
+  };
+
+  const DONE = {
+    ios: "Opening Calendar — both days, with a reminder the day before.",
+    mac: "Opening Calendar — both days, with a reminder the day before.",
+    windows: "Downloaded. Open the file to add both days to Outlook.",
+    android: "Downloaded. Open the file to add both days.",
+    other: "Downloaded. Open the file to add both days."
+  };
+
+  /* ---- Wiring ---------------------------------------------------------- */
+  const addBtn  = $("#js-add-calendar");
+  const icsLink = $("#js-ics");
+  const status  = $("#js-cal-status");
+  let objectUrl = null;
+  let prepared  = false;
+
+  /** Called when the confirmation appears, so the first tap is instant. */
+  function prepare() {
+    if (prepared) return;
+    prepared = true;
+
+    const kind = platform();
+    addBtn.innerHTML = LABEL[kind] + "&nbsp;→";
+
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    const blob = new Blob([buildIcs()], { type: "text/calendar;charset=utf-8" });
+    objectUrl = URL.createObjectURL(blob);
+    icsLink.href = objectUrl;
+    icsLink.setAttribute("download", "padre65-popup-shop.ics");
+
+    // Google Calendar takes one event per link, so two days means two links.
+    // Everyone else gets both in one file above.
+    $("#js-google-links").innerHTML = CONFIG.event.days.map((day) =>
+      '<a class="cal__link" target="_blank" rel="noopener noreferrer" href="' +
+        googleUrl(day).replace(/&/g, "&amp;") + '">' + day.short + "</a>"
+    ).join("");
+  }
+
+  addBtn.addEventListener("click", () => {
+    prepare();
+    icsLink.click();
+    status.textContent = DONE[platform()];
+  });
+
+  return {
+    buildIcs: buildIcs, googleUrl: googleUrl, zonedToUtc: zonedToUtc,
+    prepare: prepare, platform: platform
+  };
+})();
+
+/* =============================================================================
+   8. MAP
+   Google Maps JavaScript API, styled back to the Padre65 palette. Loads only
+   when a key is configured; otherwise the fallback panel simply stays put.
+   ========================================================================== */
+
+/**
+ * Inline style — used when no Map ID is set. With a Map ID, styling comes
+ * from the cloud console instead and this array is ignored by the API, so
+ * paste the same palette into your cloud style if you use one.
+ */
+const MAP_STYLE = [
+  { elementType: "geometry", stylers: [{ color: "#0f0f0f" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#8f857a" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#0a0a0a" }] },
+
+  { featureType: "administrative", elementType: "geometry", stylers: [{ visibility: "off" }] },
+  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#b3a99c" }] },
+  { featureType: "administrative.neighborhood", elementType: "labels.text.fill", stylers: [{ color: "#8f857a" }] },
+
+  { featureType: "poi", stylers: [{ visibility: "off" }] },
+  { featureType: "transit", stylers: [{ visibility: "off" }] },
+  { featureType: "transit.station", elementType: "labels.text.fill", stylers: [{ color: "#6d6259" }, { visibility: "on" }] },
+
+  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#111111" }] },
+  { featureType: "landscape.man_made", elementType: "geometry.fill", stylers: [{ color: "#141210" }] },
+
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#1f1c19" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#7d736a" }] },
+  { featureType: "road.local", elementType: "geometry", stylers: [{ color: "#1a1714" }] },
+  { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#26221e" }] },
+  // The one place the brand red is allowed on the map: the roads that matter.
+  { featureType: "road.highway", elementType: "geometry.fill", stylers: [{ color: "#4a2020" }] },
+  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#a02c2c" }] },
+  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#c9a09a" }] },
+
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#070707" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#4a443e" }] }
+];
+
+/* -----------------------------------------------------------------------------
+ * Slippy tiles
+ *
+ * Enough of a map renderer to place the real streets behind a marker: convert
+ * a coordinate to a tile position, lay out the tiles that cover the box, and
+ * let CSS do the theming. About sixty lines, no library, no API key.
+ * -------------------------------------------------------------------------- */
+const TileMap = (function () {
+  const SIZE = 256;
+
+  /** Web Mercator: a coordinate to a fractional tile position at this zoom. */
+  function project(lat, lng, zoom) {
+    const n = Math.pow(2, zoom);
+    const radians = (lat * Math.PI) / 180;
+    return {
+      x: ((lng + 180) / 360) * n,
+      y: ((1 - Math.log(Math.tan(radians) + 1 / Math.cos(radians)) / Math.PI) / 2) * n
+    };
+  }
+
+  /**
+   * Fills `host` with tiles centred on lat/lng. Returns false if the box has
+   * no size yet (hidden, or not laid out), so the caller can try again.
+   * `onFail` fires only when every tile failed — one missing tile is not a
+   * reason to throw the map away.
+   */
+  function draw(host, options) {
+    const width = host.clientWidth;
+    const height = host.clientHeight;
+    if (!width || !height) return false;
+
+    const zoom = options.zoom;
+    const n = Math.pow(2, zoom);
+    const centre = project(options.lat, options.lng, zoom);
+
+    const cols = Math.ceil(width / SIZE) + 2;
+    const rows = Math.ceil(height / SIZE) + 2;
+    const firstX = Math.floor(centre.x) - Math.floor(cols / 2);
+    const firstY = Math.floor(centre.y) - Math.floor(rows / 2);
+    const offsetX = width / 2 - (centre.x - firstX) * SIZE;
+    const offsetY = height / 2 - (centre.y - firstY) * SIZE;
+
+    const layer = document.createElement("div");
+    layer.className = "tilemap__layer";
+
+    let total = 0;
+    let failed = 0;
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const ty = firstY + row;
+        if (ty < 0 || ty >= n) continue;          // above the pole or below it
+        const tx = (((firstX + col) % n) + n) % n; // the world wraps sideways
+
+        const tile = new Image();
+        tile.className = "tilemap__tile";
+        tile.alt = "";
+        tile.decoding = "async";
+        tile.width = SIZE;
+        tile.height = SIZE;
+        tile.style.left = Math.round(offsetX + col * SIZE) + "px";
+        tile.style.top = Math.round(offsetY + row * SIZE) + "px";
+        tile.src = CONFIG.maps.tileUrl
+          .replace("{z}", String(zoom))
+          .replace("{x}", String(tx))
+          .replace("{y}", String(ty));
+        tile.addEventListener("error", () => {
+          failed += 1;
+          if (failed >= total && options.onFail) options.onFail();
+        });
+        total += 1;
+        layer.appendChild(tile);
+      }
+    }
+
+    if (!total) return false;
+    const previous = host.querySelector(".tilemap__layer");
+    if (previous) previous.remove();
+    host.insertBefore(layer, host.firstChild);
+    return true;
+  }
+
+  return { draw: draw, project: project };
+})();
+
+/* The compact map on the confirmation. Drawn on demand — it has no size until
+   the step it lives in is visible. */
+const MiniMap = (function () {
+  let drawn = false;
+  function drawNow() {
+    if (drawn || !CONFIG.maps.tiles) return;
+    const host = $("#js-mini-map-canvas");
+    if (!host) return;
+    drawn = TileMap.draw(host, {
+      lat: CONFIG.event.location.lat,
+      lng: CONFIG.event.location.lng,
+      zoom: CONFIG.maps.zoom,
+      // Offline, or the tile host is unreachable. Keep the panel: without
+      // tiles it still reads as the address plate it carries, and it is
+      // still the link down to the full map.
+      onFail: () => {
+        // Clear the dead tiles: their broken-image edges draw a grid of
+        // seams across the plate.
+        host.innerHTML = "";
+        $("#js-mini-map").dataset.tiles = "off";
+      }
+    });
+  }
+  // Two frames: one for the step to unhide, one for it to be laid out.
+  return { draw: () => window.requestAnimationFrame(() =>
+    window.requestAnimationFrame(drawNow)) };
+})();
+
+(function initMap() {
+  const key = CONFIG.maps.apiKey;
+  const fallback = $("#js-map-fallback");
+  const canvas = $("#js-map-canvas");
+
+  // No Google key. Google charges for both the JS API and the Embed API and
+  // neither works without one, so the themed OpenStreetMap tiles stand in.
+  if (!key) {
+    if (!CONFIG.maps.tiles) return;
+    const tilemap = $("#js-tilemap");
+    const paint = () => TileMap.draw(tilemap, {
+      lat: CONFIG.event.location.lat,
+      lng: CONFIG.event.location.lng,
+      zoom: CONFIG.maps.zoom,
+      // Every tile failed: offline, or the tile host is unreachable. Stand
+      // down and give the panel back — an empty black box is worse than
+      // either of them.
+      onFail: () => { tilemap.hidden = true; fallback.hidden = false; }
+    });
+
+    tilemap.hidden = false;
+    if (paint()) fallback.hidden = true;
+    else tilemap.hidden = true;
+
+    // Redraw on resize, but only when the box has actually changed width.
+    let lastWidth = tilemap.clientWidth;
+    window.addEventListener("resize", () => {
+      if (tilemap.hidden) return;
+      if (Math.abs(tilemap.clientWidth - lastWidth) < 24) return;
+      lastWidth = tilemap.clientWidth;
+      paint();
+    }, { passive: true });
+    return;
+  }
+
+  const params = new URLSearchParams({ key: key, v: "weekly", loading: "async" });
+  if (CONFIG.maps.mapId) params.set("libraries", "marker");
+
+  const script = document.createElement("script");
+  script.src = "https://maps.googleapis.com/maps/api/js?" + params.toString();
+  script.async = true;
+
+  script.addEventListener("error", () => {
+    console.warn("[padre65] Google Maps failed to load; showing the fallback panel.");
+  });
+
+  window.__padreMapInit = async function () {
+    try {
+      const ev = CONFIG.event;
+      const centre = { lat: ev.location.lat, lng: ev.location.lng };
+
+      const options = {
+        center: centre,
+        zoom: CONFIG.maps.zoom,
+        disableDefaultUI: true,
+        zoomControl: true,
+        fullscreenControl: false,
+        streetViewControl: false,
+        mapTypeControl: false,
+        keyboardShortcuts: true,
+        gestureHandling: "cooperative", // one-finger scroll still pans the page
+        backgroundColor: "#0a0a0a"
+      };
+
+      // A Map ID takes its styling from the cloud console; without one the
+      // inline style above is applied. Setting both makes the API warn.
+      if (CONFIG.maps.mapId) options.mapId = CONFIG.maps.mapId;
+      else options.styles = MAP_STYLE;
+
+      const map = new google.maps.Map(canvas, options);
+
+      const pinSvg =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="44" viewBox="0 0 24 32">' +
+        '<path fill="#a02c2c" d="M12 0a12 12 0 0 0-12 12c0 9 12 20 12 20s12-11 12-20A12 12 0 0 0 12 0Z"/>' +
+        '<circle cx="12" cy="12" r="4.2" fill="#f4f1ea"/></svg>';
+
+      if (CONFIG.maps.mapId && google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = pinSvg;
+        new google.maps.marker.AdvancedMarkerElement({
+          map: map,
+          position: centre,
+          content: wrapper.firstChild,
+          title: ev.name
+        });
+      } else {
+        new google.maps.Marker({
+          map: map,
+          position: centre,
+          title: ev.name,
+          icon: {
+            url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(pinSvg),
+            scaledSize: new google.maps.Size(34, 44),
+            anchor: new google.maps.Point(17, 44)
+          }
+        });
+      }
+
+      // Only hide the fallback once there is genuinely a map behind it.
+      fallback.hidden = true;
+    } catch (error) {
+      console.warn("[padre65] Map initialisation failed; keeping the fallback panel.", error);
+    }
+  };
+
+  script.addEventListener("load", () => { window.__padreMapInit(); });
+  document.head.appendChild(script);
+})();
+</script>
+</body>
+</html>
