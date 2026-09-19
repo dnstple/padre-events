@@ -257,6 +257,23 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
   white-space: nowrap; border: 0;
 }
 
+
+/* ---- Honeypot ----------------------------------------------------------
+ * display:none, NOT the .visually-hidden clip used everywhere else.
+ *
+ * A clipped input is still in the layout and still a real text field, so
+ * password managers fill it — and they ignore autocomplete="off". A field
+ * called "company" with a <label>Company</label> is about the strongest
+ * autofill signal there is, so anyone with an organisation saved in their
+ * manager had it filled invisibly, and the server correctly read that as a
+ * bot and threw their registration away while the page told them they were
+ * on the list. That is what happened here.
+ *
+ * Managers skip display:none. A naive bot that iterates the inputs still
+ * fills it, which is the only kind of bot a honeypot ever stopped.
+ * ---------------------------------------------------------------------- */
+.trap { display: none; }
+
 .skip-link {
   position: absolute; top: 0; left: 0; z-index: 100;
   padding: 0.75rem 1.25rem;
@@ -1679,13 +1696,14 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible { outline: none
 
         <!-- STEP 1 : one contact method, captured on Continue -->
         <form class="step" id="js-step-1" novalidate>
-          <!-- Honeypot. Same field name as the pop-up page and the events
-               site, so one server-side check catches bots on all three. Lives
-               on the first step so a bot has to pass it before anything
-               else. -->
-          <div class="visually-hidden" aria-hidden="true">
-            <label for="ms-company">Company</label>
-            <input id="ms-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+          <!-- Honeypot. Hidden with display:none (see .trap) rather than
+               clipped, and deliberately not called "company": a clipped
+               field named company is filled by password managers, and the
+               server reads that as a bot. Lives on the first step so a bot
+               has to pass it before anything else. -->
+          <div class="trap">
+            <input id="ms-subject" name="subject2" type="text"
+                   tabindex="-1" autocomplete="off" />
           </div>
 
           <fieldset class="toggle">
@@ -2513,7 +2531,7 @@ const RSVP = (function () {
   const submitBtn   = $("#js-continue-name");
   const skipBtn     = $("#js-skip");
   const backBtn     = $("#js-back-contact");
-  const honeypot    = $("#ms-company");
+  const honeypot    = $("#ms-subject");
 
   let submitting = false;
 

@@ -72,8 +72,16 @@ export async function POST(request: Request) {
 
   const payload = body as Record<string, unknown>;
 
-  // Honeypot. Accept silently so bots learn nothing from the response.
+  // Honeypot. Accept silently so bots learn nothing from the response — but
+  // never silently to US. A trip throws a signup away while telling the
+  // visitor it worked, and the page's trap was a clipped field called
+  // "company" until 19 September, which password managers fill. If this
+  // appears in the logs, the trap is eating real people.
   if (typeof payload.company === "string" && payload.company.length > 0) {
+    console.warn(
+      "[popup] honeypot tripped — signup discarded. If this is a real person, " +
+      "the trap is being autofilled and must be changed.",
+    );
     return NextResponse.json({ ok: true, token: null }, { status: 200, headers: jsonHeaders });
   }
 

@@ -109,8 +109,18 @@ export async function POST(request: Request) {
 
   const payload = body as Record<string, unknown>;
 
-  // Honeypot. Accept silently so bots learn nothing from the response.
+  // Honeypot. Accept silently so bots learn nothing from the response —
+  // but never silently to US. A trip discards somebody's registration while
+  // telling them they are on the list, and the first version of this page
+  // did exactly that to real people: the field was clipped rather than
+  // display:none and called "company", so password managers filled it. If
+  // this line starts appearing in the logs with plausible names next to it,
+  // the trap is eating visitors again.
   if (typeof payload.company === "string" && payload.company.length > 0) {
+    console.warn(
+      "[model-search] honeypot tripped — registration discarded. If this is a " +
+      "real person, the trap is being autofilled and must be changed.",
+    );
     return NextResponse.json({ ok: true, token: null }, { status: 200, headers: jsonHeaders });
   }
 
