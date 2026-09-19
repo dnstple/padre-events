@@ -50,7 +50,7 @@ function safeEqual(a: string, b: string): boolean {
  * sheet, and one endpoint could be used to overwrite the other's data. The
  * scope is inside the signed payload, so it cannot be swapped.
  */
-export type RowScope = "rsvp" | "popup";
+export type RowScope = "rsvp" | "popup" | "models";
 
 /** Returns null when no secret is configured, which disables the feature. */
 export function issueRowToken(rowNumber: number, scope: RowScope = "rsvp"): string | null {

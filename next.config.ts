@@ -52,12 +52,18 @@ const nextConfig: NextConfig = {
    *     the two in a loop, which is exactly what happened the first time.
    *   - The page's asset paths are absolute (/popup/images/…, /popup/media/…)
    *     so it does not matter which of these URLs it is being served at.
+   *
+   * /model-search is the same arrangement for the same reasons: a static
+   * page in public/, reached without its trailing slash, with absolute asset
+   * paths of its own. It also borrows /popup/fonts and six of
+   * /popup/images — same origin, so nothing is duplicated.
    */
   async rewrites() {
     return {
       beforeFiles: [
         { source: "/", destination: "/popup/index.html" },
         { source: "/popup", destination: "/popup/index.html" },
+        { source: "/model-search", destination: "/model-search/index.html" },
       ],
       afterFiles: [],
       fallback: [],

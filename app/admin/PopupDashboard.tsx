@@ -18,7 +18,7 @@ import styles from "./admin.module.css";
 
 const POLL_INTERVAL_MS = 10_000;
 
-type Filter = "all" | "mobile" | "email" | "calendar" | "egg";
+type Filter = "all" | "popup" | "models" | "mobile" | "email" | "calendar" | "egg";
 
 type Payload = {
   ok: boolean;
@@ -34,6 +34,9 @@ const EMPTY_TOTALS: PopupTotals = {
   withEmail: 0,
   addedToCalendar: 0,
   eggSolved: 0,
+  fromPopup: 0,
+  fromModelSearch: 0,
+  newsletterOptIns: 0,
 };
 
 function formatTime(iso: string): string {
@@ -145,20 +148,27 @@ export default function PopupDashboard() {
     const needle = query.trim().toLowerCase();
 
     return rows.filter((row) => {
+      if (filter === "popup" && row.source !== "popup") return false;
+      if (filter === "models" && row.source !== "model-search") return false;
       if (filter === "mobile" && !row.phone) return false;
       if (filter === "email" && !row.email) return false;
       if (filter === "calendar" && !row.calendar) return false;
       if (filter === "egg" && !row.egg) return false;
       if (!needle) return true;
-      return [row.name, row.email, row.phone].join(" ").toLowerCase().includes(needle);
+      return [row.name, row.email, row.phone, row.instagram]
+        .join(" ").toLowerCase().includes(needle);
     });
   }, [rows, query, filter]);
 
   const totalCards: { label: string; value: number; primary?: boolean }[] = [
     { label: "Signups", value: totals.signups, primary: true },
+    { label: "Pop-up", value: totals.fromPopup },
+    { label: "Model search", value: totals.fromModelSearch },
     { label: "Mobile numbers", value: totals.withMobile },
     { label: "Email addresses", value: totals.withEmail },
     { label: "Added to calendar", value: totals.addedToCalendar },
+    // The only people who may lawfully be mailed.
+    { label: "Newsletter opt-ins", value: totals.newsletterOptIns },
     { label: "Easter egg solved", value: totals.eggSolved },
   ];
 
@@ -207,6 +217,8 @@ export default function PopupDashboard() {
             {(
               [
                 ["all", "All"],
+                ["popup", "Pop-up"],
+                ["models", "Model search"],
                 ["mobile", "Mobile"],
                 ["email", "Email"],
                 ["calendar", "Calendar"],
@@ -295,9 +307,12 @@ export default function PopupDashboard() {
               <thead>
                 <tr>
                   <th scope="col">Submitted</th>
+                  <th scope="col">Source</th>
                   <th scope="col">Name</th>
                   <th scope="col">Mobile</th>
                   <th scope="col">Email</th>
+                  <th scope="col">Instagram</th>
+                  <th scope="col">Day</th>
                   <th scope="col">Calendar</th>
                   <th scope="col">Egg</th>
                 </tr>
@@ -306,9 +321,12 @@ export default function PopupDashboard() {
                 {visible.map((row) => (
                   <tr key={row.id}>
                     <td className={styles.cellTime}>{formatTime(row.created_at)}</td>
+                    <td>{row.source === "model-search" ? "Model search" : "Pop-up"}</td>
                     <td className={styles.cellName}>{row.name}</td>
                     <td>{row.phone || <span className={styles.none}>—</span>}</td>
                     <td>{row.email || <span className={styles.none}>—</span>}</td>
+                    <td>{row.instagram || <span className={styles.none}>—</span>}</td>
+                    <td>{row.day || <span className={styles.none}>—</span>}</td>
                     <td>
                       <CalendarTag taken={Boolean(row.calendar)} />
                     </td>
@@ -331,6 +349,10 @@ export default function PopupDashboard() {
                   <div className={styles.recordMeta}>
                     <span>{formatTime(row.created_at)}</span>
                     <span>{row.phone || row.email}</span>
+                    {/* Which page they came from, and — for the model
+                        search — the handle, which is how they are looked up. */}
+                    <span>{row.source === "model-search" ? "Model search" : "Pop-up"}</span>
+                    {row.instagram ? <span>{row.instagram}</span> : null}
                   </div>
                 </li>
               ))}

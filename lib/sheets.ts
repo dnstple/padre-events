@@ -291,9 +291,58 @@ async function ensureTab(
       spreadsheetId,
     );
     if (!written.ok) throw new Error(`Sheets header write failed (${written.status})`);
+  } else {
+    await widenHeader(title, header, spreadsheetId);
   }
 
   knownTabs.add(cacheKey);
+}
+
+/** 1 → A, 9 → I. Only ever called with a single-letter column. */
+function columnLetter(index: number): string {
+  return String.fromCharCode(64 + index);
+}
+
+/**
+ * Labels the columns a tab gained after it was created.
+ *
+ * `ensureTab` writes a header only when it makes the tab, so a tab that
+ * already holds data keeps whatever header it was born with. The moment the
+ * code starts writing more columns than the sheet has labels for — which is
+ * exactly what the model-search fields do to a Signups tab that predates
+ * them — the new values arrive under blank headings and nobody reading the
+ * spreadsheet can tell what they are.
+ *
+ * Only the missing cells are written. Rewriting the whole row would be one
+ * line shorter and would quietly undo any heading the organiser had renamed
+ * by hand, which is their spreadsheet to rename.
+ *
+ * A header that cannot be read or written is not worth failing a signup
+ * over: the row still lands in the right columns either way.
+ */
+async function widenHeader(
+  title: string,
+  header: readonly string[],
+  spreadsheetId?: string,
+): Promise<void> {
+  const current = await sheetsFetch(
+    `/values/${encodeURIComponent(title)}!1:1?majorDimension=ROWS`,
+    undefined,
+    spreadsheetId,
+  );
+  if (!current.ok) return;
+
+  const data = (await current.json().catch(() => null)) as { values?: string[][] } | null;
+  const existing = data?.values?.[0] ?? [];
+  if (existing.length >= header.length) return;
+
+  await sheetsFetch(
+    `/values/${encodeURIComponent(title)}` +
+      `!${columnLetter(existing.length + 1)}1:${columnLetter(header.length)}1` +
+      `?valueInputOption=RAW`,
+    { method: "PUT", body: JSON.stringify({ values: [header.slice(existing.length)] }) },
+    spreadsheetId,
+  );
 }
 
 /* -----------------------------------------------------------------------------
@@ -310,16 +359,43 @@ async function ensureTab(
  */
 export const POPUP_TAB = process.env.GOOGLE_POPUP_SHEET_TAB ?? "Signups";
 
+/**
+ * Columns A–I.
+ *
+ * F to I arrived with the model search, and they were appended rather than
+ * slotted in where they read best. Everything already in the sheet keeps its
+ * column: the calendar flag stays at E, so `markPopupCalendarAdded` still
+ * aims at the right cell, and every row written before this change still
+ * lines up with its headings. Inserting "Source" at B would have been tidier
+ * to read and would have silently shifted every existing row's meaning by
+ * one column.
+ */
 export const POPUP_HEADER_ROW = [
   "Submitted at (UTC)",
   "Name",
   "Email",
   "Phone",
   "Added to calendar",
+  "Source",
+  "Instagram",
+  "Day",
+  "Newsletter",
 ] as const;
 
-/** Columns A–E. The calendar flag is E, filled in after the fact. */
+/** The calendar flag is E, filled in after the fact. */
 const POPUP_CALENDAR_COLUMN = "E";
+
+/** The last column the append writes. Keep in step with POPUP_HEADER_ROW. */
+const POPUP_LAST_COLUMN = "I";
+
+/**
+ * Which page a signup came from.
+ *
+ * Rows written before this column existed are blank, and blank means the
+ * pop-up — it was the only page posting to this sheet at the time. So the
+ * reader fills them in rather than showing a gap.
+ */
+export type SignupSource = "popup" | "model-search";
 
 function popupSheetId(): string {
   const id = process.env.GOOGLE_POPUP_SHEET_ID;
@@ -340,6 +416,18 @@ export type NewPopupSignup = {
   /** Exactly one of these is filled; the other column stays empty. */
   email: string;
   phone: string;
+  /** Defaults to the pop-up, which is what wrote every row before this. */
+  source?: SignupSource;
+  /** Model search only: "@handle", or "" when they did not give one. */
+  instagram?: string;
+  /** Model search only: which day they said they would come. */
+  day?: string;
+  /**
+   * Model search only. True ONLY when the visitor ticked the box — it is the
+   * lawful basis for mailing them, so it is never inferred from the fact
+   * that they registered.
+   */
+  newsletter?: boolean;
 };
 
 /**
@@ -349,6 +437,12 @@ export type NewPopupSignup = {
  * `valueInputOption: RAW` matters here: a number typed as `+44 7700 900123`
  * begins with a `+`, which the Sheets UI would read as a formula. RAW stores
  * it as the text it is.
+ *
+ * That is also why nothing here is prefixed with an apostrophe. The usual
+ * advice — escape any cell starting with `= + @ -` — is for USER_ENTERED,
+ * where Sheets parses what it is given. Under RAW it does not parse at all,
+ * so an apostrophe would not be an escape: it would be a literal apostrophe
+ * sitting in front of somebody's name.
  */
 export async function appendPopupSignup(
   entry: NewPopupSignup,
@@ -356,16 +450,24 @@ export async function appendPopupSignup(
   const id = popupSheetId();
   await ensureTab(POPUP_TAB, POPUP_HEADER_ROW, id);
 
+  const at = new Date().toISOString().replace("T", " ").slice(0, 19);
+
   const row = [
-    new Date().toISOString().replace("T", " ").slice(0, 19),
+    at,
     entry.name,
     entry.email,
     entry.phone,
     "",
+    entry.source ?? "popup",
+    entry.instagram ?? "",
+    entry.day ?? "",
+    // When consent was given, not just that it was. If these addresses are
+    // ever imported into a mailing list, the date is the evidence.
+    entry.newsletter ? `Yes — ${at}` : "",
   ];
 
   const response = await sheetsFetch(
-    `/values/${encodeURIComponent(POPUP_TAB)}!A:E:append` +
+    `/values/${encodeURIComponent(POPUP_TAB)}!A:${POPUP_LAST_COLUMN}:append` +
       `?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
     { method: "POST", body: JSON.stringify({ values: [row] }) },
     id,
@@ -413,7 +515,7 @@ export async function readPopupSignups(solvedRows?: Set<number>): Promise<PopupR
   const id = popupSheetId();
 
   const response = await sheetsFetch(
-    `/values/${encodeURIComponent(POPUP_TAB)}!A2:E?majorDimension=ROWS`,
+    `/values/${encodeURIComponent(POPUP_TAB)}!A2:${POPUP_LAST_COLUMN}?majorDimension=ROWS`,
     undefined,
     id,
   );
@@ -425,7 +527,20 @@ export async function readPopupSignups(solvedRows?: Set<number>): Promise<PopupR
   const rows = data.values ?? [];
 
   const parsed: PopupRow[] = rows.map((cells, index) => {
-    const [submittedAt = "", name = "", email = "", phone = "", calendar = ""] = cells;
+    // Sheets truncates trailing empty cells, so a row written before the
+    // model-search columns existed arrives five long, not nine. Every
+    // destructured default below is doing real work.
+    const [
+      submittedAt = "",
+      name = "",
+      email = "",
+      phone = "",
+      calendar = "",
+      source = "",
+      instagram = "",
+      day = "",
+      newsletter = "",
+    ] = cells;
     return {
       // The sheet row number, so the key is stable across refreshes.
       id: String(index + 2),
@@ -437,6 +552,11 @@ export async function readPopupSignups(solvedRows?: Set<number>): Promise<PopupR
       email,
       phone,
       calendar,
+      // Blank predates the column, and only the pop-up was writing here then.
+      source: source === "model-search" ? "model-search" : "popup",
+      instagram,
+      day,
+      newsletter,
       egg: solvedRows ? solvedRows.has(index + 2) : false,
     };
   });

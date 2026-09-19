@@ -60,13 +60,31 @@ export async function GET(request: Request) {
       return new Response("Export failed.", { status: 500, headers: textHeaders });
     }
 
+    // Source, Instagram, Day and Newsletter are empty for every pop-up row
+    // and that is the point: one export covers both pages, and the Newsletter
+    // column is the only thing that makes an address safe to import.
     const popupCsv = toCsv([
-      ["Submitted at (UTC)", "Name", "Email", "Phone", "Added to calendar", "Easter egg"],
+      [
+        "Submitted at (UTC)",
+        "Source",
+        "Name",
+        "Email",
+        "Phone",
+        "Instagram",
+        "Day",
+        "Newsletter",
+        "Added to calendar",
+        "Easter egg",
+      ],
       ...signups.map((row) => [
         row.created_at ? row.created_at.replace("T", " ").replace("Z", "") : "",
+        row.source,
         row.name,
         row.email,
         row.phone,
+        row.instagram,
+        row.day,
+        row.newsletter,
         row.calendar,
         row.egg ? "Solved" : "",
       ]),
