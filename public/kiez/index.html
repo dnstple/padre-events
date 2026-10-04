@@ -266,6 +266,10 @@
   }
   .hero__row .hero__rule { width: 1px; align-self: stretch; margin: 8px 0; padding: 0; background: rgba(244,241,234,.6); }
   .hero__overlay .rsvp-btn { margin-top: clamp(14px, 2vw, 22px); }
+  .hero__motto {
+    margin: clamp(12px, 1.6vw, 16px) 0 0; font-family: var(--serif); font-style: italic; font-weight: 400;
+    font-size: calc(var(--hero-small) * 1.1); letter-spacing: .04em; line-height: 1.2; color: rgba(244,241,234,.92);
+  }
 
 
   /* The RSVP button — the same in the hero and where it follows you down. */
@@ -468,22 +472,28 @@
   .dock .rsvp-btn { box-shadow: 0 8px 28px rgba(26,23,20,.22); }
   @media (prefers-reduced-motion: reduce) { .dock { transition: none; } }
 
-  .m-rsvp { display: none; }
-  @media (max-width: 767px) {
-    /* Fixed to the bottom of the screen. The hero fills the first screen,
-       so on landing this is the bottom of the photo. */
-    .m-rsvp {
-      display: block; position: fixed; z-index: 30;
-      left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
-    }
-    .m-rsvp .rsvp-btn { width: 100%; max-width: none; box-shadow: 0 8px 24px rgba(26,23,20,.22); }
-    #js-hero-rsvp, .dock { display: none; }
-
-    /* The facts sit just above the button. */
-    .hero__overlay { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
-    /* Room at the end of the page so the button never covers the footer. */
-    .foot__inner { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  /* One RSVP button, fixed to the bottom of the screen at every width. The
+     hero fills the first screen, so on landing it sits at the bottom of the
+     photo, over the brand line, which slides out from under it on scroll. */
+  .m-rsvp {
+    --btn-w: calc(100vw - 32px); --btn-bottom: calc(16px + env(safe-area-inset-bottom));
+    position: fixed; z-index: 30; left: 50%; bottom: var(--btn-bottom); width: var(--btn-w); transform: translateX(-50%);
   }
+  @media (min-width: 768px) { .m-rsvp { --btn-w: 360px; --btn-bottom: 28px; } }
+  .m-rsvp .rsvp-btn { width: 100%; max-width: none; box-shadow: 0 8px 24px rgba(26,23,20,.22); }
+  #js-hero-rsvp, .dock { display: none; }
+
+  /* The facts sit just above the button. */
+  .hero__overlay { padding-bottom: calc(var(--btn-bottom, 16px) + 76px); }
+  @media (min-width: 768px) { .hero__overlay { padding-bottom: 104px; } }
+  /* Exactly the fixed button's box. */
+  .hero__motto {
+    position: absolute; left: 50%; transform: translateX(-50%); width: calc(100vw - 32px); bottom: calc(16px + env(safe-area-inset-bottom));
+    height: 50px; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap;
+  }
+  @media (min-width: 768px) { .hero__motto { width: 360px; bottom: 28px; } }
+  /* Room at the end of the page so the button never covers the footer. */
+  .foot__inner { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
 
   /* The 65 puzzle */
   .egg { border: 1px solid var(--line-strong); padding: 0; width: min(520px, calc(100% - 32px)); background: var(--bone); color: var(--ink); }
@@ -548,6 +558,9 @@
         <li>108 GOLBORNE RD, W10</li>
       </ul>
       <button class="rsvp-btn when-upcoming" type="button" id="js-hero-rsvp" data-rsvp-open aria-haspopup="dialog">RSVP</button>
+      <!-- On phones this sits exactly behind the fixed RSVP button, so it is
+           hidden on landing and slides out from under it as the page scrolls. -->
+      <p class="hero__motto" id="js-hero-motto">A reflection of how we choose to live</p>
     </div>
   </div>
 </header>
@@ -881,6 +894,7 @@ async function postJson(path, body) {
    ========================================================================== */
 (function content() {
   $("#js-foot-line").textContent = CONFIG.brandLine;
+  $("#js-hero-motto").textContent = CONFIG.brandLine;
 
   // Phase: before or after the night.
   let phase = CONFIG.phase.mode;
