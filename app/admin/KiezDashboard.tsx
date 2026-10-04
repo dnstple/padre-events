@@ -17,6 +17,8 @@ const POLL_INTERVAL_MS = 10_000;
 
 type Totals = {
   rsvps: number;
+  plusOnes: number;
+  totalGuests: number;
   withMobile: number;
   withEmail: number;
   addedToCalendar: number;
@@ -25,7 +27,7 @@ type Totals = {
 
 type Payload = { ok: boolean; rows: KiezRow[]; totals: Totals; fetchedAt: string; message?: string };
 
-const EMPTY: Totals = { rsvps: 0, withMobile: 0, withEmail: 0, addedToCalendar: 0, photoDrop: 0 };
+const EMPTY: Totals = { rsvps: 0, plusOnes: 0, totalGuests: 0, withMobile: 0, withEmail: 0, addedToCalendar: 0, photoDrop: 0 };
 
 function formatTime(iso: string): string {
   if (!iso) return "—";
@@ -99,11 +101,13 @@ export default function KiezDashboard() {
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     if (!needle) return rows;
-    return rows.filter((row) => [row.name, row.email, row.phone].join(" ").toLowerCase().includes(needle));
+    return rows.filter((row) => [row.name, row.email, row.phone, ...row.plusOnes].join(" ").toLowerCase().includes(needle));
   }, [rows, query]);
 
   const cards = [
-    { label: "RSVPs", value: totals.rsvps, primary: true },
+    { label: "Total guests", value: totals.totalGuests, primary: true },
+    { label: "RSVPs", value: totals.rsvps },
+    { label: "Plus ones", value: totals.plusOnes },
     { label: "Mobile numbers", value: totals.withMobile },
     { label: "Email addresses", value: totals.withEmail },
     { label: "Added to calendar", value: totals.addedToCalendar },
@@ -173,6 +177,7 @@ export default function KiezDashboard() {
                   <th scope="col">Name</th>
                   <th scope="col">Mobile</th>
                   <th scope="col">Email</th>
+                  <th scope="col">Plus ones</th>
                   <th scope="col">Calendar</th>
                   <th scope="col">From</th>
                 </tr>
@@ -184,6 +189,7 @@ export default function KiezDashboard() {
                     <td className={styles.cellName}>{row.name}</td>
                     <td>{row.phone || <span className={styles.none}>—</span>}</td>
                     <td>{row.email || <span className={styles.none}>—</span>}</td>
+                    <td>{row.plusOnes.length ? row.plusOnes.join(", ") : <span className={styles.none}>—</span>}</td>
                     <td>
                       <YesNo yes={Boolean(row.calendar)} />
                     </td>
@@ -203,6 +209,7 @@ export default function KiezDashboard() {
                   <div className={styles.recordMeta}>
                     <span>{formatTime(row.created_at)}</span>
                     <span>{row.phone || row.email}</span>
+                    {row.plusOnes.length ? <span>+{row.plusOnes.length}: {row.plusOnes.join(", ")}</span> : null}
                   </div>
                 </li>
               ))}

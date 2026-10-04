@@ -4,7 +4,9 @@ import { emailError, normaliseEmail } from "@/lib/email-rules";
 import {
   appendKiezRsvp,
   isKiezSheetConfigured,
+  MAX_PLUS_ONES,
   readKiezExisting,
+  updateKiezPlusOnes,
   type KiezExisting,
 } from "@/lib/kiez-sheets";
 import {
@@ -96,6 +98,19 @@ export async function POST(request: Request) {
     phone = normalisePhone(payload.phone);
   }
 
+  // Plus-ones: names only, blanks dropped, each held to the same rules as
+  // the guest's own name, and no more than MAX_PLUS_ONES.
+  const rawGuests = Array.isArray(payload.plusOnes) ? payload.plusOnes : [];
+  const named = rawGuests.filter((g): g is string => typeof g === "string" && g.trim() !== "");
+  if (named.length > MAX_PLUS_ONES) {
+    return problem(422, `Up to ${MAX_PLUS_ONES} plus ones, please.`, { plusOnes: `Up to ${MAX_PLUS_ONES} plus ones, please.` });
+  }
+  for (let i = 0; i < named.length; i++) {
+    const message = nameError(named[i]);
+    if (message) return problem(422, `Plus one ${i + 1}: ${message}`, { plusOnes: `Plus one ${i + 1}: ${message}` });
+  }
+  const plusOnes = named.map((g) => normaliseName(g));
+
   if (!isKiezSheetConfigured()) {
     return problem(503, "RSVPs are not available right now.");
   }
@@ -112,7 +127,10 @@ export async function POST(request: Request) {
     (async (): Promise<Result> => {
       const existing = await readKiezExisting(test);
       const match = matchExisting(existing, requestId, email, phone);
-      if (match) return { rowNumber: match.rowNumber };
+      if (match) {
+        await updateKiezPlusOnes(match.rowNumber, plusOnes, test);
+        return { rowNumber: match.rowNumber };
+      }
 
       return appendKiezRsvp({
         name: normaliseName(String(payload.name)),
@@ -122,6 +140,7 @@ export async function POST(request: Request) {
         referrer: cleanReferrer(payload.referrer),
         campaign: cleanCampaign(payload.utm),
         requestId,
+        plusOnes,
         test,
       });
     })();

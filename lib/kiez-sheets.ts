@@ -45,7 +45,11 @@ function tabFor(kind: "rsvp" | "photo", test: boolean): string {
   return test ? `${base} (test)` : base;
 }
 
-/** Columns A–J. The calendar flag is G, filled in after the fact. */
+/**
+ * Columns A–U. The calendar flag is G, filled in after the fact. K and L–U
+ * (the plus-ones) were added after the first rows; widenHeader labels them
+ * on a tab that predates them, and older rows simply leave them blank.
+ */
 const KIEZ_HEADER_ROW = [
   "Submitted at (UTC)",
   "Event",
@@ -57,9 +61,15 @@ const KIEZ_HEADER_ROW = [
   "Referrer",
   "Campaign (UTM)",
   "Request ID",
+  "Plus ones",
+  ...Array.from({ length: 10 }, (_, i) => `Plus one ${i + 1}`),
 ] as const;
 
-const LAST_COLUMN = "J";
+/** At most this many plus-ones per RSVP. */
+export const MAX_PLUS_ONES = 10;
+
+const LAST_COLUMN = "U";
+const PLUS_ONES_FIRST = "K";
 const CALENDAR_COLUMN = "G";
 
 const PHOTO_HEADER_ROW = ["Submitted at (UTC)", "Event", "Email", "Request ID"] as const;
@@ -73,6 +83,8 @@ export type NewKiezRsvp = {
   referrer: string;
   campaign: string;
   requestId: string;
+  /** Names only, already validated; at most MAX_PLUS_ONES. */
+  plusOnes: string[];
   test: boolean;
 };
 
@@ -137,6 +149,7 @@ export async function appendKiezRsvp(entry: NewKiezRsvp): Promise<{ rowNumber: n
     entry.referrer,
     entry.campaign,
     entry.requestId,
+    ...plusOneCells(entry.plusOnes),
   ];
 
   // RAW, for the reason given on appendPopupSignup: "+44…" stays text.
@@ -152,6 +165,29 @@ export async function appendKiezRsvp(entry: NewKiezRsvp): Promise<{ rowNumber: n
     | { updates?: { updatedRange?: string } }
     | null;
   return { rowNumber: rowFromRange(data?.updates?.updatedRange) };
+}
+
+/** K is the count, L–U the names, blanks after the last one. */
+function plusOneCells(names: string[]): string[] {
+  const list = names.slice(0, MAX_PLUS_ONES);
+  return [String(list.length), ...Array.from({ length: MAX_PLUS_ONES }, (_, i) => list[i] ?? "")];
+}
+
+/**
+ * Rewrites the plus-ones on a row that already exists — the same guest
+ * coming back to add a friend, or a retry of the same submission. Their
+ * latest list replaces the earlier one.
+ */
+export async function updateKiezPlusOnes(rowNumber: number, plusOnes: string[], test: boolean): Promise<void> {
+  const id = kiezSheetId();
+  const tab = tabFor("rsvp", test);
+  await ensureTab(tab, KIEZ_HEADER_ROW, id);
+  const response = await sheetsFetch(
+    `/values/${encodeURIComponent(tab)}!${PLUS_ONES_FIRST}${rowNumber}:${LAST_COLUMN}${rowNumber}?valueInputOption=RAW`,
+    { method: "PUT", body: JSON.stringify({ values: [plusOneCells(plusOnes)] }) },
+    id,
+  );
+  if (!response.ok) throw new Error(`Kiez plus-ones update failed (${response.status})`);
 }
 
 /** Same honesty as markPopupCalendarAdded: the button was pressed, no more. */
@@ -214,6 +250,7 @@ export type KiezRow = {
   calendar: string;
   referrer: string;
   campaign: string;
+  plusOnes: string[];
 };
 
 /** Every real RSVP for the night, newest first. Never reads the test tab. */
@@ -232,6 +269,7 @@ export async function readKiezRsvps(): Promise<KiezRow[]> {
     .map((cells, index) => {
       const [at = "", , name = "", method = "", email = "", phone = "", calendar = "", referrer = "", campaign = ""] =
         cells;
+      const plusOnes = cells.slice(11, 11 + MAX_PLUS_ONES).filter((n) => n && n.trim());
       return {
         id: String(index + 2),
         created_at: at ? `${at.replace(" ", "T")}Z` : "",
@@ -242,6 +280,7 @@ export async function readKiezRsvps(): Promise<KiezRow[]> {
         calendar,
         referrer,
         campaign,
+        plusOnes,
       };
     })
     .filter((row) => row.name)

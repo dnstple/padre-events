@@ -41,6 +41,8 @@ export async function GET() {
     const [rows, photoDrop] = await Promise.all([readKiezRsvps(), countKiezPhotoDrop()]);
     const totals = {
       rsvps: rows.length,
+      plusOnes: rows.reduce((n, r) => n + r.plusOnes.length, 0),
+      totalGuests: rows.reduce((n, r) => n + 1 + r.plusOnes.length, 0),
       withMobile: rows.filter((r) => r.phone).length,
       withEmail: rows.filter((r) => r.email).length,
       addedToCalendar: rows.filter((r) => r.calendar).length,

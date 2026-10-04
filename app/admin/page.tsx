@@ -37,7 +37,7 @@ const EVENTS = [
     key: "kiez",
     label: "Kiez",
     title: "Padre65 × Kiez",
-    meta: "Saturday 17 October 2026 · From 21:00 · 108 Golborne Road, London W10 5PS",
+    meta: "Saturday 17 October 2026 · From 21:30 · 108 Golborne Road, London W10 5PS",
   },
   {
     key: "popup",

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Padre65 × Kiez — One Night. Saturday 17 October 2026</title>
-<meta name="description" content="Padre65 takes over Kiez for one Saturday. Music from nine. Kitchen and bar open late. Saturday 17 October 2026, 108 Golborne Road, London W10 5PS." />
+<meta name="description" content="Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late. Saturday 17 October 2026, 108 Golborne Road, London W10 5PS." />
 <meta name="robots" content="index, follow" />
 <meta name="theme-color" content="#A02C2C" />
 <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -19,16 +19,16 @@
 <meta property="og:locale" content="en_GB" />
 <meta property="og:url" content="https://events.padre65.com/" />
 <meta property="og:title" content="Padre65 × Kiez — One Night." />
-<meta property="og:description" content="Padre65 takes over Kiez for one Saturday. Music from nine. Kitchen and bar open late. Saturday 17 October, from 21:00." />
+<meta property="og:description" content="Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late. Saturday 17 October, from 21:30." />
 <meta property="og:image" content="https://events.padre65.com/kiez/images/og.jpg" />
 <meta property="og:image:secure_url" content="https://events.padre65.com/kiez/images/og.jpg" />
 <meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Padre65 × Kiez — One Night. Saturday 17 October 2026, from 21:00, 108 Golborne Road, W10." />
+<meta property="og:image:alt" content="Padre65 at Kiez. Saturday 17 October 2026, from 21:30, 108 Golborne Rd, W10, over a photo of guests at the last Padre65 party." />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Padre65 × Kiez — One Night." />
-<meta name="twitter:description" content="Saturday 17 October 2026, from 21:00. 108 Golborne Road, London W10 5PS." />
+<meta name="twitter:description" content="Saturday 17 October 2026, from 21:30. 108 Golborne Road, London W10 5PS." />
 <meta name="twitter:image" content="https://events.padre65.com/kiez/images/og.jpg" />
 
 <!-- Confirmed facts only: no end time, no price, no capacity. -->
@@ -37,8 +37,8 @@
   "@context": "https://schema.org",
   "@type": "Event",
   "name": "Padre65 × Kiez — One Night.",
-  "description": "Padre65 takes over Kiez for one Saturday. Music from nine. Kitchen and bar open late.",
-  "startDate": "2026-10-17T21:00:00+01:00",
+  "description": "Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late.",
+  "startDate": "2026-10-17T21:30:00+01:00",
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
   "url": "https://events.padre65.com/",
@@ -352,6 +352,23 @@
   .field input[aria-invalid="true"] { border-color: var(--red); box-shadow: 0 0 0 1px var(--red); }
   .field__error { margin: 6px 0 0; font-size: var(--small); color: var(--red-deep); min-height: 1.3em; }
   .form__submit { display: flex; justify-content: center; margin-top: 10px; }
+  .guests { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .guests__legend { padding: 0; margin-bottom: 12px; font-size: var(--small); }
+  .guests__legend span { color: var(--muted); }
+  .guests__list { display: grid; gap: 10px; }
+  .guests__list .field input { min-height: 46px; }
+  .guests__list .field__error { min-height: 0; }
+  .guests__add {
+    margin: 12px 0 4px; padding: 8px 0; min-height: 40px; background: none; border: 0;
+    font-size: var(--small); color: var(--red); text-decoration: underline; text-underline-offset: 4px;
+  }
+  .form__back { margin: 8px 0 0; text-align: center; }
+  .form__back button { background: none; border: 0; min-height: 40px; font-size: var(--small); color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+  @media (max-width: 480px) {
+    /* Three steps do not fit in words on a phone: the current one keeps its
+       label, the others show their number. */
+    .steps li:not([aria-current="step"]) .steps__t { display: none; }
+  }
   .form__submit .btn { min-width: min(320px, 100%); }
   .form__error { margin: 16px auto 0; max-width: 560px; text-align: center; color: var(--red-deep); font-size: var(--small); }
   .form__note { margin: 18px 0 0; text-align: center; font-size: var(--small); color: var(--muted); }
@@ -553,7 +570,7 @@
     <div class="hero__overlay-inner">
       <p class="hero__date">SATURDAY 17 OCTOBER 2026</p>
       <ul class="hero__row" aria-label="Time and place">
-        <li>FROM 21:00</li>
+        <li>FROM 21:30</li>
         <li class="hero__rule" aria-hidden="true"></li>
         <li>108 GOLBORNE RD, W10</li>
       </ul>
@@ -575,7 +592,7 @@
   <div class="wrap">
     <div class="night__grid" data-reveal>
       <h2 class="h2" id="night-heading">The night.</h2>
-      <p class="night__copy">Padre65 takes over Kiez for one Saturday. Music from nine. Kitchen and bar open late.</p>
+      <p class="night__copy">Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late.</p>
     </div>
 
     <!-- Built, and hidden until CONFIG.audio.src names a real, authorised
@@ -657,7 +674,7 @@
   <div class="wrap">
     <hr class="closing__rule" />
     <h2 class="closing__title" id="closing-heading" data-reveal>See you on the 17th.</h2>
-    <p class="closing__meta">Padre65 × Kiez · 17 October · From 21:00</p>
+    <p class="closing__meta">Padre65 × Kiez · 17 October · From 21:30</p>
   </div>
 </section>
 <div class="when-past" style="height: var(--section)"></div>
@@ -691,9 +708,11 @@
     <button class="rsvp-dlg__close" type="button" id="js-rsvp-close">Close</button>
     <h2 class="h2" id="rsvp-heading">See you there?</h2>
     <ol class="steps label" aria-label="Progress">
-      <li id="js-step-1" aria-current="step"><span class="steps__n">01</span><span>Your details</span></li>
+      <li id="js-step-1" aria-current="step"><span class="steps__n">01</span><span class="steps__t">Your details</span></li>
       <li class="steps__line" aria-hidden="true"></li>
-      <li id="js-step-2"><span class="steps__n">02</span><span>You’re in</span></li>
+      <li id="js-step-2"><span class="steps__n">02</span><span class="steps__t">Plus ones</span></li>
+      <li class="steps__line" aria-hidden="true"></li>
+      <li id="js-step-3"><span class="steps__n">03</span><span class="steps__t">You’re in</span></li>
     </ol>
 
     <form class="form" id="js-form" novalidate>
@@ -703,7 +722,7 @@
         <input id="kiez-subject" name="subject2" type="text" tabindex="-1" autocomplete="off" />
       </div>
 
-      <div class="fields">
+      <div class="fields" id="js-stage-details">
         <div class="field">
           <label for="rsvp-name">Your name</label>
           <input id="rsvp-name" name="name" type="text" autocomplete="name" maxlength="160" required aria-describedby="rsvp-name-error" />
@@ -716,16 +735,24 @@
         </div>
       </div>
 
+      <!-- Stage two: up to ten plus-ones, all optional. Three to start. -->
+      <fieldset class="guests" id="js-stage-guests" hidden>
+        <legend class="guests__legend">Names of your plus ones <span>(optional, up to 10)</span></legend>
+        <div class="guests__list" id="js-guests"></div>
+        <button class="guests__add" type="button" id="js-guest-add">+ Add another</button>
+      </fieldset>
+
       <div class="form__submit">
-        <button class="btn" type="submit" id="js-submit">RSVP</button>
+        <button class="btn" type="submit" id="js-submit">Next</button>
       </div>
+      <p class="form__back" id="js-back-wrap" hidden><button type="button" id="js-back">← Back</button></p>
       <p class="form__error" id="js-form-error" role="alert" hidden></p>
       <p class="form__note">Used for this event only. <a href="https://padre65.com/policies/privacy-policy" target="_blank" rel="noopener">Privacy policy</a></p>
     </form>
 
     <div class="done" id="js-done" hidden>
       <h3 class="done__title" id="js-done-title" tabindex="-1">You’re in.</h3>
-      <p class="done__facts">Saturday 17 October 2026 · From 21:00 · Kiez, 108 Golborne Road, London W10 5PS</p>
+      <p class="done__facts">Saturday 17 October 2026 · From 21:30 · Kiez, 108 Golborne Road, London W10 5PS</p>
       <div class="done__actions">
         <button class="btn" type="button" id="js-cal">Add to calendar</button>
         <button class="btn btn--ghost" type="button" id="js-share">Share your invitation</button>
@@ -776,17 +803,17 @@
    1. CONFIG — the one place the night is described
    Dates are ISO and times are wall-clock in `timezone`. The UTC offset is
    resolved at runtime from the timezone database, never typed by hand:
-   21:00 on 17 October 2026 is BST, so 20:00 UTC.
+   21:30 on 17 October 2026 is BST, so 20:30 UTC.
    ========================================================================== */
 const CONFIG = {
   event: {
     id: "padre65-kiez-2026-10-17",
     name: "Padre65 × Kiez",
     title: "Padre65 × Kiez — One Night.",
-    description: "Padre65 takes over Kiez for one Saturday. Music from nine. Kitchen and bar open late.",
+    description: "Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late.",
     timezone: "Europe/London",
     date: "2026-10-17",
-    start: "21:00",
+    start: "21:30",
     /** NOT CONFIRMED. Leave null until Padre confirms a finish time. With
      *  null, the calendar entry is start-only rather than an invented length. */
     end: null,
@@ -838,7 +865,7 @@ const CONFIG = {
   share: {
     image: "/kiez/images/invitation.jpg",
     imageName: "padre65-kiez-invitation.jpg",
-    text: "Padre65 × Kiez — One Night. Saturday 17 October, from 21:00."
+    text: "Padre65 × Kiez — One Night. Saturday 17 October, from 21:30."
   },
 
   gallery: [
@@ -1065,7 +1092,7 @@ const Calendar = (function () {
     const asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
     return (asUtc - utcDate.getTime()) / 60000;
   }
-  /** "2026-10-17" + "21:00" in Europe/London → the true UTC instant. */
+  /** "2026-10-17" + "21:30" in Europe/London → the true UTC instant. */
   function zonedToUtc(dateStr, timeStr, tz) {
     const [y, m, d] = dateStr.split("-").map(Number);
     const [hh, mm] = timeStr.split(":").map(Number);
@@ -1153,6 +1180,13 @@ const RSVP = (function () {
   const formError = $("#js-form-error");
   const honeypot = $("#kiez-subject");
   const status = $("#js-done-status");
+  const stageDetails = $("#js-stage-details");
+  const stageGuests = $("#js-stage-guests");
+  const guestList = $("#js-guests");
+  const addBtn = $("#js-guest-add");
+  const backWrap = $("#js-back-wrap");
+  const MAX_GUESTS = 10;
+  let stage = "details";
 
   let token = null;
   let busy = false;
@@ -1202,12 +1236,50 @@ const RSVP = (function () {
     };
   }
 
+  /* ---- Plus ones ---- */
+  function addGuest(focus) {
+    const count = guestList.children.length;
+    if (count >= MAX_GUESTS) return;
+    const n = count + 1;
+    const wrap = document.createElement("div");
+    wrap.className = "field";
+    wrap.innerHTML =
+      '<label for="guest-' + n + '">Plus one ' + n + '</label>' +
+      '<input id="guest-' + n + '" type="text" autocomplete="off" maxlength="160" aria-describedby="guest-' + n + '-error" />' +
+      '<p class="field__error" id="guest-' + n + '-error" aria-live="polite"></p>';
+    guestList.appendChild(wrap);
+    const input = wrap.querySelector("input");
+    input.addEventListener("input", () => { if (input.getAttribute("aria-invalid")) setError(input, ""); });
+    addBtn.hidden = guestList.children.length >= MAX_GUESTS;
+    if (focus) input.focus();
+  }
+  for (let i = 0; i < 3; i++) addGuest(false);
+  addBtn.addEventListener("click", () => addGuest(true));
+  const guestInputs = () => $$("input", guestList);
+
+  function setStep(n) {
+    ["#js-step-1", "#js-step-2", "#js-step-3"].forEach((id, i) => {
+      if (i + 1 === n) $(id).setAttribute("aria-current", "step"); else $(id).removeAttribute("aria-current");
+    });
+  }
+
+  function showStage(which) {
+    stage = which;
+    stageDetails.hidden = which !== "details";
+    stageGuests.hidden = which !== "guests";
+    backWrap.hidden = which !== "guests";
+    submit.textContent = which === "details" ? "Next" : "RSVP";
+    formError.hidden = true;
+    setStep(which === "details" ? 1 : 2);
+    setTimeout(() => (which === "details" ? name : guestInputs()[0]).focus(), 30);
+  }
+  $("#js-back").addEventListener("click", () => showStage("details"));
+
   function showDone() {
     form.hidden = true;
     done.hidden = false;
     done.classList.add("is-entering");
-    $("#js-step-1").removeAttribute("aria-current");
-    $("#js-step-2").setAttribute("aria-current", "step");
+    setStep(3);
     $("#js-gcal").href = Calendar.googleUrl();
     document.dispatchEvent(new CustomEvent("kiez:rsvp-done"));
     setTimeout(() => $("#js-done-title").focus(), 30);
@@ -1223,9 +1295,28 @@ const RSVP = (function () {
     const contactMsg = emailError(contact.value);
     if (nameMsg) setError(name, nameMsg);
     if (contactMsg) setError(contact, contactMsg);
-    if (nameMsg || contactMsg) { (nameMsg ? name : contact).focus(); return; }
+    if (nameMsg || contactMsg) {
+      if (stage !== "details") showStage("details");
+      (nameMsg ? name : contact).focus();
+      return;
+    }
 
-    const details = { name: norm(name.value), method: m, value: String(contact.value).trim() };
+    // Stage one done: on to the plus ones. Nothing is sent yet.
+    if (stage === "details") { showStage("guests"); return; }
+
+    // Blank rows are simply skipped; anything typed is checked like a name.
+    let badGuest = null;
+    const plusOnes = [];
+    guestInputs().forEach((input) => {
+      setError(input, "");
+      if (!norm(input.value)) return;
+      const msg = nameError(input.value);
+      if (msg) { setError(input, msg); badGuest = badGuest || input; }
+      else plusOnes.push(norm(input.value));
+    });
+    if (badGuest) { badGuest.focus(); return; }
+
+    const details = { name: norm(name.value), method: m, value: String(contact.value).trim(), plusOnes: plusOnes };
     const fingerprint = JSON.stringify(details);
     if (fingerprint !== requestFor) { requestId = uuid(); requestFor = fingerprint; }
 
@@ -1248,6 +1339,7 @@ const RSVP = (function () {
         email: m === "email" ? details.value : "",
         phone: m === "mobile" ? details.value : "",
         requestId: requestId,
+        plusOnes: plusOnes,
         referrer: document.referrer || "",
         utm: utm(),
         website: honeypot.value,
@@ -1270,9 +1362,14 @@ const RSVP = (function () {
     if (!result.ok) {
       const data = result.data || {};
       const errors = data.errors || {};
-      if (errors.name) setError(name, errors.name);
-      if (errors.contact) setError(contact, errors.contact);
-      if (errors.name || errors.contact) { (errors.name ? name : contact).focus(); return; }
+      if (errors.name || errors.contact) {
+        // Their own details are wrong, and those live on stage one.
+        showStage("details");
+        if (errors.name) setError(name, errors.name);
+        if (errors.contact) setError(contact, errors.contact);
+        setTimeout(() => (errors.name ? name : contact).focus(), 40);
+        return;
+      }
       formError.textContent = data.message || "We could not save your RSVP. Please try again.";
       formError.hidden = false;
       return;
