@@ -104,7 +104,7 @@
 
     --max: 1280px;
     --gutter: clamp(16px, 4.2vw, 56px);
-    --section: clamp(72px, 10vw, 144px);
+    --section: clamp(48px, 6vw, 88px);
 
     --h2: clamp(2.75rem, 1.6rem + 4.4vw, 5.25rem);
     --body: clamp(0.98rem, 0.94rem + 0.2vw, 1.0625rem);
@@ -201,68 +201,65 @@
   }
 
   /* ==========================================================================
-     A. HERO — the only red surface on the page
+     A. HERO — the invitation card
+     A dark band carries the logo and fades into the photograph, so nothing
+     sits over the two caps; the red panel below carries the facts.
      ======================================================================== */
-  .hero { background: var(--red); color: var(--cream); padding-bottom: clamp(28px, 4vw, 44px); }
-  .nav {
-    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    min-height: 64px; border-bottom: 1px solid var(--cream-line);
-    position: relative;
+  .hero { padding: 0; }
+  @media (min-width: 600px) { .hero { padding: clamp(24px, 4vw, 48px) var(--gutter) 0; } }
+  .card { --band: #343D38; position: relative; container-type: inline-size; margin: 0 auto;
+    /* On a desktop the whole card, RSVP included, fits the first screen. */
+    width: min(100%, max(360px, min(560px, calc((100svh - 420px) / 1.1)))); background: var(--band); color: var(--cream); overflow: hidden; }
+  .card__title { margin: 0; position: absolute; z-index: 2; inset: 0 0 auto; padding: clamp(22px, 6cqw, 34px) 7% 0; text-align: center; font-weight: 400; }
+  .card__logo { display: block; width: 100%; height: auto; color: var(--cream); }
+  .card__logo svg { display: block; width: 100%; height: auto; }
+  .card__at {
+    display: block; margin-top: clamp(8px, 2.4cqw, 14px);
+    font-family: var(--serif); font-weight: 500; font-size: clamp(1.4rem, 7cqw, 2.3rem); line-height: 1;
+    letter-spacing: .2em; padding-left: .2em; text-transform: uppercase;
   }
-  .nav__links { display: flex; gap: clamp(18px, 2.4vw, 36px); list-style: none; margin: 0; padding: 0; }
-  .nav__links a { text-decoration: none; font-size: var(--label); letter-spacing: .2em; text-transform: uppercase; padding: 10px 0; display: inline-block; }
-  .nav__links a:hover { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
-  /* The grid's equal side columns keep the mark on the true centre line
-     however wide the links on the left are. */
-  .nav__brand { grid-column: 2; display: block; color: var(--cream); padding: 10px 4px; }
-  .nav__brand svg { display: block; width: auto; height: 17px; }
-  .nav__end { grid-column: 3; justify-self: end; display: flex; align-items: center; }
-  .sixtyfive {
-    background: none; border: 0; padding: 10px 2px 10px 12px; min-width: 44px; min-height: 44px;
-    font-family: var(--serif); font-weight: 500; font-size: 1.05rem; letter-spacing: .04em;
-    font-variant-numeric: lining-nums; color: inherit;
+  .card__at em { font-style: italic; text-transform: none; letter-spacing: .02em; font-weight: 400; font-size: .8em; margin-right: .35em; }
+  /* The band is part of the photo's own frame: the logo needs that much
+     room above the caps, and the mask fades the photo in beneath it. */
+  .card__photo { position: relative; margin: 0; padding-top: clamp(118px, 34cqw, 190px); }
+  .card__photo img {
+    display: block; width: 100%; height: auto; aspect-ratio: 660 / 729; object-fit: cover;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16%); mask-image: linear-gradient(to bottom, transparent 0, #000 16%);
   }
-  @media (max-width: 899px) { .nav__links { display: none; } }
-
-  .hero__head { text-align: center; padding-top: clamp(28px, 4vw, 48px); }
-  .hero__title {
-    font-family: var(--serif); font-weight: 700;
-    /* One line at every width: sized to the viewport, capped on wide screens. */
-    font-size: min(12.8vw, 11.4rem);
-    line-height: .9; letter-spacing: -0.015em; margin: 0; white-space: nowrap;
+  .card__photo::after { content: ""; position: absolute; inset: auto 0 0; height: 30%; background: linear-gradient(to bottom, rgba(26,23,20,0), rgba(26,23,20,.62)); pointer-events: none; }
+  .card__caption {
+    position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(14px, 4cqw, 24px); text-align: center;
+    font-family: var(--serif); font-size: clamp(1.3rem, 5.6cqw, 1.75rem); line-height: 1.2; padding: 0 16px;
+  }
+  .card__panel { background: var(--red); padding: clamp(16px, 4.5cqw, 24px) clamp(18px, 6cqw, 32px) clamp(20px, 5.5cqw, 28px); text-align: center; }
+  .card__date {
+    margin: 0; padding-bottom: clamp(12px, 3.4cqw, 16px); border-bottom: 1px solid var(--cream-line);
+    font-family: var(--serif); font-weight: 500; font-size: clamp(1.02rem, 5.2cqw, 1.55rem); letter-spacing: .16em; line-height: 1.2; white-space: nowrap;
     font-variant-numeric: lining-nums;
   }
-  .facts {
-    display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center;
-    margin: clamp(18px, 2.4vw, 28px) 0 clamp(28px, 4vw, 44px);
-    border-top: 1px solid var(--cream-line); border-bottom: 1px solid var(--cream-line);
-    list-style: none; padding: 0;
+  .card__row {
+    display: grid; grid-template-columns: auto auto auto; justify-content: center; column-gap: clamp(12px, 4.5cqw, 22px);
+    align-items: center; list-style: none; margin: 0; padding: 0;
+    border-bottom: 1px solid var(--cream-line);
   }
-  .facts li { padding: 14px 8px; text-align: center; font-size: clamp(.68rem, .62rem + .2vw, .78rem); letter-spacing: .2em; text-transform: uppercase; }
-  .facts .facts__rule { width: 1px; height: 22px; background: var(--cream-line); padding: 0; }
-  @media (min-width: 768px) and (max-width: 1099px) {
-    .facts li { white-space: nowrap; letter-spacing: .12em; padding: 14px 4px; }
+  .card__row li {
+    padding: clamp(10px, 3cqw, 14px) 4px; white-space: nowrap;
+    font-family: var(--serif); font-weight: 500; font-size: clamp(.78rem, 3.7cqw, 1.05rem); letter-spacing: .14em;
+    font-variant-numeric: lining-nums;
   }
-  @media (max-width: 767px) {
-    .facts li { white-space: nowrap; font-size: 2.15vw; letter-spacing: .05em; padding: 11px 0; }
-    .facts .facts__rule { height: 14px; margin: 0 2vw; }
+  .card__row .card__rule { width: 1px; align-self: stretch; margin: 8px 0; padding: 0; background: var(--cream-line); }
+  .card__rsvp {
+    display: block; width: min(100%, 300px); margin: clamp(14px, 4cqw, 18px) auto 0; min-height: 48px;
+    background: transparent; color: var(--cream); border: 1px solid rgba(244,241,234,.75); border-radius: 0;
+    font-family: var(--serif); font-weight: 500; font-size: 1rem; letter-spacing: .32em; padding-left: .32em;
+    transition: background .25s var(--ease), color .25s var(--ease);
   }
-
-  .hero__photo { width: min(460px, 82vw); margin: 0 auto; aspect-ratio: 1; background: var(--red-deep); }
-  .hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
-  .hero__caption {
-    width: min(760px, 100%); margin: clamp(22px, 3vw, 32px) auto 0;
-    border-top: 1px solid var(--cream-line); border-bottom: 1px solid var(--cream-line);
-    padding: 10px 0 12px; text-align: center;
-    font-family: var(--serif); font-weight: 400; font-size: clamp(1.25rem, 1rem + .9vw, 1.7rem); line-height: 1.25;
-  }
-  .hero__line { text-align: center; margin: 14px 0 0; letter-spacing: .28em; }
-  @media (max-width: 480px) { .hero__line { letter-spacing: .12em; font-size: .625rem; } }
+  .card__rsvp:hover { background: var(--cream); color: var(--red); }
 
   /* ==========================================================================
      B. THE NIGHT + MUSIC
      ======================================================================== */
-  .night { padding: var(--section) 0 clamp(48px, 6vw, 80px); }
+  .night { padding: var(--section) 0 0; }
   .night__grid { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: end; }
   .night__copy { margin: 0; max-width: 34ch; font-size: clamp(1rem, .95rem + .25vw, 1.125rem); }
   @media (min-width: 768px) {
@@ -294,21 +291,32 @@
   /* ==========================================================================
      C. RSVP
      ======================================================================== */
-  .rsvp { background: var(--oat); padding: clamp(64px, 8vw, 112px) 0; }
-  .rsvp .h2 { text-align: center; }
+  .rsvp-dlg {
+    border: 0; padding: 0; width: min(640px, calc(100% - 24px)); max-height: calc(100% - 24px);
+    background: var(--oat); color: var(--ink); overflow: auto;
+  }
+  .rsvp-dlg::backdrop { background: rgba(26,23,20,.62); }
+  .rsvp-dlg[open] { animation: rise .45s var(--ease) both; }
+  @media (prefers-reduced-motion: reduce) { .rsvp-dlg[open] { animation: none; } }
+  .rsvp-dlg__inner { position: relative; padding: clamp(44px, 7vw, 56px) clamp(18px, 5vw, 44px) clamp(24px, 5vw, 40px); }
+  .rsvp-dlg__close {
+    position: absolute; top: 6px; right: 8px; min-width: 44px; min-height: 44px; background: none; border: 0;
+    font-size: var(--label); letter-spacing: .2em; text-transform: uppercase;
+  }
+  .rsvp-dlg .h2 { text-align: center; font-size: clamp(2.3rem, 1.6rem + 3vw, 3.6rem); }
   .steps {
     display: flex; align-items: center; justify-content: center; gap: 14px;
-    margin: 18px auto clamp(28px, 4vw, 40px); padding: 0; list-style: none; color: var(--muted);
+    margin: 14px auto clamp(20px, 3vw, 28px); padding: 0; list-style: none; color: var(--muted);
   }
-  .steps li { display: flex; gap: 10px; align-items: baseline; }
+  .steps li { display: flex; gap: 8px; align-items: baseline; white-space: nowrap; }
+  @media (max-width: 480px) { .steps { gap: 10px; letter-spacing: .12em; } .steps__line { width: 28px !important; } }
   .steps__n { color: var(--red); }
   .steps__line { width: clamp(40px, 10vw, 120px); height: 1px; background: var(--line-strong); }
   .steps li[aria-current="step"] { color: var(--ink); }
 
   .form { max-width: 900px; margin: 0 auto; }
 
-  .fields { display: grid; grid-template-columns: 1fr; gap: 16px; }
-  @media (min-width: 768px) { .fields { grid-template-columns: 1fr 1fr; gap: 24px; } }
+  .fields { display: grid; grid-template-columns: 1fr; gap: 6px; }
   .field label { display: block; font-size: var(--small); margin-bottom: 6px; }
   .field input {
     width: 100%; min-height: 50px; padding: 12px 14px;
@@ -367,7 +375,7 @@
   /* ==========================================================================
      F. GALLERY
      ======================================================================== */
-  .gallery { padding: var(--section) 0 0; margin-top: var(--section); border-top: 1px solid var(--line); }
+  .gallery { padding: var(--section) 0 0; }
   .gallery__eyebrow { color: var(--red); margin: 0 0 clamp(18px, 2vw, 24px); }
 
   .mosaic { display: grid; gap: clamp(8px, 1vw, 14px); grid-template-columns: repeat(6, 1fr); }
@@ -407,8 +415,9 @@
   /* ==========================================================================
      G. CLOSING + FOOTER
      ======================================================================== */
-  .closing { text-align: center; padding: var(--section) 0 clamp(64px, 8vw, 104px); }
+  .closing { text-align: center; padding: var(--section) 0 8px; }
   .closing__rule { border: 0; border-top: 1px solid var(--line); margin: 0 0 var(--section); }
+  .closing__meta { margin-bottom: 4px !important; }
   .closing__title { font-family: var(--serif); font-weight: 300; color: var(--red); font-size: clamp(2.6rem, 1.6rem + 4vw, 4.75rem); line-height: 1; margin: 0; }
   .closing__meta { margin: 16px 0 26px; font-size: var(--small); letter-spacing: .14em; color: var(--muted); }
   .closing .btn { min-height: 44px; border-radius: 999px; padding: 0 30px; }
@@ -417,7 +426,7 @@
   .foot__inner { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; align-items: center; gap: 12px 24px; padding: 18px 0 calc(18px + env(safe-area-inset-bottom)); }
   .foot a, .foot span { color: var(--red); text-decoration: none; }
   .foot a:hover { text-decoration: underline; text-underline-offset: 5px; }
-  .foot__65 { font-family: var(--serif); font-weight: 500; font-size: 1rem; letter-spacing: .04em; }
+  .foot__65 { font-family: var(--serif); font-weight: 500; font-size: 1rem; letter-spacing: .04em; color: var(--red); background: none; border: 0; padding: 10px 4px; min-width: 44px; min-height: 44px; }
   @media (max-width: 600px) {
     .foot__inner { grid-template-columns: 1fr auto 1fr; }
     .foot__inner > :nth-child(2) { order: 3; justify-self: end; }
@@ -425,23 +434,17 @@
     .foot__line { order: 4; grid-column: 1 / -1; justify-self: center; text-align: center; letter-spacing: .12em; }
   }
 
-  /* Sticky RSVP — from the top of the page until the RSVP section takes over. */
-  .sticky {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-    background: rgba(244,241,234,.94); border-top: 1px solid var(--line);
-    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    transform: translateY(110%); transition: transform .35s var(--ease); visibility: hidden;
+  /* RSVP dock — sticky to the bottom of the screen until it reaches its own
+     place at the end of the page. It steps aside only while the card's own
+     RSVP button is on screen, so exactly one is always in view. */
+  .dock {
+    position: sticky; bottom: 0; z-index: 30; display: flex; justify-content: center;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+    transition: opacity .3s var(--ease), transform .3s var(--ease);
   }
-  .sticky.is-shown { transform: none; visibility: visible; }
-  .sticky .btn { width: 100%; }
-  @media (min-width: 768px) {
-    .sticky { left: 50%; right: auto; transform: translate(-50%, 140%); background: none; border: 0;
-      -webkit-backdrop-filter: none; backdrop-filter: none; padding-bottom: 28px; }
-    .sticky.is-shown { transform: translate(-50%, 0); }
-    .sticky .btn { width: auto; min-width: 240px; border-radius: 999px; box-shadow: 0 6px 24px rgba(26,23,20,.18); }
-  }
-  @media (prefers-reduced-motion: reduce) { .sticky { transition: none; } }
+  .dock.is-aside { opacity: 0; transform: translateY(12px); pointer-events: none; }
+  .dock__btn { width: min(100%, 360px); border-radius: 999px; box-shadow: 0 6px 24px rgba(26,23,20,.2); }
+  @media (prefers-reduced-motion: reduce) { .dock { transition: none; } }
 
   /* The 65 puzzle */
   .egg { border: 1px solid var(--line-strong); padding: 0; width: min(520px, calc(100% - 32px)); background: var(--bone); color: var(--ink); }
@@ -477,45 +480,32 @@
 <!-- =====================================================================
      A. HERO
      ===================================================================== -->
-<header class="hero on-red" id="top">
-  <div class="wrap">
-    <nav class="nav" aria-label="Main">
-      <ul class="nav__links" id="nav-links">
-        <li><a href="#the-night">The night</a></li>
-        <li><a href="#find-us">Find us</a></li>
-      </ul>
-      <a class="nav__brand" href="https://padre65.com/" aria-label="Padre65 — padre65.com">
-        <svg viewBox="0 0 4000 802" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"> <g transform="translate(0.000000,802.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none"> <path d="M11060 8004 c-393 -37 -582 -55 -740 -69 -195 -18 -215 -25 -267 -93 -34 -44 -32 -35 -52 -267 -14 -161 -43 -328 -91 -515 -68 -271 -132 -446 -305 -840 -43 -96 -102 -231 -132 -300 -30 -69 -81 -183 -113 -255 -32 -71 -92 -208 -134 -302 -42 -95 -110 -249 -151 -343 -41 -93 -109 -248 -151 -342 -42 -95 -118 -267 -169 -383 -118 -266 -278 -630 -471 -1067 -42 -95 -118 -267 -169 -383 -234 -529 -289 -655 -356 -807 -182 -415 -303 -621 -468 -792 -164 -170 -341 -267 -642 -350 -71 -20 -101 -44 -131 -104 -22 -45 -23 -58 -26 -310 -2 -168 1 -282 8 -315 14 -68 51 -122 100 -147 39 -20 49 -20 1538 -18 l1498 3 37 25 c22 15 48 46 62 74 25 50 25 51 25 346 0 295 0 296 -25 346 -33 65 -73 90 -186 114 -530 113 -752 309 -700 616 41 239 124 367 269 416 l67 23 1030 3 c1111 3 1148 2 1252 -47 108 -51 146 -105 222 -313 85 -231 111 -400 75 -486 -41 -100 -168 -171 -383 -216 -93 -19 -134 -47 -166 -110 -25 -50 -25 -51 -25 -346 0 -295 0 -296 25 -346 14 -28 40 -59 62 -74 l37 -25 1800 -3 c1357 -2 1808 1 1831 9 48 19 93 68 110 120 14 40 16 94 13 331 l-3 283 -27 46 c-33 56 -54 70 -159 109 -292 106 -461 317 -709 885 -141 322 -291 658 -370 830 -78 169 -233 508 -385 845 -29 63 -98 216 -155 340 -56 124 -126 277 -155 340 -29 63 -143 315 -255 560 -112 245 -224 492 -250 550 -42 92 -131 288 -390 855 -72 156 -246 539 -455 1000 -68 149 -148 326 -180 395 -31 69 -88 195 -127 280 -75 163 -102 203 -157 226 -38 16 -47 16 -231 -2z m-490 -4024 c188 -410 362 -787 386 -838 24 -52 44 -98 44 -103 0 -5 -307 -9 -765 -9 -421 0 -765 2 -765 4 0 2 38 88 84 192 45 104 128 293 184 419 55 127 165 379 245 560 79 182 164 376 188 432 24 56 47 99 50 95 3 -4 160 -342 349 -752z"/> <path d="M93 7903 c-23 -14 -52 -45 -65 -67 -23 -41 -23 -44 -23 -351 0 -340 1 -344 63 -402 36 -34 57 -41 176 -58 359 -54 567 -190 639 -420 l22 -70 0 -2575 0 -2575 -22 -57 c-83 -218 -287 -346 -648 -408 -134 -23 -171 -43 -209 -116 -20 -36 -21 -58 -24 -324 -2 -202 1 -298 9 -329 16 -56 72 -116 124 -130 54 -15 3953 -16 4007 -1 50 14 97 55 119 105 17 36 19 70 19 335 0 270 -2 298 -20 335 -34 72 -88 115 -143 115 -46 0 -262 40 -351 66 -285 80 -447 214 -486 401 -8 36 -10 209 -8 535 4 465 5 485 26 548 25 76 76 142 133 170 76 39 153 50 374 50 849 2 1442 78 1965 251 622 205 1072 506 1388 929 92 123 130 187 207 345 162 332 237 678 237 1100 0 367 -55 671 -177 975 -359 894 -1243 1447 -2570 1606 -353 42 -448 44 -2630 44 l-2091 0 -41 -27z m4238 -1023 c642 -112 951 -554 989 -1414 38 -895 -185 -1418 -697 -1634 -72 -31 -177 -61 -283 -82 -173 -34 -701 -37 -825 -4 -144 38 -213 123 -235 290 -7 53 -10 485 -8 1294 4 1135 5 1219 22 1275 56 186 163 271 370 296 128 14 537 2 667 -21z"/> <path d="M15668 7901 c-31 -20 -53 -44 -69 -77 -24 -48 -24 -53 -24 -344 0 -290 0 -296 24 -343 34 -70 79 -96 198 -113 392 -58 602 -205 667 -465 15 -59 16 -291 16 -2598 0 -2797 5 -2587 -62 -2714 -61 -115 -210 -222 -389 -280 -67 -21 -170 -44 -290 -62 -46 -7 -97 -41 -126 -83 -38 -57 -45 -124 -41 -400 3 -222 6 -263 22 -299 23 -54 75 -100 123 -109 22 -4 126 2 248 15 315 33 380 39 620 57 302 21 784 31 1185 23 321 -7 454 -12 1055 -44 614 -32 921 -39 1165 -26 1040 55 1872 335 2540 855 194 150 460 430 616 646 311 430 535 1016 630 1645 87 579 74 1352 -32 1890 -330 1680 -1446 2597 -3419 2811 -387 42 -505 44 -2601 44 l-2010 0 -46 -29z m4102 -1006 c704 -155 1205 -803 1394 -1805 65 -340 90 -635 90 -1055 0 -641 -73 -1167 -227 -1620 -259 -760 -696 -1203 -1320 -1337 -139 -29 -466 -33 -567 -5 -126 35 -207 90 -253 174 -60 112 -57 -59 -57 2708 0 1698 4 2551 11 2595 12 78 54 172 99 223 58 66 147 108 280 132 104 19 447 13 550 -10z"/> <path d="M24165 7907 c-29 -16 -48 -37 -67 -76 l-28 -55 0 -293 0 -294 25 -49 c38 -74 77 -95 214 -115 245 -36 394 -98 512 -215 79 -79 115 -139 140 -240 21 -82 21 -5117 0 -5200 -46 -182 -194 -318 -431 -394 -58 -19 -152 -42 -210 -51 -132 -21 -173 -38 -204 -84 -44 -64 -46 -80 -46 -384 0 -262 2 -296 19 -332 22 -50 69 -91 119 -105 54 -15 3953 -14 4007 1 54 15 109 74 124 132 16 67 14 580 -3 629 -18 51 -55 94 -96 111 -19 9 -89 23 -155 32 -425 60 -671 204 -731 427 -20 76 -20 1513 0 1603 31 136 84 201 193 235 89 28 285 30 383 5 269 -69 449 -319 730 -1010 326 -806 648 -1337 993 -1642 381 -337 814 -490 1477 -523 267 -13 1105 -13 1152 1 21 5 54 26 73 46 58 60 65 101 65 397 0 271 -5 310 -43 367 -37 55 -77 75 -159 82 -95 7 -157 29 -240 84 -190 124 -317 348 -593 1043 -226 568 -352 819 -533 1063 -88 120 -244 277 -357 362 -84 63 -276 177 -332 197 -42 15 -42 24 2 32 72 14 285 90 405 145 239 109 431 243 606 423 118 121 174 191 248 306 354 553 417 1304 160 1912 -317 753 -1118 1257 -2234 1405 -332 44 -354 45 -2810 45 l-2335 0 -40 -23z m4304 -1007 c428 -44 710 -346 822 -881 31 -145 34 -512 5 -664 -58 -315 -175 -556 -355 -736 -185 -185 -405 -281 -714 -310 -143 -13 -542 -7 -619 10 -125 27 -200 88 -241 198 -22 58 -22 59 -25 1015 -3 1024 -1 1061 47 1188 40 105 112 164 224 180 80 12 742 11 856 0z"/> <path d="M32985 7911 c-45 -28 -73 -62 -90 -110 -12 -35 -15 -95 -15 -305 l0 -261 40 -72 c42 -75 101 -133 136 -133 48 0 215 -34 299 -61 242 -78 391 -230 425 -434 8 -52 10 -728 8 -2615 l-3 -2545 -22 -59 c-73 -192 -248 -315 -544 -382 -59 -13 -118 -24 -131 -24 -87 0 -166 -63 -193 -152 -22 -74 -22 -531 0 -605 18 -62 71 -119 124 -133 27 -7 1024 -9 3198 -8 l3158 3 67 33 c74 36 127 90 160 161 23 51 40 135 63 316 59 470 155 878 286 1217 50 131 56 166 39 230 -15 53 -50 90 -115 122 -56 27 -59 27 -219 24 -154 -3 -165 -4 -198 -28 -25 -16 -93 -108 -211 -285 -199 -295 -301 -422 -410 -513 -177 -146 -342 -218 -617 -270 -72 -13 -206 -16 -878 -19 -542 -3 -810 -1 -845 7 -166 34 -266 138 -324 335 -16 55 -18 133 -21 865 -4 898 -2 927 55 1041 57 115 153 182 310 217 68 15 135 17 518 16 482 -1 611 -10 779 -59 274 -79 370 -207 432 -576 21 -127 33 -157 78 -197 52 -45 99 -54 265 -50 168 4 195 13 246 89 l30 44 3 1253 c1 858 -1 1266 -8 1293 -12 45 -60 103 -101 125 -21 10 -69 14 -194 14 -145 0 -171 -2 -204 -20 -72 -36 -96 -87 -121 -260 -43 -288 -126 -428 -302 -509 -181 -83 -266 -93 -854 -98 -471 -4 -494 -4 -579 16 -201 48 -304 153 -341 348 -13 69 -14 192 -11 844 3 835 1 803 63 925 34 68 117 148 186 179 131 60 134 60 838 60 713 0 721 -1 908 -66 301 -107 546 -356 831 -849 40 -69 83 -136 94 -148 45 -49 63 -52 275 -52 190 0 200 1 233 23 42 28 76 77 90 131 10 36 4 76 -50 351 -102 516 -153 864 -186 1255 -16 195 -71 299 -188 351 l-52 24 -3090 2 c-3002 3 -3091 2 -3120 -16z"/> </g> </svg>
-      </a>
-      <div class="nav__end">
-        <button class="sixtyfive" type="button" id="js-egg-open" aria-haspopup="dialog" aria-label="65">65</button>
-      </div>
-    </nav>
-
-    <div class="hero__head">
-      <h1 class="hero__title">PADRE65 × KIEZ</h1>
-      <ul class="facts" id="js-facts" aria-label="When and where">
-        <li>Saturday 17 October 2026</li>
-        <li class="facts__rule" aria-hidden="true"></li>
-        <li>From 21:00</li>
-        <li class="facts__rule" aria-hidden="true"></li>
-        <li>108 Golborne Rd, W10</li>
-      </ul>
-    </div>
-
-    <figure style="margin:0">
-      <div class="hero__photo">
-        <picture>
-          <source type="image/webp" srcset="/kiez/images/hero-480.webp 480w, /kiez/images/hero.webp 729w" sizes="(min-width: 600px) 460px, 82vw" />
-          <img src="/kiez/images/hero.jpg" srcset="/kiez/images/hero-480.jpg 480w, /kiez/images/hero.jpg 729w" sizes="(min-width: 600px) 460px, 82vw"
-               width="729" height="729" fetchpriority="high" decoding="async"
-               alt="Two guests at the last Padre65 party, one in a denim Padre cap and one in a camouflage Padre cap, posing for the camera." />
-        </picture>
-      </div>
-      <figcaption class="hero__caption">Two DJs. Kitchen &amp; bar. One Saturday.</figcaption>
+<div class="page" id="top">
+<header class="hero on-red">
+  <article class="card" aria-labelledby="card-title">
+    <h1 class="card__title" id="card-title">
+      <span class="visually-hidden">Padre65 at Kiez</span>
+      <span class="card__logo" aria-hidden="true"><svg viewBox="0 0 4000 802" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"> <g transform="translate(0.000000,802.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none"> <path d="M11060 8004 c-393 -37 -582 -55 -740 -69 -195 -18 -215 -25 -267 -93 -34 -44 -32 -35 -52 -267 -14 -161 -43 -328 -91 -515 -68 -271 -132 -446 -305 -840 -43 -96 -102 -231 -132 -300 -30 -69 -81 -183 -113 -255 -32 -71 -92 -208 -134 -302 -42 -95 -110 -249 -151 -343 -41 -93 -109 -248 -151 -342 -42 -95 -118 -267 -169 -383 -118 -266 -278 -630 -471 -1067 -42 -95 -118 -267 -169 -383 -234 -529 -289 -655 -356 -807 -182 -415 -303 -621 -468 -792 -164 -170 -341 -267 -642 -350 -71 -20 -101 -44 -131 -104 -22 -45 -23 -58 -26 -310 -2 -168 1 -282 8 -315 14 -68 51 -122 100 -147 39 -20 49 -20 1538 -18 l1498 3 37 25 c22 15 48 46 62 74 25 50 25 51 25 346 0 295 0 296 -25 346 -33 65 -73 90 -186 114 -530 113 -752 309 -700 616 41 239 124 367 269 416 l67 23 1030 3 c1111 3 1148 2 1252 -47 108 -51 146 -105 222 -313 85 -231 111 -400 75 -486 -41 -100 -168 -171 -383 -216 -93 -19 -134 -47 -166 -110 -25 -50 -25 -51 -25 -346 0 -295 0 -296 25 -346 14 -28 40 -59 62 -74 l37 -25 1800 -3 c1357 -2 1808 1 1831 9 48 19 93 68 110 120 14 40 16 94 13 331 l-3 283 -27 46 c-33 56 -54 70 -159 109 -292 106 -461 317 -709 885 -141 322 -291 658 -370 830 -78 169 -233 508 -385 845 -29 63 -98 216 -155 340 -56 124 -126 277 -155 340 -29 63 -143 315 -255 560 -112 245 -224 492 -250 550 -42 92 -131 288 -390 855 -72 156 -246 539 -455 1000 -68 149 -148 326 -180 395 -31 69 -88 195 -127 280 -75 163 -102 203 -157 226 -38 16 -47 16 -231 -2z m-490 -4024 c188 -410 362 -787 386 -838 24 -52 44 -98 44 -103 0 -5 -307 -9 -765 -9 -421 0 -765 2 -765 4 0 2 38 88 84 192 45 104 128 293 184 419 55 127 165 379 245 560 79 182 164 376 188 432 24 56 47 99 50 95 3 -4 160 -342 349 -752z"/> <path d="M93 7903 c-23 -14 -52 -45 -65 -67 -23 -41 -23 -44 -23 -351 0 -340 1 -344 63 -402 36 -34 57 -41 176 -58 359 -54 567 -190 639 -420 l22 -70 0 -2575 0 -2575 -22 -57 c-83 -218 -287 -346 -648 -408 -134 -23 -171 -43 -209 -116 -20 -36 -21 -58 -24 -324 -2 -202 1 -298 9 -329 16 -56 72 -116 124 -130 54 -15 3953 -16 4007 -1 50 14 97 55 119 105 17 36 19 70 19 335 0 270 -2 298 -20 335 -34 72 -88 115 -143 115 -46 0 -262 40 -351 66 -285 80 -447 214 -486 401 -8 36 -10 209 -8 535 4 465 5 485 26 548 25 76 76 142 133 170 76 39 153 50 374 50 849 2 1442 78 1965 251 622 205 1072 506 1388 929 92 123 130 187 207 345 162 332 237 678 237 1100 0 367 -55 671 -177 975 -359 894 -1243 1447 -2570 1606 -353 42 -448 44 -2630 44 l-2091 0 -41 -27z m4238 -1023 c642 -112 951 -554 989 -1414 38 -895 -185 -1418 -697 -1634 -72 -31 -177 -61 -283 -82 -173 -34 -701 -37 -825 -4 -144 38 -213 123 -235 290 -7 53 -10 485 -8 1294 4 1135 5 1219 22 1275 56 186 163 271 370 296 128 14 537 2 667 -21z"/> <path d="M15668 7901 c-31 -20 -53 -44 -69 -77 -24 -48 -24 -53 -24 -344 0 -290 0 -296 24 -343 34 -70 79 -96 198 -113 392 -58 602 -205 667 -465 15 -59 16 -291 16 -2598 0 -2797 5 -2587 -62 -2714 -61 -115 -210 -222 -389 -280 -67 -21 -170 -44 -290 -62 -46 -7 -97 -41 -126 -83 -38 -57 -45 -124 -41 -400 3 -222 6 -263 22 -299 23 -54 75 -100 123 -109 22 -4 126 2 248 15 315 33 380 39 620 57 302 21 784 31 1185 23 321 -7 454 -12 1055 -44 614 -32 921 -39 1165 -26 1040 55 1872 335 2540 855 194 150 460 430 616 646 311 430 535 1016 630 1645 87 579 74 1352 -32 1890 -330 1680 -1446 2597 -3419 2811 -387 42 -505 44 -2601 44 l-2010 0 -46 -29z m4102 -1006 c704 -155 1205 -803 1394 -1805 65 -340 90 -635 90 -1055 0 -641 -73 -1167 -227 -1620 -259 -760 -696 -1203 -1320 -1337 -139 -29 -466 -33 -567 -5 -126 35 -207 90 -253 174 -60 112 -57 -59 -57 2708 0 1698 4 2551 11 2595 12 78 54 172 99 223 58 66 147 108 280 132 104 19 447 13 550 -10z"/> <path d="M24165 7907 c-29 -16 -48 -37 -67 -76 l-28 -55 0 -293 0 -294 25 -49 c38 -74 77 -95 214 -115 245 -36 394 -98 512 -215 79 -79 115 -139 140 -240 21 -82 21 -5117 0 -5200 -46 -182 -194 -318 -431 -394 -58 -19 -152 -42 -210 -51 -132 -21 -173 -38 -204 -84 -44 -64 -46 -80 -46 -384 0 -262 2 -296 19 -332 22 -50 69 -91 119 -105 54 -15 3953 -14 4007 1 54 15 109 74 124 132 16 67 14 580 -3 629 -18 51 -55 94 -96 111 -19 9 -89 23 -155 32 -425 60 -671 204 -731 427 -20 76 -20 1513 0 1603 31 136 84 201 193 235 89 28 285 30 383 5 269 -69 449 -319 730 -1010 326 -806 648 -1337 993 -1642 381 -337 814 -490 1477 -523 267 -13 1105 -13 1152 1 21 5 54 26 73 46 58 60 65 101 65 397 0 271 -5 310 -43 367 -37 55 -77 75 -159 82 -95 7 -157 29 -240 84 -190 124 -317 348 -593 1043 -226 568 -352 819 -533 1063 -88 120 -244 277 -357 362 -84 63 -276 177 -332 197 -42 15 -42 24 2 32 72 14 285 90 405 145 239 109 431 243 606 423 118 121 174 191 248 306 354 553 417 1304 160 1912 -317 753 -1118 1257 -2234 1405 -332 44 -354 45 -2810 45 l-2335 0 -40 -23z m4304 -1007 c428 -44 710 -346 822 -881 31 -145 34 -512 5 -664 -58 -315 -175 -556 -355 -736 -185 -185 -405 -281 -714 -310 -143 -13 -542 -7 -619 10 -125 27 -200 88 -241 198 -22 58 -22 59 -25 1015 -3 1024 -1 1061 47 1188 40 105 112 164 224 180 80 12 742 11 856 0z"/> <path d="M32985 7911 c-45 -28 -73 -62 -90 -110 -12 -35 -15 -95 -15 -305 l0 -261 40 -72 c42 -75 101 -133 136 -133 48 0 215 -34 299 -61 242 -78 391 -230 425 -434 8 -52 10 -728 8 -2615 l-3 -2545 -22 -59 c-73 -192 -248 -315 -544 -382 -59 -13 -118 -24 -131 -24 -87 0 -166 -63 -193 -152 -22 -74 -22 -531 0 -605 18 -62 71 -119 124 -133 27 -7 1024 -9 3198 -8 l3158 3 67 33 c74 36 127 90 160 161 23 51 40 135 63 316 59 470 155 878 286 1217 50 131 56 166 39 230 -15 53 -50 90 -115 122 -56 27 -59 27 -219 24 -154 -3 -165 -4 -198 -28 -25 -16 -93 -108 -211 -285 -199 -295 -301 -422 -410 -513 -177 -146 -342 -218 -617 -270 -72 -13 -206 -16 -878 -19 -542 -3 -810 -1 -845 7 -166 34 -266 138 -324 335 -16 55 -18 133 -21 865 -4 898 -2 927 55 1041 57 115 153 182 310 217 68 15 135 17 518 16 482 -1 611 -10 779 -59 274 -79 370 -207 432 -576 21 -127 33 -157 78 -197 52 -45 99 -54 265 -50 168 4 195 13 246 89 l30 44 3 1253 c1 858 -1 1266 -8 1293 -12 45 -60 103 -101 125 -21 10 -69 14 -194 14 -145 0 -171 -2 -204 -20 -72 -36 -96 -87 -121 -260 -43 -288 -126 -428 -302 -509 -181 -83 -266 -93 -854 -98 -471 -4 -494 -4 -579 16 -201 48 -304 153 -341 348 -13 69 -14 192 -11 844 3 835 1 803 63 925 34 68 117 148 186 179 131 60 134 60 838 60 713 0 721 -1 908 -66 301 -107 546 -356 831 -849 40 -69 83 -136 94 -148 45 -49 63 -52 275 -52 190 0 200 1 233 23 42 28 76 77 90 131 10 36 4 76 -50 351 -102 516 -153 864 -186 1255 -16 195 -71 299 -188 351 l-52 24 -3090 2 c-3002 3 -3091 2 -3120 -16z"/> </g> </svg></span>
+      <span class="card__at" aria-hidden="true"><em>at</em>Kiez</span>
+    </h1>
+    <figure class="card__photo">
+      <picture>
+        <source type="image/webp" srcset="/kiez/images/hero-portrait.webp 660w" sizes="(min-width: 600px) 560px, 100vw" />
+        <img src="/kiez/images/hero-portrait.jpg" width="660" height="729" fetchpriority="high" decoding="async"
+             alt="Two guests at the last Padre65 party, one in a denim Padre cap and one in a camouflage Padre cap, posing for the camera." />
+      </picture>
+      <figcaption class="card__caption">Two DJs. Kitchen &amp; bar.</figcaption>
     </figure>
-    <p class="label hero__line" id="js-brand-line">A reflection of how we choose to live</p>
-  </div>
+    <div class="card__panel">
+      <p class="card__date">SATURDAY 17 OCTOBER 2026</p>
+      <ul class="card__row" aria-label="Time and place">
+        <li>FROM 21:00</li>
+        <li class="card__rule" aria-hidden="true"></li>
+        <li>108 GOLBORNE RD, W10</li>
+      </ul>
+      <button class="card__rsvp when-upcoming" type="button" id="js-hero-rsvp" data-rsvp-open aria-haspopup="dialog">RSVP</button>
+    </div>
+  </article>
 </header>
 
 <main id="main">
@@ -546,63 +536,6 @@
         <span id="js-mood-total">–:––</span>
       </div>
       <p class="mood__status" id="js-mood-status" aria-live="polite"></p>
-    </div>
-  </div>
-</section>
-
-<!-- =====================================================================
-     C. RSVP
-     ===================================================================== -->
-<section class="rsvp when-upcoming" id="rsvp" aria-labelledby="rsvp-heading">
-  <div class="wrap">
-    <h2 class="h2" id="rsvp-heading" data-reveal>See you there?</h2>
-    <ol class="steps label" aria-label="Progress">
-      <li id="js-step-1" aria-current="step"><span class="steps__n">01</span><span>Your details</span></li>
-      <li class="steps__line" aria-hidden="true"></li>
-      <li id="js-step-2"><span class="steps__n">02</span><span>You’re in</span></li>
-    </ol>
-
-    <form class="form" id="js-form" novalidate>
-      <!-- Bots fill every field; people never see this one. Named so that
-           no password manager or autofill profile recognises it. -->
-      <div class="trap" aria-hidden="true">
-        <input id="kiez-subject" name="subject2" type="text" tabindex="-1" autocomplete="off" />
-      </div>
-
-      <div class="fields">
-        <div class="field">
-          <label for="rsvp-name">Your name</label>
-          <input id="rsvp-name" name="name" type="text" autocomplete="name" maxlength="160" required aria-describedby="rsvp-name-error" />
-          <p class="field__error" id="rsvp-name-error" aria-live="polite"></p>
-        </div>
-        <div class="field">
-          <label for="rsvp-contact">Email</label>
-          <input id="rsvp-contact" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required aria-describedby="rsvp-contact-error" />
-          <p class="field__error" id="rsvp-contact-error" aria-live="polite"></p>
-        </div>
-      </div>
-
-      <div class="form__submit">
-        <button class="btn" type="submit" id="js-submit">RSVP</button>
-      </div>
-      <p class="form__error" id="js-form-error" role="alert" hidden></p>
-      <p class="form__note">Used for this event only. <a href="https://padre65.com/policies/privacy-policy" target="_blank" rel="noopener">Privacy policy</a></p>
-    </form>
-
-    <div class="done" id="js-done" hidden>
-      <h3 class="done__title" id="js-done-title" tabindex="-1">You’re in.</h3>
-      <p class="done__facts">Saturday 17 October 2026 · From 21:00 · Kiez, 108 Golborne Road, London W10 5PS</p>
-      <div class="done__actions">
-        <button class="btn" type="button" id="js-cal">Add to calendar</button>
-        <button class="btn btn--ghost" type="button" id="js-share">Share your invitation</button>
-      </div>
-      <p class="done__alt">Or <a id="js-gcal" href="#" target="_blank" rel="noopener">add it to Google Calendar</a></p>
-      <a id="js-ics" hidden></a>
-      <div class="share-fallback" id="js-share-fallback" hidden>
-        <a class="btn btn--ghost" href="/kiez/images/invitation.jpg" download="padre65-kiez-invitation.jpg">Download the invitation</a>
-        <button class="btn btn--ghost" type="button" id="js-copy">Copy link</button>
-      </div>
-      <p class="done__status" id="js-done-status" aria-live="polite"></p>
     </div>
   </div>
 </section>
@@ -669,20 +602,82 @@
 
 </main>
 
+<!-- The RSVP button rides along the bottom of the screen and settles into
+     this spot, under the closing line, when the page reaches it. Sticky
+     positioning against .page, which spans the whole page, does both. -->
+<div class="dock when-upcoming" id="js-dock">
+  <button class="btn dock__btn" type="button" data-rsvp-open aria-haspopup="dialog">RSVP</button>
+</div>
+</div>
+
 <footer class="foot">
   <div class="wrap">
     <div class="foot__inner label">
       <a href="https://www.instagram.com/_padre65/" target="_blank" rel="noopener">Instagram</a>
       <a href="https://padre65.com/" target="_blank" rel="noopener">Shop</a>
       <span class="foot__line" id="js-foot-line">A reflection of how we choose to live</span>
-      <span class="foot__65" aria-hidden="true">65</span>
+      <button class="foot__65" type="button" id="js-egg-open" aria-haspopup="dialog" aria-label="65">65</button>
     </div>
   </div>
 </footer>
 
-<div class="sticky when-upcoming" id="js-sticky" aria-hidden="true">
-  <a class="btn" href="#rsvp" data-rsvp-jump tabindex="-1">RSVP</a>
-</div>
+<!-- =====================================================================
+     C. RSVP — a popup, opened by any RSVP button
+     ===================================================================== -->
+<dialog class="rsvp-dlg" id="rsvp" aria-labelledby="rsvp-heading">
+  <div class="rsvp-dlg__inner">
+    <button class="rsvp-dlg__close" type="button" id="js-rsvp-close">Close</button>
+    <h2 class="h2" id="rsvp-heading">See you there?</h2>
+    <ol class="steps label" aria-label="Progress">
+      <li id="js-step-1" aria-current="step"><span class="steps__n">01</span><span>Your details</span></li>
+      <li class="steps__line" aria-hidden="true"></li>
+      <li id="js-step-2"><span class="steps__n">02</span><span>You’re in</span></li>
+    </ol>
+
+    <form class="form" id="js-form" novalidate>
+      <!-- Bots fill every field; people never see this one. Named so that
+           no password manager or autofill profile recognises it. -->
+      <div class="trap" aria-hidden="true">
+        <input id="kiez-subject" name="subject2" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="fields">
+        <div class="field">
+          <label for="rsvp-name">Your name</label>
+          <input id="rsvp-name" name="name" type="text" autocomplete="name" maxlength="160" required aria-describedby="rsvp-name-error" />
+          <p class="field__error" id="rsvp-name-error" aria-live="polite"></p>
+        </div>
+        <div class="field">
+          <label for="rsvp-contact">Email</label>
+          <input id="rsvp-contact" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required aria-describedby="rsvp-contact-error" />
+          <p class="field__error" id="rsvp-contact-error" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="form__submit">
+        <button class="btn" type="submit" id="js-submit">RSVP</button>
+      </div>
+      <p class="form__error" id="js-form-error" role="alert" hidden></p>
+      <p class="form__note">Used for this event only. <a href="https://padre65.com/policies/privacy-policy" target="_blank" rel="noopener">Privacy policy</a></p>
+    </form>
+
+    <div class="done" id="js-done" hidden>
+      <h3 class="done__title" id="js-done-title" tabindex="-1">You’re in.</h3>
+      <p class="done__facts">Saturday 17 October 2026 · From 21:00 · Kiez, 108 Golborne Road, London W10 5PS</p>
+      <div class="done__actions">
+        <button class="btn" type="button" id="js-cal">Add to calendar</button>
+        <button class="btn btn--ghost" type="button" id="js-share">Share your invitation</button>
+      </div>
+      <p class="done__alt">Or <a id="js-gcal" href="#" target="_blank" rel="noopener">add it to Google Calendar</a></p>
+      <a id="js-ics" hidden></a>
+      <div class="share-fallback" id="js-share-fallback" hidden>
+        <a class="btn btn--ghost" href="/kiez/images/invitation.jpg" download="padre65-kiez-invitation.jpg">Download the invitation</a>
+        <button class="btn btn--ghost" type="button" id="js-copy">Copy link</button>
+      </div>
+      <p class="done__status" id="js-done-status" aria-live="polite"></p>
+    </div>
+  </div>
+</dialog>
 
 <dialog class="lightbox" id="js-lightbox" aria-label="Photos from the last one">
   <div class="lightbox__bar">
@@ -837,7 +832,6 @@ async function postJson(path, body) {
    3. CONTENT FROM CONFIG
    ========================================================================== */
 (function content() {
-  $("#js-brand-line").textContent = CONFIG.brandLine;
   $("#js-foot-line").textContent = CONFIG.brandLine;
 
   // Phase: before or after the night.
@@ -907,14 +901,22 @@ async function postJson(path, body) {
     });
   });
 
-  // RSVP buttons: scroll to the form and put the cursor in it.
-  $$("[data-rsvp-jump]").forEach((a) => a.addEventListener("click", (e) => {
-    e.preventDefault();
-    const section = $("#rsvp");
-    section.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
+  // RSVP buttons open the popup.
+  const dlg = $("#rsvp");
+  let opener = null;
+  $$("[data-rsvp-open]").forEach((b) => b.addEventListener("click", () => {
+    opener = b;
+    dlg.showModal();
+    document.body.style.overflow = "hidden";
     const target = $("#js-done").hidden ? $("#rsvp-name") : $("#js-done-title");
-    setTimeout(() => target.focus({ preventScroll: true }), reduced() ? 0 : 600);
+    setTimeout(() => target.focus(), 30);
   }));
+  $("#js-rsvp-close").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener("close", () => {
+    document.body.style.overflow = "";
+    if (opener) opener.focus();
+  });
 
   if ("IntersectionObserver" in window) {
     const io = new IntersectionObserver((entries) => {
@@ -1331,30 +1333,15 @@ const RSVP = (function () {
 })();
 
 /* =============================================================================
-   12. STICKY RSVP — on screen from the very top, gone once the RSVP section
-   is in view (it hands over to the form), and never over the footer
+   12. RSVP DOCK — steps aside only while the card's own button is visible
    ========================================================================== */
-(function sticky() {
-  const bar = $("#js-sticky");
-  if (document.body.dataset.phase !== "upcoming") return;
-  const link = bar.querySelector("a");
-  const seen = { rsvp: false, foot: false };
-  let done = false;
-  function update() {
-    const show = !done && !seen.rsvp && !seen.foot;
-    bar.classList.toggle("is-shown", show);
-    bar.setAttribute("aria-hidden", String(!show));
-    link.tabIndex = show ? 0 : -1;
-  }
-  if ("IntersectionObserver" in window) {
-    const watch = (el, key) => new IntersectionObserver((entries) => {
-      seen[key] = entries[0].isIntersecting; update();
-    }).observe(el);
-    watch($("#rsvp"), "rsvp");
-    watch($(".foot"), "foot");
-  }
-  document.addEventListener("kiez:rsvp-done", () => { done = true; update(); });
-  update();
+(function dock() {
+  const el = $("#js-dock");
+  const hero = $("#js-hero-rsvp");
+  if (!("IntersectionObserver" in window) || document.body.dataset.phase !== "upcoming") return;
+  new IntersectionObserver((entries) => {
+    el.classList.toggle("is-aside", entries[0].isIntersecting);
+  }).observe(hero);
 })();
 
 /* =============================================================================
