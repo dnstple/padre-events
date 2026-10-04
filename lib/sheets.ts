@@ -145,7 +145,7 @@ async function getAccessToken(): Promise<string> {
  * house-party sheet; the popup page has its own document because it captures
  * a different shape of data for a different event.
  */
-async function sheetsFetch(
+export async function sheetsFetch(
   path: string,
   init?: RequestInit,
   spreadsheetId?: string,
@@ -261,7 +261,7 @@ const knownTabs = new Set<string>();
  * removes the failure everybody hits once: a 400 from Sheets that reads like a
  * credentials problem but is actually a missing worksheet.
  */
-async function ensureTab(
+export async function ensureTab(
   title: string,
   header: readonly string[],
   spreadsheetId?: string,
@@ -397,7 +397,7 @@ const POPUP_LAST_COLUMN = "I";
  */
 export type SignupSource = "popup" | "model-search";
 
-function popupSheetId(): string {
+export function popupSheetId(): string {
   const id = process.env.GOOGLE_POPUP_SHEET_ID;
   if (!id) throw new Error("GOOGLE_POPUP_SHEET_ID is not set.");
   return id;

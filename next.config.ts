@@ -41,8 +41,10 @@ const nextConfig: NextConfig = {
   },
 
   /**
-   * The popup shop is the live event, so it is what the site root serves. It
-   * answers on /popup too, because that URL has been shared.
+   * Padre65 × Kiez (17 October 2026) is the live event, so it is what the
+   * site root serves, and it answers on /kiez too. The pop-up shop it
+   * replaced is archived where it always also lived: /popup, with every one
+   * of its asset paths and its API untouched.
    *
    * Rewrites, not redirects, and `beforeFiles` so they are applied before the
    * app router looks for a page. Two things to know:
@@ -61,7 +63,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        { source: "/", destination: "/popup/index.html" },
+        { source: "/", destination: "/kiez/index.html" },
+        { source: "/kiez", destination: "/kiez/index.html" },
         { source: "/popup", destination: "/popup/index.html" },
         { source: "/model-search", destination: "/model-search/index.html" },
       ],

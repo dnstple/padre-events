@@ -10,6 +10,7 @@ import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-sess
 import { signOut } from "./actions";
 import styles from "./admin.module.css";
 import Dashboard from "./Dashboard";
+import KiezDashboard from "./KiezDashboard";
 import PopupDashboard from "./PopupDashboard";
 
 export const metadata: Metadata = {
@@ -32,6 +33,12 @@ export const revalidate = 0;
  * implies it does.
  */
 const EVENTS = [
+  {
+    key: "kiez",
+    label: "Kiez",
+    title: "Padre65 × Kiez",
+    meta: "Saturday 17 October 2026 · From 21:00 · 108 Golborne Road, London W10 5PS",
+  },
   {
     key: "popup",
     label: "Popup shop",
@@ -73,9 +80,10 @@ export default async function AdminPage({
     redirect("/admin/login");
   }
 
-  // The popup is the live event, so it is what you land on.
+  // Kiez is the live event, so it is what you land on.
   const requested = (await searchParams).event;
-  const active: EventKey = requested === "houseparty" ? "houseparty" : "popup";
+  const active: EventKey =
+    requested === "houseparty" ? "houseparty" : requested === "popup" ? "popup" : "kiez";
   const current = EVENTS.find((e) => e.key === active)!;
 
   return (
@@ -96,7 +104,7 @@ export default async function AdminPage({
           {EVENTS.map((event) => (
             <Link
               key={event.key}
-              href={event.key === "popup" ? "/admin" : `/admin?event=${event.key}`}
+              href={event.key === "kiez" ? "/admin" : `/admin?event=${event.key}`}
               className={styles.eventTab}
               aria-current={event.key === active ? "page" : undefined}
               prefetch={false}
@@ -111,7 +119,7 @@ export default async function AdminPage({
 
         {/* Data is fetched client-side from an authenticated endpoint so that
             no name is ever present in this page's initial HTML. */}
-        {active === "popup" ? <PopupDashboard /> : <Dashboard />}
+        {active === "kiez" ? <KiezDashboard /> : active === "popup" ? <PopupDashboard /> : <Dashboard />}
       </main>
     </div>
   );
