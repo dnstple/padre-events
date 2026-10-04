@@ -394,23 +394,24 @@
   .gallery { padding: var(--section) 0 0; }
   .gallery__eyebrow { color: var(--red); margin: 0 0 clamp(18px, 2vw, 24px); }
 
-  .mosaic { display: grid; gap: clamp(8px, 1vw, 14px); grid-template-columns: repeat(6, 1fr); }
+  .mosaic { display: grid; gap: clamp(8px, 1vw, 14px); grid-template-columns: repeat(3, 1fr); }
   .tile { margin: 0; position: relative; overflow: hidden; background: var(--oat); }
   .tile button { all: unset; display: block; width: 100%; height: 100%; cursor: zoom-in; }
   .tile button:focus-visible { outline: 2px solid var(--red); outline-offset: -4px; }
   .tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease), filter .4s; }
   .tile button:hover img { transform: scale(1.02); }
-  .tile--crowd { grid-column: span 4; aspect-ratio: 3 / 2; }
-  .tile--dj { grid-column: span 2; }
-  .tile--caps, .tile--mirror, .tile--decks { grid-column: span 2; aspect-ratio: 4 / 3; }
+  .tile--dj { grid-column: 1; grid-row: 1 / span 2; }
+  .tile--caps { grid-column: 2 / span 2; grid-row: 1; aspect-ratio: 2 / 1; }
+  .tile--mirror { grid-column: 2; grid-row: 2; aspect-ratio: 4 / 3; }
+  .tile--decks { grid-column: 3; grid-row: 2; aspect-ratio: 4 / 3; }
   .tile--dj img { object-position: 50% 35%; }
   .tile--caps img { object-position: 40% 30%; }
   .tile--mirror img { object-position: 55% 40%; }
   .tile--decks img { object-position: 45% 40%; }
   @media (max-width: 767px) {
     .mosaic { grid-template-columns: 1fr 1fr; }
-    .tile--crowd, .tile--caps, .tile--decks { grid-column: span 2; aspect-ratio: 3 / 2; }
-    .tile--dj, .tile--mirror { grid-column: span 1; aspect-ratio: 3 / 4; }
+    .tile--caps, .tile--decks { grid-column: span 2; grid-row: auto; aspect-ratio: 3 / 2; }
+    .tile--dj, .tile--mirror { grid-column: span 1; grid-row: auto; aspect-ratio: 3 / 4; }
     /* The two portraits share a row; the landscapes take a row each. */
     .tile--dj { order: 1; } .tile--mirror { order: 2; } .tile--caps { order: 3; } .tile--decks { order: 4; }
   }
@@ -464,15 +465,24 @@
 
   .m-rsvp { display: none; }
   @media (max-width: 767px) {
+    /* Fixed to the bottom of the screen. The hero fills the first screen,
+       so on landing this is the bottom of the photo. */
     .m-rsvp {
-      display: block; position: sticky; top: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 30;
-      /* Sits in the gap under The night without pushing anything down. */
-      margin: 28px 16px -78px;
+      display: block; position: fixed; z-index: 30;
+      left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom));
     }
     .m-rsvp .rsvp-btn { width: 100%; max-width: none; box-shadow: 0 8px 24px rgba(26,23,20,.22); }
-    .find { padding-top: calc(var(--section) + 68px); }
     #js-hero-rsvp, .dock { display: none; }
-    .hero__overlay { padding-bottom: 18px; }
+
+    /* The photo fills the first screen. */
+    .hero { display: flex; flex-direction: column; height: 100svh; min-height: 560px; }
+    .hero__media { flex: 1; min-height: 0; }
+    .hero__media picture { position: absolute; inset: 0; }
+    .hero__media img { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; object-position: 50% 45%; }
+    /* The facts sit just above the button. */
+    .hero__overlay { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+    /* Room at the end of the page so the button never covers the footer. */
+    .foot__inner { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
   }
 
   /* The 65 puzzle */
@@ -571,8 +581,7 @@
   </div>
 </section>
 
-<!-- Phones: the RSVP button starts under The night's copy and holds to
-     the top of the screen from there to the end of the page. -->
+<!-- Phones: the RSVP button, fixed to the bottom of the screen. -->
 <div class="m-rsvp when-upcoming">
   <button class="rsvp-btn" type="button" data-rsvp-open aria-haspopup="dialog">RSVP</button>
 </div>
@@ -616,11 +625,10 @@
     <h2 class="visually-hidden" id="gallery-heading">Photos from the last Padre65 party</h2>
 
     <div class="mosaic" id="js-mosaic">
-      <figure class="tile tile--crowd" data-reveal><button type="button" data-index="0" aria-label="Open photo 1 of 5: guests at the last Padre65 party, one in a taupe Padre65 top"><img src="/popup/images/event-01.jpg" width="1800" height="1194" loading="lazy" decoding="async" sizes="(min-width: 768px) 66vw, 100vw" alt="" /></button></figure>
-      <figure class="tile tile--dj" data-reveal style="--d:80ms"><button type="button" data-index="1" aria-label="Open photo 2 of 5: two DJs at the decks at the last Padre65 party"><img src="/popup/images/event-03.jpg" width="1150" height="1734" loading="lazy" decoding="async" alt="" /></button></figure>
-      <figure class="tile tile--caps" data-reveal><button type="button" data-index="2" aria-label="Open photo 3 of 5: two guests in denim and camouflage Padre caps"><img src="/kiez/images/gallery-caps.jpg" width="870" height="729" loading="lazy" decoding="async" alt="" /></button></figure>
-      <figure class="tile tile--mirror" data-reveal style="--d:80ms"><button type="button" data-index="3" aria-label="Open photo 4 of 5: guests in Padre caps writing on a mirror in lipstick"><img src="/popup/images/event-04.jpg" width="1100" height="729" loading="lazy" decoding="async" alt="" /></button></figure>
-      <figure class="tile tile--decks" data-reveal style="--d:160ms"><button type="button" data-index="4" aria-label="Open photo 5 of 5: guests by the decks, one in a Padre Self Directed tee"><img src="/popup/images/event-05.jpg" width="1100" height="729" loading="lazy" decoding="async" alt="" /></button></figure>
+      <figure class="tile tile--dj" data-reveal style="--d:80ms"><button type="button" data-index="0" aria-label="Open photo 1 of 4: two DJs at the decks at the last Padre65 party"><img src="/popup/images/event-03.jpg" width="1150" height="1734" loading="lazy" decoding="async" alt="" /></button></figure>
+      <figure class="tile tile--caps" data-reveal><button type="button" data-index="1" aria-label="Open photo 2 of 4: two guests in denim and camouflage Padre caps"><img src="/kiez/images/gallery-caps.jpg" width="870" height="729" loading="lazy" decoding="async" alt="" /></button></figure>
+      <figure class="tile tile--mirror" data-reveal style="--d:80ms"><button type="button" data-index="2" aria-label="Open photo 3 of 4: guests in Padre caps writing on a mirror in lipstick"><img src="/popup/images/event-04.jpg" width="1100" height="729" loading="lazy" decoding="async" alt="" /></button></figure>
+      <figure class="tile tile--decks" data-reveal style="--d:160ms"><button type="button" data-index="3" aria-label="Open photo 4 of 4: guests by the decks, one in a Padre Self Directed tee"><img src="/popup/images/event-05.jpg" width="1100" height="729" loading="lazy" decoding="async" alt="" /></button></figure>
     </div>
   </div>
 </section>
@@ -817,7 +825,6 @@ const CONFIG = {
   },
 
   gallery: [
-    { src: "/popup/images/event-01.jpg", alt: "Guests at the last Padre65 party, one in a taupe Padre65 top, seen from behind." },
     { src: "/popup/images/event-03.jpg", alt: "Two DJs at the decks at the last Padre65 party, Padre caps on the table." },
     { src: "/kiez/images/gallery-caps.jpg", alt: "Two guests in denim and camouflage Padre caps." },
     { src: "/popup/images/event-04.jpg", alt: "Guests in Padre caps writing on a mirror in red lipstick." },
