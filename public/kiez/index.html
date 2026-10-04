@@ -206,7 +206,7 @@
      photograph, so it never covers the caps; the facts and the RSVP button
      sit over the bottom of the photo on a soft shade.
      ======================================================================== */
-  .hero { --band: #343D38; position: relative; background: var(--band); color: var(--cream); overflow: hidden; }
+  .hero { --hero-small: clamp(.78rem, .62rem + .7vw, 1.05rem); --band: #343D38; position: relative; background: var(--band); color: var(--cream); overflow: hidden; }
   .hero__title { position: relative; z-index: 2; margin: 0; padding: clamp(22px, 4vw, 40px) var(--gutter) 0; text-align: center; font-weight: 400; }
   .hero__logo { display: block; width: min(72vw, 440px); margin: 0 auto; }
   .hero__logo svg { display: block; width: 100%; height: auto; }
@@ -232,10 +232,10 @@
     padding: 0 var(--gutter) clamp(20px, 3.4vw, 44px); text-align: center;
   }
   .hero__overlay-inner { max-width: 640px; margin: 0 auto; }
-  .hero__caption { margin: 0 0 clamp(12px, 2vw, 20px); font-family: var(--serif); font-size: clamp(1.3rem, 1rem + 1.4vw, 2rem); line-height: 1.2; }
+  .hero__caption { margin: 0 0 clamp(10px, 1.6vw, 16px); font-family: var(--serif); font-weight: 500; font-size: var(--hero-small); letter-spacing: .06em; line-height: 1.2; }
   .hero__date {
     margin: 0; padding: clamp(10px, 1.6vw, 14px) 0; border-top: 1px solid rgba(244,241,234,.6); border-bottom: 1px solid rgba(244,241,234,.6);
-    font-family: var(--serif); font-weight: 500; font-size: clamp(1rem, .7rem + 1.5vw, 1.6rem); letter-spacing: .16em; line-height: 1.2; white-space: nowrap;
+    font-family: var(--serif); font-weight: 500; font-size: var(--hero-small); letter-spacing: .14em; line-height: 1.2; white-space: nowrap;
     font-variant-numeric: lining-nums;
   }
   .hero__row {
@@ -244,7 +244,7 @@
   }
   .hero__row li {
     padding: clamp(10px, 1.5vw, 14px) 0; white-space: nowrap;
-    font-family: var(--serif); font-weight: 500; font-size: clamp(.78rem, .62rem + .7vw, 1.05rem); letter-spacing: .14em;
+    font-family: var(--serif); font-weight: 500; font-size: var(--hero-small); letter-spacing: .14em;
     font-variant-numeric: lining-nums;
   }
   .hero__row .hero__rule { width: 1px; align-self: stretch; margin: 8px 0; padding: 0; background: rgba(244,241,234,.6); }
@@ -478,6 +478,22 @@
   .dock .rsvp-btn:hover { background: var(--cream); color: var(--ink); }
   @media (prefers-reduced-motion: reduce) { .dock { transition: none; } }
 
+  .m-rsvp { display: none; }
+  @media (max-width: 767px) {
+    .m-rsvp {
+      display: block; position: sticky; top: 12px; z-index: 30;
+      /* Overlaps the top of The night rather than pushing it down. */
+      margin: 16px 16px -66px;
+    }
+    .m-rsvp .rsvp-btn {
+      width: 100%; max-width: none; background: rgba(43,48,45,.94); border: 1px solid #fff;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: 0 8px 24px rgba(26,23,20,.22);
+    }
+    .night { padding-top: calc(var(--section) + 66px); }
+    #js-hero-rsvp, .dock { display: none; }
+    .hero__overlay { padding-bottom: 18px; }
+  }
+
   /* The 65 puzzle */
   .egg { border: 1px solid var(--line-strong); padding: 0; width: min(520px, calc(100% - 32px)); background: var(--bone); color: var(--ink); }
   .egg::backdrop { background: rgba(26,23,20,.6); }
@@ -541,6 +557,13 @@
     </div>
   </div>
 </header>
+
+<!-- Phones: the RSVP button sits just under the hero, over the top of The
+     night, and holds to the top of the screen from there to the end of the
+     page. Sticky against .page, which spans everything. -->
+<div class="m-rsvp when-upcoming">
+  <button class="rsvp-btn" type="button" data-rsvp-open aria-haspopup="dialog">RSVP</button>
+</div>
 
 <main id="main">
 
