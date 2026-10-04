@@ -222,36 +222,14 @@
     font-family: var(--serif); font-weight: 500; font-size: 1.05rem; letter-spacing: .04em;
     font-variant-numeric: lining-nums; color: inherit;
   }
-  .menu-btn { display: none; }
-
-  @media (max-width: 899px) {
-    .nav__links { display: none; }
-    .menu-btn {
-      display: inline-flex; align-items: center; gap: 10px; justify-self: start;
-      background: none; border: 0; padding: 10px 0; min-height: 44px;
-      font-size: var(--label); letter-spacing: .2em; text-transform: uppercase;
-    }
-    .menu-btn__bars { width: 18px; height: 9px; position: relative; }
-    .menu-btn__bars::before, .menu-btn__bars::after { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: currentColor; transition: transform .25s var(--ease); }
-    .menu-btn__bars::before { top: 0; } .menu-btn__bars::after { bottom: 0; }
-    .menu-btn[aria-expanded="true"] .menu-btn__bars::before { transform: translateY(4px) rotate(45deg); }
-    .menu-btn[aria-expanded="true"] .menu-btn__bars::after { transform: translateY(-4px) rotate(-45deg); }
-    .nav__links.is-open {
-      display: flex; flex-direction: column; gap: 0;
-      position: absolute; top: 100%; left: calc(var(--gutter) * -1); right: calc(var(--gutter) * -1); z-index: 20;
-      background: var(--red-deep); padding: 8px var(--gutter) 16px;
-      border-bottom: 1px solid var(--cream-line);
-    }
-    .nav__links.is-open a { padding: 14px 0; display: block; border-bottom: 1px solid var(--cream-line); }
-    .nav__links.is-open li:last-child a { border-bottom: 0; }
-  }
+  @media (max-width: 899px) { .nav__links { display: none; } }
 
   .hero__head { text-align: center; padding-top: clamp(28px, 4vw, 48px); }
-  .hero__eyebrow { margin: 0 0 clamp(6px, 1vw, 12px); letter-spacing: .5em; font-size: clamp(.68rem, .62rem + .25vw, .8rem); padding-left: .5em; }
   .hero__title {
     font-family: var(--serif); font-weight: 700;
-    font-size: clamp(4rem, 1.2rem + 11.5vw, 10.5rem);
-    line-height: .86; letter-spacing: -0.015em; margin: 0;
+    /* One line at every width: sized to the viewport, capped on wide screens. */
+    font-size: min(12.8vw, 11.4rem);
+    line-height: .9; letter-spacing: -0.015em; margin: 0; white-space: nowrap;
     font-variant-numeric: lining-nums;
   }
   .facts {
@@ -266,9 +244,8 @@
     .facts li { white-space: nowrap; letter-spacing: .12em; padding: 14px 4px; }
   }
   @media (max-width: 767px) {
-    .facts { grid-template-columns: 1fr; }
-    .facts .facts__rule { width: 40px; height: 1px; justify-self: center; }
-    .facts li { padding: 11px 0; }
+    .facts li { white-space: nowrap; font-size: 2.15vw; letter-spacing: .05em; padding: 11px 0; }
+    .facts .facts__rule { height: 14px; margin: 0 2vw; }
   }
 
   .hero__photo { width: min(460px, 82vw); margin: 0 auto; aspect-ratio: 1; background: var(--red-deep); }
@@ -329,14 +306,6 @@
   .steps li[aria-current="step"] { color: var(--ink); }
 
   .form { max-width: 900px; margin: 0 auto; }
-  .method { border: 0; margin: 0 0 18px; padding: 0; display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .method legend { float: left; margin-right: 6px; font-size: var(--small); color: var(--muted); padding: 0; }
-  .method__set { display: inline-flex; border: 1px solid var(--line-strong); }
-  .method__opt { position: relative; }
-  .method__opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-  .method__opt label { display: block; padding: 9px 20px; font-size: var(--small); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; min-height: 40px; }
-  .method__opt input:checked + label { background: var(--ink); color: var(--bone); }
-  .method__opt input:focus-visible + label { outline: 2px solid var(--red); outline-offset: 2px; }
 
   .fields { display: grid; grid-template-columns: 1fr; gap: 16px; }
   @media (min-width: 768px) { .fields { grid-template-columns: 1fr 1fr; gap: 24px; } }
@@ -377,16 +346,8 @@
   .venue img { width: 100%; height: 100%; object-fit: cover; object-position: 30% 62%; }
   @media (min-width: 768px) { .venue { aspect-ratio: 16 / 7; } }
   .find__grid { display: grid; grid-template-columns: 1fr; gap: 28px; margin-top: clamp(16px, 2vw, 24px); }
-  @media (min-width: 900px) { .find__grid { grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 4vw, 56px); } }
 
-  .map { position: relative; aspect-ratio: 16 / 10; background: #E9E6E0; overflow: hidden; border: 1px solid var(--line); }
-  .map__tiles { position: absolute; inset: 0; filter: grayscale(1) contrast(.92) brightness(1.04); }
-  .map__tile { position: absolute; width: 256px; height: 256px; max-width: none; user-select: none; }
-  .map__pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%); display: grid; justify-items: center; gap: 4px; pointer-events: none; }
-  .map__pin span { background: var(--red); color: var(--cream); font-size: .625rem; letter-spacing: .2em; padding: 4px 10px; }
-  .map__pin svg { width: 18px; height: 24px; color: var(--red); }
-  .map__credit { position: absolute; right: 0; bottom: 0; background: rgba(244,241,234,.9); font-family: system-ui, sans-serif; font-size: 10px; padding: 2px 6px; color: #333; }
-  .map__fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: var(--muted); font-size: var(--small); }
+
 
   .place__addr { margin: 0 0 4px; font-size: 1rem; }
   .place__links { display: flex; flex-wrap: wrap; gap: 12px 20px; margin: 16px 0 0; align-items: center; }
@@ -404,61 +365,10 @@
   .faq__a { padding: 0 0 16px; margin: 0; color: var(--muted); font-size: var(--small); }
 
   /* ==========================================================================
-     E. WEAR IT ON THE NIGHT
-     ======================================================================== */
-  .collection { padding: var(--section) 0 0; }
-  .collection__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: clamp(24px, 3vw, 36px); }
-  .collection__head .tlink { color: var(--red); }
-
-  .rail {
-    display: grid; grid-auto-flow: column; gap: clamp(14px, 1.6vw, 24px);
-    grid-auto-columns: 74%;
-    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
-    scrollbar-width: none; -ms-overflow-style: none;
-    padding-bottom: 2px;
-  }
-  .rail::-webkit-scrollbar { display: none; }
-  @media (min-width: 600px) { .rail { grid-auto-columns: calc((100% - 1 * clamp(14px, 1.6vw, 24px)) / 2.2); } }
-  @media (min-width: 1000px) { .rail { grid-auto-columns: calc((100% - 2 * clamp(14px, 1.6vw, 24px)) / 3); } }
-  .slide { margin: 0; scroll-snap-align: start; }
-  .slide a { text-decoration: none; display: block; }
-  .slide__img { aspect-ratio: 4 / 5; overflow: hidden; background: var(--oat); }
-  .slide__img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; transition: transform 1.2s var(--ease); }
-  .slide a:hover .slide__img img { transform: scale(1.025); }
-  .slide figcaption { margin-top: 12px; font-size: var(--small); }
-  .slide a:hover figcaption { text-decoration: underline; text-underline-offset: 4px; }
-  .rail__controls { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; }
-  .rail__count { margin: 0; font-size: var(--small); color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: .08em; }
-  .rail__btns { display: flex; gap: 6px; }
-  .rail__btn { width: 48px; height: 44px; background: none; border: 0; display: grid; place-items: center; }
-  .rail__btn svg { width: 28px; height: 12px; }
-  .rail__btn[disabled] { opacity: .3; cursor: default; }
-
-  /* ==========================================================================
      F. GALLERY
      ======================================================================== */
   .gallery { padding: var(--section) 0 0; margin-top: var(--section); border-top: 1px solid var(--line); }
-  .gallery__head { display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: clamp(28px, 4vw, 44px); }
-  @media (min-width: 900px) { .gallery__head { grid-template-columns: 1fr auto; align-items: end; gap: 48px; } }
-  .gallery__eyebrow { color: var(--red); margin: 0 0 14px; }
-  .gallery .h2 { color: var(--red); }
-  .gallery__lede { margin: 14px 0 0; font-family: var(--serif); font-size: clamp(1.2rem, 1rem + .6vw, 1.5rem); line-height: 1.3; }
-  .drop { max-width: 300px; }
-  .drop__btn {
-    display: inline-flex; gap: .5em; align-items: center; justify-content: center;
-    min-height: 44px; padding: 0 22px; border-radius: 999px;
-    border: 1px solid var(--red); color: var(--red); background: transparent; text-decoration: none;
-    font-family: var(--serif); font-size: 1.1rem;
-  }
-  .drop__btn:hover { background: var(--red); color: var(--cream); }
-  .drop__note { margin: 12px 0 0; font-size: var(--small); color: var(--muted); }
-  .drop__form { margin-top: 14px; }
-  .drop__row { display: flex; gap: 8px; }
-  .drop__row input { flex: 1; min-width: 0; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line-strong); background: var(--bone); border-radius: 0; font-size: 1rem; }
-  .drop__row input[aria-invalid="true"] { border-color: var(--red); }
-  .drop__row .btn { min-height: 44px; padding: 0 16px; letter-spacing: .14em; }
-  .drop__msg { margin: 8px 0 0; font-size: var(--small); min-height: 1.3em; }
-  .drop__msg[data-tone="error"] { color: var(--red-deep); }
+  .gallery__eyebrow { color: var(--red); margin: 0 0 clamp(18px, 2vw, 24px); }
 
   .mosaic { display: grid; gap: clamp(8px, 1vw, 14px); grid-template-columns: repeat(6, 1fr); }
   .tile { margin: 0; position: relative; overflow: hidden; background: var(--oat); }
@@ -515,7 +425,7 @@
     .foot__line { order: 4; grid-column: 1 / -1; justify-self: center; text-align: center; letter-spacing: .12em; }
   }
 
-  /* Sticky RSVP — phones only, and only when it is not in the way. */
+  /* Sticky RSVP — from the top of the page until the RSVP section takes over. */
   .sticky {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
@@ -525,7 +435,12 @@
   }
   .sticky.is-shown { transform: none; visibility: visible; }
   .sticky .btn { width: 100%; }
-  @media (min-width: 768px) { .sticky { display: none; } }
+  @media (min-width: 768px) {
+    .sticky { left: 50%; right: auto; transform: translate(-50%, 140%); background: none; border: 0;
+      -webkit-backdrop-filter: none; backdrop-filter: none; padding-bottom: 28px; }
+    .sticky.is-shown { transform: translate(-50%, 0); }
+    .sticky .btn { width: auto; min-width: 240px; border-radius: 999px; box-shadow: 0 6px 24px rgba(26,23,20,.18); }
+  }
   @media (prefers-reduced-motion: reduce) { .sticky { transition: none; } }
 
   /* The 65 puzzle */
@@ -565,12 +480,8 @@
 <header class="hero on-red" id="top">
   <div class="wrap">
     <nav class="nav" aria-label="Main">
-      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav-links" id="js-menu">
-        <span class="menu-btn__bars" aria-hidden="true"></span>Menu
-      </button>
       <ul class="nav__links" id="nav-links">
         <li><a href="#the-night">The night</a></li>
-        <li><a href="#the-collection">The collection</a></li>
         <li><a href="#find-us">Find us</a></li>
       </ul>
       <a class="nav__brand" href="https://padre65.com/" aria-label="Padre65 — padre65.com">
@@ -582,8 +493,7 @@
     </nav>
 
     <div class="hero__head">
-      <p class="label hero__eyebrow">Padre65 × Kiez</p>
-      <h1 class="hero__title">ONE NIGHT.</h1>
+      <h1 class="hero__title">PADRE65 × KIEZ</h1>
       <ul class="facts" id="js-facts" aria-label="When and where">
         <li>Saturday 17 October 2026</li>
         <li class="facts__rule" aria-hidden="true"></li>
@@ -653,20 +563,6 @@
     </ol>
 
     <form class="form" id="js-form" novalidate>
-      <fieldset class="method">
-        <legend>Reach me by</legend>
-        <div class="method__set">
-          <span class="method__opt">
-            <input type="radio" name="method" id="method-email" value="email" checked />
-            <label for="method-email">Email</label>
-          </span>
-          <span class="method__opt">
-            <input type="radio" name="method" id="method-mobile" value="mobile" />
-            <label for="method-mobile">Mobile</label>
-          </span>
-        </div>
-      </fieldset>
-
       <!-- Bots fill every field; people never see this one. Named so that
            no password manager or autofill profile recognises it. -->
       <div class="trap" aria-hidden="true">
@@ -680,7 +576,7 @@
           <p class="field__error" id="rsvp-name-error" aria-live="polite"></p>
         </div>
         <div class="field">
-          <label for="rsvp-contact" id="rsvp-contact-label">Email</label>
+          <label for="rsvp-contact">Email</label>
           <input id="rsvp-contact" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required aria-describedby="rsvp-contact-error" />
           <p class="field__error" id="rsvp-contact-error" aria-live="polite"></p>
         </div>
@@ -728,70 +624,14 @@
     </div>
 
     <div class="find__grid">
-      <div class="map" id="js-map" role="img" aria-label="Map of Golborne Road, London W10, with Kiez marked at number 108.">
-        <div class="map__tiles" id="js-map-tiles"></div>
-        <div class="map__pin" aria-hidden="true">
-          <span>KIEZ</span>
-          <svg viewBox="0 0 18 24"><path d="M9 0a9 9 0 0 0-9 9c0 6.8 9 15 9 15s9-8.2 9-15a9 9 0 0 0-9-9zm0 12.2A3.2 3.2 0 1 1 9 5.8a3.2 3.2 0 0 1 0 6.4z" fill="currentColor"/></svg>
-        </div>
-        <p class="map__fallback" id="js-map-fallback" hidden>108 Golborne Road, London W10 5PS</p>
-        <a class="map__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a>
-      </div>
-
       <div class="place">
         <p class="place__addr">Kiez, 108 Golborne Road, London W10 5PS</p>
         <div class="place__links">
           <a class="btn btn--ghost" id="js-directions" href="https://www.google.com/maps/dir/?api=1&amp;destination=108%20Golborne%20Road%2C%20London%20W10%205PS" target="_blank" rel="noopener">Get directions <span aria-hidden="true">→</span></a>
           <a class="tlink" id="js-apple-maps" href="https://maps.apple.com/?daddr=108%20Golborne%20Road%2C%20London%20W10%205PS&amp;q=Kiez" target="_blank" rel="noopener">Apple Maps</a>
-          <a class="tlink" href="https://www.kiezkebab.com/" target="_blank" rel="noopener">kiezkebab.com</a>
         </div>
         <!-- Only questions with an organiser-approved answer are rendered. -->
         <div class="faq" id="js-faq" hidden></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- =====================================================================
-     E. WEAR IT ON THE NIGHT
-     ===================================================================== -->
-<section class="collection" id="the-collection" aria-labelledby="collection-heading">
-  <div class="wrap">
-    <div class="collection__head" data-reveal>
-      <h2 class="h2" id="collection-heading">Wear it on the night.</h2>
-      <a class="tlink" href="https://padre65.com/collections/all" target="_blank" rel="noopener">Shop the collection <span class="tlink__arrow" aria-hidden="true">→</span></a>
-    </div>
-
-    <div class="rail" id="js-rail" tabindex="0" role="region" aria-roledescription="carousel" aria-labelledby="collection-heading">
-      <figure class="slide"><a href="https://padre65.com/products/club-long-sleeve-vintage-white" target="_blank" rel="noopener">
-        <div class="slide__img"><img src="/popup/images/collection-01.jpg" srcset="/popup/images/collection-01.jpg 800w, /popup/images/collection-01@2x.jpg 1200w" sizes="(min-width: 1000px) 420px, (min-width: 600px) 44vw, 74vw" width="800" height="1200" loading="lazy" decoding="async" alt="The Club Long Sleeve in vintage white, worn with a denim trucker cap and washed jeans" /></div>
-        <figcaption>Club Long Sleeve — Vintage White</figcaption></a></figure>
-      <figure class="slide"><a href="https://padre65.com/products/famara-tee-vintage-olive" target="_blank" rel="noopener">
-        <div class="slide__img"><img src="/popup/images/collection-02.jpg" srcset="/popup/images/collection-02.jpg 800w, /popup/images/collection-02@2x.jpg 1200w" sizes="(min-width: 1000px) 420px, (min-width: 600px) 44vw, 74vw" width="800" height="1200" loading="lazy" decoding="async" alt="The back of the Famara Tee in vintage olive, carrying its printed graphic" /></div>
-        <figcaption>Famara Tee — Vintage Olive</figcaption></a></figure>
-      <figure class="slide"><a href="https://padre65.com/products/revised-foulard-famara-yellow" target="_blank" rel="noopener">
-        <div class="slide__img"><img src="/popup/images/collection-03.jpg" srcset="/popup/images/collection-03.jpg 800w, /popup/images/collection-03@2x.jpg 1200w" sizes="(min-width: 1000px) 420px, (min-width: 600px) 44vw, 74vw" width="800" height="1200" loading="lazy" decoding="async" alt="The Revised Foulard in Famara yellow, worn as a headscarf" /></div>
-        <figcaption>Revised Foulard — Famara Yellow</figcaption></a></figure>
-      <figure class="slide"><a href="https://padre65.com/products/club-long-sleeve-vintage-black" target="_blank" rel="noopener">
-        <div class="slide__img"><img src="/popup/images/collection-04.jpg" srcset="/popup/images/collection-04.jpg 800w, /popup/images/collection-04@2x.jpg 1200w" sizes="(min-width: 1000px) 420px, (min-width: 600px) 44vw, 74vw" width="800" height="1200" loading="lazy" decoding="async" alt="The Club Long Sleeve in vintage black, worn with a camouflage trucker cap" /></div>
-        <figcaption>Club Long Sleeve — Vintage Black</figcaption></a></figure>
-      <figure class="slide"><a href="https://padre65.com/products/denim-patchwork-club-cap" target="_blank" rel="noopener">
-        <div class="slide__img"><img src="/popup/images/collection-05.jpg" srcset="/popup/images/collection-05.jpg 800w, /popup/images/collection-05@2x.jpg 1200w" sizes="(min-width: 1000px) 420px, (min-width: 600px) 44vw, 74vw" width="800" height="1200" loading="lazy" decoding="async" alt="The Denim Patchwork Club Cap seen from behind, over the Club Long Sleeve in vintage white" /></div>
-        <figcaption>Denim Patchwork Club Cap</figcaption></a></figure>
-      <figure class="slide"><a href="https://padre65.com/products/marea-jeans-burn-light-blue" target="_blank" rel="noopener">
-        <div class="slide__img"><img src="/popup/images/collection-06.jpg" srcset="/popup/images/collection-06.jpg 800w, /popup/images/collection-06@2x.jpg 1200w" sizes="(min-width: 1000px) 420px, (min-width: 600px) 44vw, 74vw" width="800" height="1200" loading="lazy" decoding="async" alt="The Marea Jeans in burn light blue from behind, with the Padre script embroidered at the pocket" /></div>
-        <figcaption>Marea Jeans — Burn Light Blue</figcaption></a></figure>
-    </div>
-
-    <div class="rail__controls">
-      <p class="rail__count" id="js-rail-count" aria-live="polite">01 — 03 / 06</p>
-      <div class="rail__btns" id="js-rail-btns" hidden>
-        <button class="rail__btn" type="button" id="js-rail-prev" aria-label="Previous pieces" aria-controls="js-rail">
-          <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M27 6H1M6 1L1 6l5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-        </button>
-        <button class="rail__btn" type="button" id="js-rail-next" aria-label="Next pieces" aria-controls="js-rail">
-          <svg viewBox="0 0 28 12" aria-hidden="true"><path d="M1 6h26M22 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-        </button>
       </div>
     </div>
   </div>
@@ -802,31 +642,8 @@
      ===================================================================== -->
 <section class="gallery" id="gallery" aria-labelledby="gallery-heading">
   <div class="wrap">
-    <div class="gallery__head">
-      <div data-reveal>
-        <p class="label gallery__eyebrow">From the last one</p>
-        <h2 class="h2" id="gallery-heading">Good people. Late nights.</h2>
-        <p class="gallery__lede">A few moments from our last gathering.</p>
-      </div>
-      <div class="drop" id="js-drop" data-reveal>
-        <!-- Before the photos exist: ask to be told. -->
-        <div id="js-drop-ask">
-          <button class="drop__btn" type="button" id="js-drop-toggle" aria-expanded="false" aria-controls="js-drop-form">Get the photo drop <span aria-hidden="true">→</span></button>
-          <p class="drop__note">Photos from Kiez will land here after the night.</p>
-          <form class="drop__form" id="js-drop-form" novalidate hidden>
-            <label class="visually-hidden" for="drop-email">Your email</label>
-            <div class="trap" aria-hidden="true"><input id="drop-subject" name="subject2" type="text" tabindex="-1" autocomplete="off" /></div>
-            <div class="drop__row">
-              <input id="drop-email" type="email" inputmode="email" autocomplete="email" placeholder="Your email" maxlength="254" aria-describedby="drop-msg" />
-              <button class="btn" type="submit" id="js-drop-submit">Notify me</button>
-            </div>
-            <p class="drop__msg" id="drop-msg" aria-live="polite"></p>
-          </form>
-        </div>
-        <!-- After: a link to the real gallery. Switched by CONFIG.photos. -->
-        <a class="drop__btn" id="js-drop-view" href="#" hidden>View the photos <span aria-hidden="true">→</span></a>
-      </div>
-    </div>
+    <p class="label gallery__eyebrow" data-reveal>From the last one</p>
+    <h2 class="visually-hidden" id="gallery-heading">Photos from the last Padre65 party</h2>
 
     <div class="mosaic" id="js-mosaic">
       <figure class="tile tile--crowd" data-reveal><button type="button" data-index="0" aria-label="Open photo 1 of 5: guests at the last Padre65 party, one in a taupe Padre65 top"><img src="/popup/images/event-01.jpg" width="1800" height="1194" loading="lazy" decoding="async" sizes="(min-width: 768px) 66vw, 100vw" alt="" /></button></figure>
@@ -846,7 +663,6 @@
     <hr class="closing__rule" />
     <h2 class="closing__title" id="closing-heading" data-reveal>See you on the 17th.</h2>
     <p class="closing__meta">Padre65 × Kiez · 17 October · From 21:00</p>
-    <a class="btn" href="#rsvp" data-rsvp-jump>RSVP <span aria-hidden="true">→</span></a>
   </div>
 </section>
 <div class="when-past" style="height: var(--section)"></div>
@@ -940,7 +756,6 @@ const CONFIG = {
   rsvp: {
     signupPath: "/api/kiez",
     calendarPath: "/api/kiez/calendar",
-    photoDropPath: "/api/kiez/photo-drop",
     /** "auto" | "live" | "preview". Preview throws every registration away. */
     mode: "auto",
     /** ms before a request is treated as lost. A retry reuses the same
@@ -960,16 +775,8 @@ const CONFIG = {
     { q: "What time does it finish?", a: "" }
   ],
 
-  /** Flip `published` and set `url` once the Kiez photos are online. */
-  photos: { published: false, url: "" },
-
   /** The 65 puzzle. The reveal is published brand copy (About page). */
   egg: { enabled: true, message: "Authentic experiences which can never be forgotten." },
-
-  maps: {
-    zoom: 16,
-    tileUrl: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-  },
 
   share: {
     image: "/kiez/images/invitation.jpg",
@@ -1078,35 +885,13 @@ async function postJson(path, body) {
     faq.hidden = false;
   }
 
-  // Photo drop vs. the published gallery.
-  if (CONFIG.photos.published && CONFIG.photos.url) {
-    $("#js-drop-ask").hidden = true;
-    const view = $("#js-drop-view");
-    view.href = CONFIG.photos.url;
-    view.hidden = false;
-  }
-
   if (!CONFIG.egg.enabled) $("#js-egg-open").hidden = true;
 })();
 
 /* =============================================================================
-   4. NAV — mobile menu, anchors, entrance
+   4. NAV — anchors, entrance
    ========================================================================== */
 (function nav() {
-  const btn = $("#js-menu");
-  const list = $("#nav-links");
-  function setOpen(open) {
-    btn.setAttribute("aria-expanded", String(open));
-    list.classList.toggle("is-open", open);
-  }
-  btn.addEventListener("click", () => setOpen(btn.getAttribute("aria-expanded") !== "true"));
-  list.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && btn.getAttribute("aria-expanded") === "true") { setOpen(false); btn.focus(); }
-  });
-  document.addEventListener("click", (e) => {
-    if (btn.getAttribute("aria-expanded") === "true" && !e.target.closest(".nav")) setOpen(false);
-  });
 
   // Anchor jumps move focus to the section heading, so keyboard and screen
   // reader users land where sighted users do.
@@ -1300,7 +1085,6 @@ const RSVP = (function () {
   const done = $("#js-done");
   const name = $("#rsvp-name");
   const contact = $("#rsvp-contact");
-  const contactLabel = $("#rsvp-contact-label");
   const submit = $("#js-submit");
   const formError = $("#js-form-error");
   const honeypot = $("#kiez-subject");
@@ -1312,9 +1096,6 @@ const RSVP = (function () {
    *  the server can recognise it; changing the details makes a new one. */
   let requestId = null;
   let requestFor = "";
-
-  // Values typed per method, so switching back and forth loses nothing.
-  const typed = { email: "", mobile: "" };
 
   const MAX_NAME = 80;
   const FORBIDDEN = /[<>{}\\`$|]/, HTML_TAG = /<[^>]*>/, HTML_ENTITY = /&#?\w+;/, FORMULA = /^[=+@\-]/;
@@ -1336,18 +1117,6 @@ const RSVP = (function () {
     if (EMAIL_BAD.test(e) || !EMAIL.test(e)) return "Please enter a valid email address";
     return null;
   }
-  function phoneError(v) {
-    const raw = String(v || "").trim();
-    if (!raw) return "Please enter your mobile number.";
-    if (/[^0-9+()\-.\s]/.test(raw)) return "Numbers only, please";
-    const digits = raw.replace(/\D/g, "");
-    if (digits.length < 9) return "That number looks too short";
-    if (digits.length > 15) return "That number looks too long";
-    return null;
-  }
-
-  const method = () => ($('input[name="method"]:checked') || {}).value || "email";
-
   function setError(input, msg) {
     $("#" + input.id + "-error").textContent = msg || "";
     if (msg) input.setAttribute("aria-invalid", "true"); else input.removeAttribute("aria-invalid");
@@ -1357,25 +1126,8 @@ const RSVP = (function () {
     formError.hidden = true; formError.textContent = "";
   }
 
-  function applyMethod(m) {
-    if (m === "email") {
-      contactLabel.textContent = "Email";
-      contact.type = "email"; contact.inputMode = "email"; contact.autocomplete = "email"; contact.name = "email";
-    } else {
-      contactLabel.textContent = "Mobile number";
-      contact.type = "tel"; contact.inputMode = "tel"; contact.autocomplete = "tel"; contact.name = "tel";
-    }
-    contact.value = typed[m];
-    setError(contact, "");
-  }
-  $$('input[name="method"]').forEach((r) => r.addEventListener("change", () => {
-    typed[r.value === "email" ? "mobile" : "email"] = contact.value;
-    applyMethod(method());
-    contact.focus();
-  }));
   [name, contact].forEach((i) => i.addEventListener("input", () => {
     if (i.getAttribute("aria-invalid")) setError(i, "");
-    typed[method()] = contact.value;
   }));
 
   function utm() {
@@ -1402,9 +1154,9 @@ const RSVP = (function () {
     if (busy) return;
     clearErrors();
 
-    const m = method();
+    const m = "email";
     const nameMsg = nameError(name.value);
-    const contactMsg = m === "email" ? emailError(contact.value) : phoneError(contact.value);
+    const contactMsg = emailError(contact.value);
     if (nameMsg) setError(name, nameMsg);
     if (contactMsg) setError(contact, contactMsg);
     if (nameMsg || contactMsg) { (nameMsg ? name : contact).focus(); return; }
@@ -1521,115 +1273,7 @@ const RSVP = (function () {
     }
   });
 
-  applyMethod(method());
   return { isDone: () => !done.hidden };
-})();
-
-/* =============================================================================
-   8. MAP — real OpenStreetMap tiles, drawn when the section comes near
-   ========================================================================== */
-(function map() {
-  const host = $("#js-map-tiles");
-  const fallback = $("#js-map-fallback");
-  let drawn = false;
-
-  function project(lat, lng, z) {
-    const n = Math.pow(2, z), r = lat * Math.PI / 180;
-    return { x: (lng + 180) / 360 * n, y: (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * n };
-  }
-
-  function draw() {
-    const w = host.clientWidth, h = host.clientHeight;
-    if (!w || !h) return;
-    const z = CONFIG.maps.zoom, c = project(CONFIG.event.lat, CONFIG.event.lng, z);
-    const cols = Math.ceil(w / 256) + 2, rows = Math.ceil(h / 256) + 2;
-    const fx = Math.floor(c.x) - Math.floor(cols / 2), fy = Math.floor(c.y) - Math.floor(rows / 2);
-    const ox = w / 2 - (c.x - fx) * 256, oy = h / 2 - (c.y - fy) * 256;
-    const frag = document.createDocumentFragment();
-    let total = 0, failed = 0;
-    const tiles = [];
-    for (let r = 0; r < rows; r++) for (let col = 0; col < cols; col++) {
-      const t = new Image();
-      t.className = "map__tile"; t.alt = ""; t.decoding = "async"; t.width = 256; t.height = 256;
-      t.style.left = Math.round(ox + col * 256) + "px";
-      t.style.top = Math.round(oy + r * 256) + "px";
-      t.src = CONFIG.maps.tileUrl.replace("{z}", z).replace("{x}", fx + col).replace("{y}", fy + r);
-      tiles.push(t); frag.appendChild(t); total++;
-    }
-    tiles.forEach((t) => t.addEventListener("error", () => {
-      t.hidden = true;
-      if (++failed >= total) { host.innerHTML = ""; fallback.hidden = false; }
-    }));
-    host.innerHTML = "";
-    host.appendChild(frag);
-    drawn = true;
-  }
-
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); draw(); }
-    }, { rootMargin: "400px 0px" });
-    io.observe($("#js-map"));
-  } else {
-    draw();
-  }
-  let lastW = 0;
-  window.addEventListener("resize", () => {
-    if (!drawn || host.clientWidth === lastW) return;
-    lastW = host.clientWidth;
-    draw();
-  });
-})();
-
-/* =============================================================================
-   9. COLLECTION RAIL — native scrolling, plus buttons and a visible range
-   ========================================================================== */
-(function rail() {
-  const rail = $("#js-rail");
-  const slides = $$(".slide", rail);
-  const count = $("#js-rail-count");
-  const prev = $("#js-rail-prev"), next = $("#js-rail-next");
-  $("#js-rail-btns").hidden = false;
-
-  function step() {
-    const a = slides[0].getBoundingClientRect(), b = slides[1].getBoundingClientRect();
-    return b.left - a.left;
-  }
-  function visibleRange() {
-    const box = rail.getBoundingClientRect();
-    let first = -1, last = -1;
-    slides.forEach((s, i) => {
-      const r = s.getBoundingClientRect();
-      const shown = Math.min(r.right, box.right) - Math.max(r.left, box.left);
-      if (shown >= r.width * 0.6) { if (first < 0) first = i; last = i; }
-    });
-    if (first < 0) { first = 0; last = 0; }
-    return [first, last];
-  }
-  function update() {
-    const [first, last] = visibleRange();
-    count.textContent = first === last
-      ? pad(first + 1) + " / " + pad(slides.length)
-      : pad(first + 1) + " — " + pad(last + 1) + " / " + pad(slides.length);
-    prev.disabled = rail.scrollLeft <= 2;
-    next.disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
-  }
-  function move(dir) {
-    const [first, last] = visibleRange();
-    const per = Math.max(1, last - first + 1);
-    rail.scrollBy({ left: dir * per * step(), behavior: reduced() ? "auto" : "smooth" });
-  }
-  prev.addEventListener("click", () => move(-1));
-  next.addEventListener("click", () => move(1));
-  rail.addEventListener("keydown", (e) => {
-    if (e.target !== rail) return;
-    if (e.key === "ArrowRight") { e.preventDefault(); rail.scrollBy({ left: step(), behavior: reduced() ? "auto" : "smooth" }); }
-    if (e.key === "ArrowLeft") { e.preventDefault(); rail.scrollBy({ left: -step(), behavior: reduced() ? "auto" : "smooth" }); }
-  });
-  let timer = 0;
-  rail.addEventListener("scroll", () => { clearTimeout(timer); timer = setTimeout(update, 60); }, { passive: true });
-  window.addEventListener("resize", update);
-  update();
 })();
 
 /* =============================================================================
@@ -1687,82 +1331,30 @@ const RSVP = (function () {
 })();
 
 /* =============================================================================
-   11. PHOTO DROP
-   ========================================================================== */
-(function photoDrop() {
-  const toggle = $("#js-drop-toggle");
-  const form = $("#js-drop-form");
-  const email = $("#drop-email");
-  const msg = $("#drop-msg");
-  const btn = $("#js-drop-submit");
-  const trap = $("#drop-subject");
-  let busy = false, requestId = uuid();
-
-  toggle.addEventListener("click", () => {
-    const open = toggle.getAttribute("aria-expanded") !== "true";
-    toggle.setAttribute("aria-expanded", String(open));
-    form.hidden = !open;
-    if (open) email.focus();
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (busy) return;
-    const value = email.value.trim();
-    msg.dataset.tone = "";
-    email.removeAttribute("aria-invalid");
-    if (!/^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(value)) {
-      msg.dataset.tone = "error";
-      msg.textContent = "Please enter a valid email address";
-      email.setAttribute("aria-invalid", "true");
-      email.focus();
-      return;
-    }
-    if (isPreview()) { msg.textContent = "You’re on the list."; return; }
-
-    busy = true; btn.disabled = true; btn.textContent = "Sending…";
-    let result;
-    try {
-      result = await postJson(CONFIG.rsvp.photoDropPath, { email: value, requestId: requestId, website: trap.value, test: TEST });
-    } catch (err) {
-      result = { ok: false, data: { message: "We could not reach the server. Please try again." } };
-    }
-    busy = false; btn.disabled = false; btn.textContent = "Notify me";
-
-    if (!result.ok) {
-      msg.dataset.tone = "error";
-      msg.textContent = (result.data && result.data.message) || "We could not save that. Please try again.";
-      return;
-    }
-    requestId = uuid();
-    email.disabled = true; btn.hidden = true;
-    msg.textContent = "You’re on the list.";
-  });
-})();
-
-/* =============================================================================
-   12. STICKY RSVP — phones only, after the hero, never over the form
+   12. STICKY RSVP — on screen from the very top, gone once the RSVP section
+   is in view (it hands over to the form), and never over the footer
    ========================================================================== */
 (function sticky() {
   const bar = $("#js-sticky");
-  if (!("IntersectionObserver" in window) || document.body.dataset.phase !== "upcoming") return;
-  const seen = { hero: true, rsvp: false, foot: false, closing: false };
-  let done = false;
+  if (document.body.dataset.phase !== "upcoming") return;
   const link = bar.querySelector("a");
+  const seen = { rsvp: false, foot: false };
+  let done = false;
   function update() {
-    const show = !done && !seen.hero && !seen.rsvp && !seen.foot && !seen.closing;
+    const show = !done && !seen.rsvp && !seen.foot;
     bar.classList.toggle("is-shown", show);
     bar.setAttribute("aria-hidden", String(!show));
     link.tabIndex = show ? 0 : -1;
   }
-  const watch = (el, key) => new IntersectionObserver((entries) => {
-    seen[key] = entries[0].isIntersecting; update();
-  }).observe(el);
-  watch($(".hero"), "hero");
-  watch($("#rsvp"), "rsvp");
-  watch($(".foot"), "foot");
-  watch($(".closing"), "closing");
+  if ("IntersectionObserver" in window) {
+    const watch = (el, key) => new IntersectionObserver((entries) => {
+      seen[key] = entries[0].isIntersecting; update();
+    }).observe(el);
+    watch($("#rsvp"), "rsvp");
+    watch($(".foot"), "foot");
+  }
   document.addEventListener("kiez:rsvp-done", () => { done = true; update(); });
+  update();
 })();
 
 /* =============================================================================
