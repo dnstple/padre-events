@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { emailError, normaliseEmail } from "@/lib/email-rules";
 import {
   appendKiezRsvp,
+  isKiezSheetConfigured,
   readKiezExisting,
   type KiezExisting,
 } from "@/lib/kiez-sheets";
@@ -18,7 +19,6 @@ import {
 import { nameError, normaliseName } from "@/lib/name-rules";
 import { normalisePhone, phoneError } from "@/lib/phone-rules";
 import { issueRowToken } from "@/lib/row-token";
-import { isPopupSheetConfigured } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
     phone = normalisePhone(payload.phone);
   }
 
-  if (!isPopupSheetConfigured()) {
+  if (!isKiezSheetConfigured()) {
     return problem(503, "RSVPs are not available right now.");
   }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { emailError, normaliseEmail } from "@/lib/email-rules";
-import { appendKiezPhotoDrop } from "@/lib/kiez-sheets";
+import { appendKiezPhotoDrop, isKiezSheetConfigured } from "@/lib/kiez-sheets";
 import {
   cleanRequestId,
   jsonHeaders,
@@ -9,7 +9,6 @@ import {
   rateLimited,
   readJsonBody,
 } from "@/lib/kiez-request";
-import { isPopupSheetConfigured } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
   const message = emailError(payload.email);
   if (message) return problem(422, message, { email: message });
 
-  if (!isPopupSheetConfigured()) return problem(503, "This is not available right now.");
+  if (!isKiezSheetConfigured()) return problem(503, "This is not available right now.");
 
   try {
     await appendKiezPhotoDrop(

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { markKiezCalendarAdded } from "@/lib/kiez-sheets";
+import { markKiezCalendarAdded, isKiezSheetConfigured } from "@/lib/kiez-sheets";
 import { jsonHeaders, problem, readJsonBody } from "@/lib/kiez-request";
 import { verifyRowToken } from "@/lib/row-token";
-import { isPopupSheetConfigured } from "@/lib/sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,7 +26,7 @@ export async function POST(request: Request) {
   }
   if (rowNumber === null) return problem(403, "That link has expired.");
 
-  if (!isPopupSheetConfigured()) return problem(503, "Not available right now.");
+  if (!isKiezSheetConfigured()) return problem(503, "Not available right now.");
 
   try {
     await markKiezCalendarAdded(rowNumber, test);

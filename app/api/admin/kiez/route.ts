@@ -2,8 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { ADMIN_COOKIE, isAdminConfigured, verifySession } from "@/lib/admin-session";
-import { countKiezPhotoDrop, readKiezRsvps } from "@/lib/kiez-sheets";
-import { isPopupSheetConfigured } from "@/lib/sheets";
+import { countKiezPhotoDrop, readKiezRsvps, isKiezSheetConfigured } from "@/lib/kiez-sheets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,9 +30,9 @@ export async function GET() {
     return NextResponse.json({ ok: false, message: "Please sign in." }, { status: 401, headers: privateHeaders });
   }
 
-  if (!isPopupSheetConfigured()) {
+  if (!isKiezSheetConfigured()) {
     return NextResponse.json(
-      { ok: false, message: "GOOGLE_POPUP_SHEET_ID is not set on this deployment." },
+      { ok: false, message: "GOOGLE_KIEZ_SHEET_ID is not set on this deployment." },
       { status: 503, headers: privateHeaders },
     );
   }

@@ -1,12 +1,11 @@
 import "server-only";
 
-import { ensureTab, popupSheetId, sheetsFetch } from "@/lib/sheets";
+import { ensureTab, sheetsFetch } from "@/lib/sheets";
 
 /* -----------------------------------------------------------------------------
  * Padre65 × Kiez — 17 October 2026
  *
- * Same spreadsheet as the pop-up (GOOGLE_POPUP_SHEET_ID), so no new variable
- * and no new sharing step, but its own tabs. The pop-up and model-search rows
+ * Its own spreadsheet (see kiezSheetId) and its own tabs. The pop-up and model-search rows
  * share a tab because they were the same weekend; this is a different night,
  * and a guest count that mixed them would answer neither question.
  *
@@ -18,6 +17,25 @@ import { ensureTab, popupSheetId, sheetsFetch } from "@/lib/sheets";
  * -------------------------------------------------------------------------- */
 
 export const KIEZ_EVENT_ID = "padre65-kiez-2026-10-17";
+
+/**
+ * Kiez has a spreadsheet of its own (GOOGLE_KIEZ_SHEET_ID). Unset, it falls
+ * back to the pop-up's, which is where the first Kiez rows were written.
+ * Either document must be shared with the service account as Editor.
+ */
+function kiezSheetId(): string {
+  const id = process.env.GOOGLE_KIEZ_SHEET_ID || process.env.GOOGLE_POPUP_SHEET_ID;
+  if (!id) throw new Error("GOOGLE_KIEZ_SHEET_ID is not set.");
+  return id;
+}
+
+export function isKiezSheetConfigured(): boolean {
+  return Boolean(
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
+      process.env.GOOGLE_PRIVATE_KEY &&
+      (process.env.GOOGLE_KIEZ_SHEET_ID || process.env.GOOGLE_POPUP_SHEET_ID),
+  );
+}
 
 const KIEZ_TAB = process.env.GOOGLE_KIEZ_TAB ?? "Kiez RSVPs";
 const KIEZ_PHOTO_TAB = process.env.GOOGLE_KIEZ_PHOTO_TAB ?? "Kiez photo drop";
@@ -84,7 +102,7 @@ function rowFromRange(range: string | undefined): number | null {
  * safe, which an in-memory cache alone cannot promise.
  */
 export async function readKiezExisting(test: boolean): Promise<KiezExisting[]> {
-  const id = popupSheetId();
+  const id = kiezSheetId();
   const tab = tabFor("rsvp", test);
   const response = await sheetsFetch(
     `/values/${encodeURIComponent(tab)}!A2:${LAST_COLUMN}?majorDimension=ROWS`,
@@ -104,7 +122,7 @@ export async function readKiezExisting(test: boolean): Promise<KiezExisting[]> {
 }
 
 export async function appendKiezRsvp(entry: NewKiezRsvp): Promise<{ rowNumber: number | null }> {
-  const id = popupSheetId();
+  const id = kiezSheetId();
   const tab = tabFor("rsvp", entry.test);
   await ensureTab(tab, KIEZ_HEADER_ROW, id);
 
@@ -138,7 +156,7 @@ export async function appendKiezRsvp(entry: NewKiezRsvp): Promise<{ rowNumber: n
 
 /** Same honesty as markPopupCalendarAdded: the button was pressed, no more. */
 export async function markKiezCalendarAdded(rowNumber: number, test: boolean): Promise<void> {
-  const id = popupSheetId();
+  const id = kiezSheetId();
   const tab = tabFor("rsvp", test);
   const response = await sheetsFetch(
     `/values/${encodeURIComponent(tab)}` +
@@ -160,7 +178,7 @@ export async function appendKiezPhotoDrop(
   requestId: string,
   test: boolean,
 ): Promise<{ added: boolean }> {
-  const id = popupSheetId();
+  const id = kiezSheetId();
   const tab = tabFor("photo", test);
   await ensureTab(tab, PHOTO_HEADER_ROW, id);
 
@@ -200,7 +218,7 @@ export type KiezRow = {
 
 /** Every real RSVP for the night, newest first. Never reads the test tab. */
 export async function readKiezRsvps(): Promise<KiezRow[]> {
-  const id = popupSheetId();
+  const id = kiezSheetId();
   const response = await sheetsFetch(
     `/values/${encodeURIComponent(KIEZ_TAB)}!A2:${LAST_COLUMN}?majorDimension=ROWS`,
     undefined,
@@ -232,7 +250,7 @@ export async function readKiezRsvps(): Promise<KiezRow[]> {
 
 /** How many addresses are waiting for the photos. Never counts the test tab. */
 export async function countKiezPhotoDrop(): Promise<number> {
-  const id = popupSheetId();
+  const id = kiezSheetId();
   const response = await sheetsFetch(
     `/values/${encodeURIComponent(KIEZ_PHOTO_TAB)}!C2:C?majorDimension=COLUMNS`,
     undefined,
