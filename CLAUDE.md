@@ -8,7 +8,7 @@ pop-up page, the model search competition page, and the APIs behind them.
 ```
 public/kiez/                Padre65 × Kiez (17 Oct 2026) — served at / and /kiez
 app/api/kiez/               Kiez RSVP endpoint (+ calendar/, photo-drop/)
-lib/kiez-sheets.ts          Kiez tabs in the pop-up spreadsheet
+lib/kiez-sheets.ts          Kiez tabs in the Kiez spreadsheet
 app/admin/KiezDashboard.tsx /admin lands on Kiez
 app/api/popup/              pop-up signup endpoint
 app/api/model-search/       model search signup endpoint
@@ -28,8 +28,9 @@ nothing until filled: `event.end` (null → start-only calendar entry),
 `audio.src` (empty → music module hidden), `faq[].a` (empty → question
 omitted), `photos.published/url`.
 
-Rows go to the pop-up spreadsheet (`GOOGLE_POPUP_SHEET_ID`), tabs
-"Kiez RSVPs" and "Kiez photo drop", each row stamped
+Rows go to Kiez's own spreadsheet (`GOOGLE_KIEZ_SHEET_ID`, set in Vercel
+since 4 Oct; it falls back to the pop-up's sheet if unset — the first test
+rows are there), tabs "Kiez RSVPs" and "Kiez photo drop", each row stamped
 `padre65-kiez-2026-10-17`. Visiting with `?test=kiez` writes to the
 "(test)" twins of those tabs instead, which the admin never counts — use that
 for any test against production. Duplicates (same request ID, same email in
