@@ -61,8 +61,8 @@
 
 <link rel="preload" href="/popup/fonts/CormorantGaramond-Variable.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/popup/fonts/Sanchez-Regular.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="preload" as="image" href="/kiez/images/hero-portrait.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high" />
-<link rel="preload" as="image" href="/kiez/images/gallery-caps.webp" type="image/webp" media="(min-width: 768px)" fetchpriority="high" />
+<link rel="preload" as="image" href="/kiez/images/hero-crowd-m.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high" />
+<link rel="preload" as="image" imagesrcset="/kiez/images/hero-crowd-1400.webp 1400w, /kiez/images/hero-crowd-2000.webp 2000w" imagesizes="100vw" type="image/webp" media="(min-width: 768px)" fetchpriority="high" />
 
 <style>
   /* The fonts are the pop-up page's own files, shared on this origin rather
@@ -219,7 +219,7 @@
 
   .hero__media { position: relative; margin: calc(-1 * clamp(4px, 2vw, 24px)) 0 0; }
   .hero__media img {
-    display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 0;
+    display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 30%;
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%); mask-image: linear-gradient(to bottom, transparent 0, #000 14%);
   }
   .hero__media::after {
@@ -254,22 +254,10 @@
     /* Desktop and tablet: the hero is the first screen. */
     .hero { display: flex; flex-direction: column; height: clamp(620px, 100svh, 1240px); }
     .hero__media { flex: 1; min-height: 0; }
-    /* The photo shows at its own size, centred, so it stays sharp and the
-       faces stay clear of the text; a blurred, darkened copy of it fills the
-       rest of the width. */
-    .hero__media::before {
-      content: ""; position: absolute; inset: -60px; z-index: 0;
-      background: url("/kiez/images/gallery-caps.jpg") center 30% / cover no-repeat;
-      filter: blur(36px) brightness(.5) saturate(.9);
-    }
-    .hero__media picture { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+    .hero__media picture { position: absolute; inset: 0; }
     .hero__media img {
-      position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%);
-      height: 100%; width: auto; max-width: none; aspect-ratio: 870 / 729; object-fit: cover; object-position: 50% 0;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%), linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%);
-      -webkit-mask-composite: source-in;
-      mask-image: linear-gradient(to bottom, transparent 0, #000 18%), linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%);
-      mask-composite: intersect;
+      position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; object-position: 50% 100%;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24%); mask-image: linear-gradient(to bottom, transparent 0, #000 24%);
     }
     .hero__media::after { height: 52%; z-index: 1; }
     .hero__caption { margin-bottom: 12px; }
@@ -278,11 +266,11 @@
   /* The RSVP button — the same in the hero and where it follows you down. */
   .rsvp-btn {
     display: flex; align-items: center; justify-content: center; width: min(100%, 300px); min-height: 50px; margin: 0 auto;
-    background: transparent; color: var(--cream); border: 1px solid rgba(244,241,234,.85); border-radius: 0;
+    background: var(--red); color: #fff; border: 1px solid #fff; border-radius: 0;
     font-family: var(--serif); font-weight: 500; font-size: 1rem; letter-spacing: .32em; padding: 0 0 0 .32em; text-transform: uppercase;
     transition: background .25s var(--ease), color .25s var(--ease);
   }
-  .rsvp-btn:hover { background: var(--cream); color: var(--ink); }
+  .rsvp-btn:hover { background: var(--red-deep); }
 
   /* ==========================================================================
      B. THE NIGHT + MUSIC
@@ -471,25 +459,18 @@
     transition: opacity .3s var(--ease), transform .3s var(--ease);
   }
   .dock.is-aside { opacity: 0; transform: translateY(12px); pointer-events: none; }
-  .dock .rsvp-btn {
-    background: rgba(43,48,45,.9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-    box-shadow: 0 8px 28px rgba(26,23,20,.22);
-  }
-  .dock .rsvp-btn:hover { background: var(--cream); color: var(--ink); }
+  .dock .rsvp-btn { box-shadow: 0 8px 28px rgba(26,23,20,.22); }
   @media (prefers-reduced-motion: reduce) { .dock { transition: none; } }
 
   .m-rsvp { display: none; }
   @media (max-width: 767px) {
     .m-rsvp {
-      display: block; position: sticky; top: 12px; z-index: 30;
-      /* Overlaps the top of The night rather than pushing it down. */
-      margin: 16px 16px -66px;
+      display: block; position: sticky; top: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 30;
+      /* Sits in the gap under The night without pushing anything down. */
+      margin: 28px 16px -78px;
     }
-    .m-rsvp .rsvp-btn {
-      width: 100%; max-width: none; background: rgba(43,48,45,.94); border: 1px solid #fff;
-      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: 0 8px 24px rgba(26,23,20,.22);
-    }
-    .night { padding-top: calc(var(--section) + 66px); }
+    .m-rsvp .rsvp-btn { width: 100%; max-width: none; box-shadow: 0 8px 24px rgba(26,23,20,.22); }
+    .find { padding-top: calc(var(--section) + 68px); }
     #js-hero-rsvp, .dock { display: none; }
     .hero__overlay { padding-bottom: 18px; }
   }
@@ -537,16 +518,15 @@
   </h1>
   <figure class="hero__media" style="margin-left:0;margin-right:0">
     <picture>
-      <source media="(min-width: 768px)" type="image/webp" srcset="/kiez/images/gallery-caps.webp" />
-      <source media="(min-width: 768px)" srcset="/kiez/images/gallery-caps.jpg" />
-      <source type="image/webp" srcset="/kiez/images/hero-portrait.webp" />
-      <img src="/kiez/images/hero-portrait.jpg" width="660" height="729" fetchpriority="high" decoding="async"
-           alt="Two guests at the last Padre65 party, one in a denim Padre cap and one in a camouflage Padre cap, posing for the camera." />
+      <source media="(min-width: 768px)" type="image/webp" srcset="/kiez/images/hero-crowd-1400.webp 1400w, /kiez/images/hero-crowd-2000.webp 2000w" sizes="100vw" />
+      <source media="(min-width: 768px)" srcset="/kiez/images/hero-crowd-1400.jpg 1400w, /kiez/images/hero-crowd-2000.jpg 2000w" sizes="100vw" />
+      <source type="image/webp" srcset="/kiez/images/hero-crowd-m.webp" />
+      <img src="/kiez/images/hero-crowd-m.jpg" width="900" height="1125" fetchpriority="high" decoding="async"
+           alt="Guests at the last Padre65 party; at the centre, a man seen from behind in a Padre cap and a taupe top with the Padre65 script on the back." />
     </picture>
   </figure>
   <div class="hero__overlay">
     <div class="hero__overlay-inner">
-      <p class="hero__caption">Two DJs. Kitchen &amp; bar.</p>
       <p class="hero__date">SATURDAY 17 OCTOBER 2026</p>
       <ul class="hero__row" aria-label="Time and place">
         <li>FROM 21:00</li>
@@ -558,12 +538,6 @@
   </div>
 </header>
 
-<!-- Phones: the RSVP button sits just under the hero, over the top of The
-     night, and holds to the top of the screen from there to the end of the
-     page. Sticky against .page, which spans everything. -->
-<div class="m-rsvp when-upcoming">
-  <button class="rsvp-btn" type="button" data-rsvp-open aria-haspopup="dialog">RSVP</button>
-</div>
 
 <main id="main">
 
@@ -596,6 +570,12 @@
     </div>
   </div>
 </section>
+
+<!-- Phones: the RSVP button starts under The night's copy and holds to
+     the top of the screen from there to the end of the page. -->
+<div class="m-rsvp when-upcoming">
+  <button class="rsvp-btn" type="button" data-rsvp-open aria-haspopup="dialog">RSVP</button>
+</div>
 
 <!-- =====================================================================
      D. MEET US AT KIEZ
