@@ -19,16 +19,16 @@
 <meta property="og:locale" content="en_GB" />
 <meta property="og:url" content="https://events.padre65.com/" />
 <meta property="og:title" content="Padre65 × Kiez — One Night." />
-<meta property="og:description" content="Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late. Saturday 17 October, from 21:30." />
+<meta property="og:description" content="Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late. Saturday 17 October, from 21:00." />
 <meta property="og:image" content="https://events.padre65.com/kiez/images/og.jpg" />
 <meta property="og:image:secure_url" content="https://events.padre65.com/kiez/images/og.jpg" />
 <meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="Padre65 at Kiez. Saturday 17 October 2026, from 21:30, 108 Golborne Rd, W10, over a photo of guests at the last Padre65 party." />
+<meta property="og:image:alt" content="Padre65 at Kiez. Saturday 17 October 2026, from 21:00, 108 Golborne Rd, W10, over a photo of guests at the last Padre65 party." />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Padre65 × Kiez — One Night." />
-<meta name="twitter:description" content="Saturday 17 October 2026, from 21:30. 108 Golborne Road, London W10 5PS." />
+<meta name="twitter:description" content="Saturday 17 October 2026, from 21:00. 108 Golborne Road, London W10 5PS." />
 <meta name="twitter:image" content="https://events.padre65.com/kiez/images/og.jpg" />
 
 <!-- Confirmed facts only: no end time, no price, no capacity. -->
@@ -38,7 +38,7 @@
   "@type": "Event",
   "name": "Padre65 × Kiez — One Night.",
   "description": "Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late.",
-  "startDate": "2026-10-17T21:30:00+01:00",
+  "startDate": "2026-10-17T21:00:00+01:00",
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
   "url": "https://events.padre65.com/",
@@ -570,7 +570,7 @@
     <div class="hero__overlay-inner">
       <p class="hero__date">SATURDAY 17 OCTOBER 2026</p>
       <ul class="hero__row" aria-label="Time and place">
-        <li>FROM 21:30</li>
+        <li>FROM 21:00</li>
         <li class="hero__rule" aria-hidden="true"></li>
         <li>108 GOLBORNE RD, W10</li>
       </ul>
@@ -674,7 +674,7 @@
   <div class="wrap">
     <hr class="closing__rule" />
     <h2 class="closing__title" id="closing-heading" data-reveal>See you on the 17th.</h2>
-    <p class="closing__meta">Padre65 × Kiez · 17 October · From 21:30</p>
+    <p class="closing__meta">Padre65 × Kiez · 17 October · From 21:00</p>
   </div>
 </section>
 <div class="when-past" style="height: var(--section)"></div>
@@ -752,7 +752,7 @@
 
     <div class="done" id="js-done" hidden>
       <h3 class="done__title" id="js-done-title" tabindex="-1">You’re in.</h3>
-      <p class="done__facts">Saturday 17 October 2026 · From 21:30 · Kiez, 108 Golborne Road, London W10 5PS</p>
+      <p class="done__facts">Saturday 17 October 2026 · From 21:00 · Kiez, 108 Golborne Road, London W10 5PS</p>
       <div class="done__actions">
         <button class="btn" type="button" id="js-cal">Add to calendar</button>
         <button class="btn btn--ghost" type="button" id="js-share">Share your invitation</button>
@@ -803,7 +803,7 @@
    1. CONFIG — the one place the night is described
    Dates are ISO and times are wall-clock in `timezone`. The UTC offset is
    resolved at runtime from the timezone database, never typed by hand:
-   21:30 on 17 October 2026 is BST, so 20:30 UTC.
+   21:00 on 17 October 2026 is BST, so 20:00 UTC.
    ========================================================================== */
 const CONFIG = {
   event: {
@@ -813,7 +813,7 @@ const CONFIG = {
     description: "Padre65 takes over Kiez for one night. Meido on the decks. Kitchen and bar open late.",
     timezone: "Europe/London",
     date: "2026-10-17",
-    start: "21:30",
+    start: "21:00",
     /** NOT CONFIRMED. Leave null until Padre confirms a finish time. With
      *  null, the calendar entry is start-only rather than an invented length. */
     end: null,
@@ -865,7 +865,7 @@ const CONFIG = {
   share: {
     image: "/kiez/images/invitation.jpg",
     imageName: "padre65-kiez-invitation.jpg",
-    text: "Padre65 × Kiez — One Night. Saturday 17 October, from 21:30."
+    text: "Padre65 × Kiez — One Night. Saturday 17 October, from 21:00."
   },
 
   gallery: [
@@ -1092,7 +1092,7 @@ const Calendar = (function () {
     const asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
     return (asUtc - utcDate.getTime()) / 60000;
   }
-  /** "2026-10-17" + "21:30" in Europe/London → the true UTC instant. */
+  /** "2026-10-17" + "21:00" in Europe/London → the true UTC instant. */
   function zonedToUtc(dateStr, timeStr, tz) {
     const [y, m, d] = dateStr.split("-").map(Number);
     const [hh, mm] = timeStr.split(":").map(Number);
